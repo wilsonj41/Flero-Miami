@@ -9,7 +9,7 @@ Regarding this readme.md file, ultimately you will update this page to reflect y
 [[_TOC_]]
 
 
-# added text
+
 # Read these articles
 Read the following articles to familiarize yourself with Gitlab and how you will be expected to use it during your project.
 
