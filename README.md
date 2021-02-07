@@ -32,9 +32,8 @@ This project templates includes 2 branches to start with.
 
 | **Name**   | **Description** |
 | ------ | ------ |
-| Master         | Protected branch.  You cannot push to master.  This branch should be what your push to your test server (ceclnx for example) or other devices for your client to review. |
-| initial_commit |  To begin sharing code, someone on the team has probably started a project on a local IDE.  Push that project to this branch and then merge it to master.  Delete this branch when you are done.|
-| . . .          | Thereafter, you should follow the code management strategy defined and agreed upon by the team.  I recommend a branch from master for each sprint or interval.  From the sprint-branch, create issue, feature or named branches for the individual work items. |
+| Master         | Protected branch.  You cannot push directly to master.  This branch should be what you push to your test server (ceclnx for example) or other devices for your client to review. |
+| . . .          | Thereafter, you should follow the code management strategy defined and agreed upon by the team.  I recommend a branch from master for each sprint or interval.  From the sprint-branch, I recommend branching by issue.  Throughout the sprint, rebase your issue branch regularly especially begore a commit.  If an issue is incomplete during the prescribed sprint, commit it to the next spring branch.  This approach gives the master branch an additional degree of protection. |
 
  
 
