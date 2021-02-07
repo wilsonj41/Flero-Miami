@@ -7,7 +7,7 @@
 **IN ORDER TO ...** *value it adds*.
 
 ## Estimtes and reminders:
-/estimate 32h 
+add the quickaction '/estimate' to provide your work estimate in time rather than weight
 
 Use [Gitlab Quick Actions](https://docs.gitlab.com/12.10/ee/user/project/quick_actions.html) (/spend /due /weight, etc) to manage your estimates, time spent working, etc.
 
