@@ -1,3 +1,38 @@
+## Name
+Flero++: A Friendly, Efficient C++ Web Framework
+
+## Description
+Build a plugin for a chosen web server (likely Apache or Nginx) that implements portions of the
+FastCGI protocol. This plugin should facilitate as-needed recompilation of source files à la GNU
+make. Additionally, develop a metalanguage that sits alongside C++ source files to simplify
+common web-specific tasks. The goal of this project is to make C++ a performant and friendly
+platform for writing server-side code for the web.
+
+## Roadmap
+ - Auto-compiled sources with rapid compilation and hot-swap of compiled binaries.
+ - Convenient specifications for routing HTTP requests
+ - Streamlined interface to SQL-like databases through Virtual objects
+ - HTML templating system
+ - Benchmarking the system against well-established frameworks to asses its effectiveness.
+
+## Installation
+TBD.
+
+## Usage
+TBD.
+
+## Support
+TBD.
+
+## Authors and acknowledgment
+Baxter Huntington, Jose Salinas, Joey Woods, Raymond Lin
+
+## License
+TBD.
+
+## Project status
+The project is correctly in development.
+
 # CSE Capstone Project Template
 
 
