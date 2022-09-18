@@ -1,39 +1,78 @@
-# CSE Capstone Project Template
+# Flero++
 
 
-This begins your capstone development effort.  You will use GitLab as your primary repository for code and documentation.  In these early phases, you may not be delivering 'working software' but you will be delivering just enough documentation to show an understanding of the product in order to communicate a high-level understanding of the product, objectives, scope and quality requirements.  The issues and boards can also be used to collaborate on research.  For those of you on an R&D project, issues are a great way to track each research question.  The comments and team collaboration build a large body of knowledge during your efforts. 
 
-Regarding this readme.md file, ultimately you will update this page to reflect your project and assist anyone who has access to your repository.
+## Getting started
 
+To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
-# Read these articles
-Read the following articles to familiarize yourself with Gitlab and how you will be expected to use it during your project.
+Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-* [How to use GitLab for Agile Software Development](https://about.gitlab.com/blog/2018/03/05/gitlab-for-agile-software-development/). 
-* [How to Write a Beautiful and Meaningful README.md*](https://blog.bitsrc.io/how-to-write-beautiful-and-meaningful-readme-md-for-your-next-project-897045e3f991#:~:text=It's%20a%20set%20of%20useful,github%20below%20the%20project%20directory.) - buidling your ReadMe file 
-* [Always start with an issue](https://about.gitlab.com/blog/2016/03/03/start-with-an-issue/) - This article discusses issues and how to use them to collaborate.  Several issue and merge templates are provided in the .gitlab/issue_templates and .gitlab/merge_request_templates.  These should facilitate collaboration and quality. Feel free to edit them to fit the needs of this project.
-* [Template Samples](https://gitlab.com/gitlab-org/gitlab/-/tree/master/.gitlab/issue_templates)
+## Add your files
 
+- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
+- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-# Time Tracking
+```
+cd existing_repo
+git remote add origin https://gitlab.csi.miamioh.edu/linr5/flero.git
+git branch -M main
+git push -uf origin main
+```
 
-Time tracking is required.  It's very simple.  There are other useful actions like /done, /assign, /approve and /wip to name a few.
+## Integrate with your tools
 
-| cmd | purpose |
-| ------ | ------ |
-| /estimate | in the issue description, document the initial work estimate in days, hours, or minutes |
-| /spend | in the comments for the issue, indicate how much time you spend working at that time | 
+- [ ] [Set up project integrations](https://gitlab.csi.miamioh.edu/linr5/flero/-/settings/integrations)
 
-Here's the link to [Quick Actions](https://docs.gitlab.com/ee/user/project/quick_actions.html).  
+## Collaborate with your team
 
-# Branches
+- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
+- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
+- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
+- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
+- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
 
-This project templates includes 2 branches to start with.  
+## Test and Deploy
 
-| **Name**   | **Description** |
-| ------ | ------ |
-| Master         | Protected branch.  You cannot push directly to master.  This branch should be what you push to your test server (ceclnx for example) or other devices for your client to review. |
-| . . .          | Thereafter, you should follow the code management strategy defined and agreed upon by the team.  I recommend a branch from master for each sprint or interval.  From the sprint-branch, I recommend branching by issue.  Throughout the sprint, rebase your issue branch regularly especially begore a commit.  If an issue is incomplete during the prescribed sprint, commit it to the next spring branch.  This approach gives the master branch an additional degree of protection. |
+Use the built-in continuous integration in GitLab.
 
- 
+- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
+- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
+- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
+- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
+- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
+***
+## Name
+Flero++: A Friendly, Efficient C++ Web Framework
+
+## Description
+Build a plugin for a chosen web server (likely Apache or Nginx) that implements portions of the
+FastCGI protocol. This plugin should facilitate as-needed recompilation of source files à la GNU
+make. Additionally, develop a metalanguage that sits alongside C++ source files to simplify
+common web-specific tasks. The goal of this project is to make C++ a performant and friendly
+platform for writing server-side code for the web.
+
+## Visuals
+TBD.
+
+## Installation
+TBD.
+
+## Usage
+TBD.
+
+## Support
+TBD.
+
+## Roadmap
+TBD.
+
+## Authors and acknowledgment
+Baxter Huntington, Jose Salinas, Joey Woods, Raymond Lin
+
+## License
+TBD.
+
+## Project status
+Currently in development.

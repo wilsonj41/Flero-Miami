@@ -7,5 +7,6 @@ services:
       - 8443:443
     volumes:
       - ./public-html:/var/www/html
+      - ./fcgi:/var/www/fcgi
       - ./etc/apache2.conf:/etc/apache2/apache2.conf
       - ../fleropp_fcgi/obj:/etc/apache2/modules

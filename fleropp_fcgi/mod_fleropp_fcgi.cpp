@@ -1,9 +1,15 @@
-#include <memory>
+#include <string>
+#include <vector>
+#include <iostream>
 
 #include "httpd.h"
 #include "http_config.h"
 #include "http_protocol.h"
 #include "ap_config.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 extern "C" {
     static int fleropp_fcgi_handler(request_rec *r);
@@ -20,33 +26,56 @@ extern "C" {
     };
 }
 
-/* The sample content handler */
-static int fleropp_fcgi_handler(request_rec *r)
-{
-    /* Set the appropriate content type */
-    ap_set_content_type(r, "text/html");
+static time_t last_mtime;
+static pid_t proc_pid;
 
-    /* Print out the IP address of the client connecting to us: */
-    ap_rprintf(r, "<h2>Hello, %s!</h2>", r->useragent_ip);
-    
-    /* If we were reached through a GET or a POST request, be happy, else sad. */
-    if ( !strcmp(r->method, "POST") || !strcmp(r->method, "GET") ) {
-        ap_rputs("You used a GET or a POST method, that makes us happy!<br/>", r);
+bool recompile_if_stale(const std::string &path) {
+    struct stat fd;
+    if (stat(path.c_str(), &fd) == 0) {
+        auto mtime = fd.st_mtim;
+
+        if (mtime.tv_sec != last_mtime) {
+            last_mtime = mtime.tv_sec;
+            auto child_pid = fork();
+            if (!child_pid) {
+                chdir("/var/www/fcgi");
+                execlp("g++", "g++", "hello_world_fcgi.cpp", "-std=c++17",
+                        "-lfcgi++", "-lfcgi", "-o", "hello_world_fcgi",
+                         nullptr);
+            }
+            waitpid(child_pid, nullptr, 0);
+            return true;
+        }
     }
-    else {
-        ap_rputs("You did not use POST or GET, that makes us sad :(<br/>", r);
+    return false;
+}
+
+void restart_process() {
+    if (proc_pid) {
+        kill(proc_pid, SIGKILL);
+        waitpid(proc_pid, nullptr, 0);
+    }
+    proc_pid = fork();
+    if (!proc_pid) {
+        chdir("/var/www/fcgi");
+        execl("./hello_world_fcgi", "hello_world_fcgi", nullptr);
+    }
+}
+
+
+static int fleropp_fcgi_handler(request_rec *r) {
+    if (strcmp(r->handler, "hello_world_fcgi")) {
+        return DECLINED;
     }
 
-    /* Lastly, if there was a query string, let's print that too! */
-    if (r->args) {
-        ap_rprintf(r, "Your query string was: %s", r->args);
+    if (recompile_if_stale("/var/www/fcgi/hello_world_fcgi.cpp")) {
+        restart_process();
     }
     return OK;
 }
 
-static void fleropp_fcgi_register_hooks(apr_pool_t *p)
-{
-    ap_hook_handler(fleropp_fcgi_handler, NULL, NULL, APR_HOOK_MIDDLE);
+static void fleropp_fcgi_register_hooks(apr_pool_t *p) {
+    ap_hook_handler(fleropp_fcgi_handler, NULL, NULL, APR_HOOK_FIRST);
 }
 
 
