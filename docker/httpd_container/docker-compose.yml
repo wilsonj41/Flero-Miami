@@ -8,4 +8,4 @@ services:
     volumes:
       - ./public-html:/var/www/html
       - ./etc/apache2.conf:/etc/apache2/apache2.conf
-      - ../fleropp_fcgi/obj:/etc/apache2/modules
+      - ../../mod_fleropp_fcgi/obj:/etc/apache2/modules

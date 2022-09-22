@@ -23,6 +23,7 @@ APACHECTL=docker restart fleropp-dev
 all: local-shared-build copy-build clean
 
 copy-build:
+	if [ ! -d "obj/" ]; then mkdir obj; fi
 	cp -RL .libs/* obj/
 
 #   install the shared object file into Apache 
