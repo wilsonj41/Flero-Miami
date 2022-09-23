@@ -1,7 +1,7 @@
 services:
-  apache2-fcgi:
+  apache2_fcgi:
     build: .
-    container_name: fleropp-dev
+    container_name: httpd_container
     ports:
       - 8080:80
       - 8443:443
