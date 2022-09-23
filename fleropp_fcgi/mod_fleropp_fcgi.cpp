@@ -64,18 +64,19 @@ void restart_process() {
 
 
 static int fleropp_fcgi_handler(request_rec *r) {
-    if (strcmp(r->handler, "hello_world_fcgi")) {
+    if (strcmp(r->parsed_uri.path, "/hello_world_fcgi")) {
         return DECLINED;
     }
 
     if (recompile_if_stale("/var/www/fcgi/hello_world_fcgi.cpp")) {
         restart_process();
+        
     }
     return OK;
 }
 
 static void fleropp_fcgi_register_hooks(apr_pool_t *p) {
-    ap_hook_handler(fleropp_fcgi_handler, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_post_read_request(fleropp_fcgi_handler, nullptr, nullptr, APR_HOOK_FIRST);
 }
 
 

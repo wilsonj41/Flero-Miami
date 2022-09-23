@@ -6,7 +6,7 @@ int main(void) {
     std::streambuf *cout_streambuf = std::cout.rdbuf();
     std::streambuf *cerr_streambuf = std::cerr.rdbuf();
 
-    int sock = FCGX_OpenSocket("/var/run/hello.sock", 10);
+    int sock = FCGX_OpenSocket(":50001", 10);
     FCGX_Request request;
 
     FCGX_Init();
@@ -25,10 +25,10 @@ int main(void) {
             << "\r\n"
             << "<html>\n"
             << "  <head>\n"
-            << "    <title>Hello, World</title>\n"
+            << "    <title>Hello, World2</title>\n"
             << "  </head>\n"
             << "  <body>\n"
-            << "    <h1>Hello, World!</h1>\n"
+            << "    <h1>Hello, World!3</h1>\n"
             << "  </body>\n"
             << "</html>\n";
     }
