@@ -1,6 +1,7 @@
 services:
   apache2_fcgi:
-    build: .
+    build: 
+      context: .
     container_name: httpd_container
     ports:
       - 8080:80
@@ -10,3 +11,7 @@ services:
       - ./etc/apache2.conf:/etc/apache2/apache2.conf
       - ./etc/override:/etc/apache2/override
       - ../../mod_fleropp_fcgi/obj:/etc/apache2/modules
+<<<<<<< HEAD
+=======
+      - ./fcgi:/var/www/fcgi
+>>>>>>> 554b734 (Implement proof-of-concept with new project layout)
