@@ -9,4 +9,4 @@ services:
       - ./public-html:/var/www/html
       - ./etc/apache2.conf:/etc/apache2/apache2.conf
       - ./etc/override:/etc/apache2/override
-      - ../../mod_fleropp_fcgi/obj:/etc/apache2/modules:w
+      - ../../mod_fleropp_fcgi/obj:/etc/apache2/modules
