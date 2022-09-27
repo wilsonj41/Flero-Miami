@@ -3,12 +3,13 @@
 main() {
     SELF_DIR="$(dirname $(readlink -f ${BASH_SOURCE[0]}))"
     [ "${#}" -eq 0 ] && usage
-    while getopts "mbrdh" opt; do
+    while getopts "mbrdih" opt; do
         case "${opt}" in
             m) container_make "build_container" && container_restart "httpd_container" ;;
             b) container_make "build_container" ;;
             r) container_restart "httpd_container" ;;
             d) container_bootstrap ;;
+            i) container_shell "httpd_container" ;;
             h | *) usage ;;
         esac
     done
@@ -27,17 +28,23 @@ optional arguments:
     -b  only build the software
     -r  only restart the testing environment container
     -d  bootstrap the container environments
+    -i  enter interative shell within the testing environment container
 EOF
 }
 
 container_make() {
-    echo "Building software..."
+    echo "Building software in ${1}..."
     docker run -v "${SELF_DIR}:${SELF_DIR}" -w "${SELF_DIR}" -i -t "${1}" /bin/bash -c "make"
 }
 
 container_restart() {
-    echo "Restarting testing environment container..."
+    echo "Restarting ${1}..."
     docker restart "${1}"
+}
+
+container_shell() {
+    echo "Entering interactive shell in ${1}..."
+    docker exec -it "${1}" /bin/bash
 }
 
 container_bootstrap() {

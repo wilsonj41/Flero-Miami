@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
             << "    <title>Hello, World</title>\n"
             << "  </head>\n"
             << "  <body>\n"
-            << "    <h1>Hello, World!, now</h1>\n"
+            << "    <h1>Hello, World!, later</h1>\n"
             << "  </body>\n"
             << "</html>\n";
     }
