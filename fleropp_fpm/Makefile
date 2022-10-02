@@ -1,0 +1,37 @@
+SRCDIR = ./src
+OBJDIR = ./obj
+BINDIR = ./bin
+INCDIR = ./include
+
+CXX=g++
+CXXFLAGS=-std=c++17 -Wall -I $(INCDIR)
+LDLIBS=-lfcgi -lfcgi++
+
+BIN=fleropp_fpm
+SRC=$(wildcard $(SRCDIR)/*.cpp)
+OBJ=$(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
+
+.PHONY : all
+all: $(BINDIR) $(OBJDIR) compile link
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+.PHONY : compile
+compile: $(OBJ)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+link: compile
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS)
+
+.PHONY : clean
+clean:
+	find -type f -name "$(BIN)" -delete
+	find -type f -name "*.o" -delete
+	find -type f -name "*~" -delete
+
