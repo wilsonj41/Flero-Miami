@@ -57,8 +57,12 @@ void restart_process() {
     }
     proc_pid = fork();
     if (!proc_pid) {
-        chdir("/var/www/fcgi");
-        execl("./hello_world_fcgi", "hello_world_fcgi", nullptr);
+        pid_t proc_pid_2 = fork();
+        if (!proc_pid_2) {
+            chdir("/var/www/fcgi");
+            execl("./hello_world_fcgi", "hello_world_fcgi", nullptr);
+        }
+        exit(0);
     }
 }
 

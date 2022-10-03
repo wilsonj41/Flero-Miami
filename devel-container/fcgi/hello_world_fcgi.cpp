@@ -28,7 +28,7 @@ int main(void) {
             << "    <title>Hello, World2</title>\n"
             << "  </head>\n"
             << "  <body>\n"
-            << "    <h1>Hello, World!3</h1>\n"
+            << "    <h1>Hello, World!</h1>\n"
             << "  </body>\n"
             << "</html>\n";
     }
