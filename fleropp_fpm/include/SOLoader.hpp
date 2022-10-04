@@ -126,7 +126,7 @@ namespace fleropp_fpm {
             if (src_ret && !lib_ret && errno == ENOENT) {
                 return true;
             } else if (src_ret && lib_ret) {
-                return src_stat.st_mtim.tv_sec >= lib_stat.st_mtim.tv_sec;
+                return src_stat.st_mtim.tv_sec > lib_stat.st_mtim.tv_sec;
             }
 
             return false;
