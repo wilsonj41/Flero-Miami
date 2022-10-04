@@ -23,9 +23,11 @@ $(OBJDIR):
 .PHONY : compile
 compile: $(OBJ)
 
+.PHONY : $(OBJDIR)/%.o
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
 
+.PHONY : link
 link: compile
 	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS)
 
