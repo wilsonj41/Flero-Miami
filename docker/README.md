@@ -53,8 +53,7 @@ volumes:
   - ./public-html:/var/www/html
   - ./etc/apache2.conf:/etc/apache2/apache2.conf
   - ./etc/override:/etc/apache2/override
-  - ../../mod_fleropp_fcgi/obj:/etc/apache2/modules
-  - ./fcgi:/var/www/fcgi
+  - ../../fleropp_fpm/bin:/opt/fleropp_fpm
 ```
 
 ### Webroot
@@ -64,7 +63,3 @@ If you modify a file inside of `public-html/`, Apache will serve the updated ver
 ```bash
 docker-compose restart
 ```
-
-FastCGI binaries and source files are stored in/written to `httpd_container/fcgi`.
-
-

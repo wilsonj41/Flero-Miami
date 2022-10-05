@@ -34,7 +34,9 @@ EOF
 
 container_make() {
     echo "Building software in ${1}..."
-    docker run -v "${SELF_DIR}:${SELF_DIR}" -w "${SELF_DIR}" -i -t "${1}" /bin/bash -c "make"
+    docker run -v "${SELF_DIR}:${SELF_DIR}" -w "${SELF_DIR}" -i -t "${1}" /bin/bash -c "make all"
+    # Copy library headers to webroot
+    cp "${SELF_DIR}/include/IView.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
 }
 
 container_restart() {
