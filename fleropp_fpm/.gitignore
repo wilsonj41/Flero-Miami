@@ -1,5 +1,6 @@
 .libs/
 obj/
+bin/
 *.la
 *.lo
 *.o
