@@ -7,18 +7,19 @@
 #include <iostream>
 #include <unordered_map>
 #include "CompUnit.hpp"
-namespace pt = boost::property_tree;
-using namespace std;
+#include "IView.hpp"
 
-class ConfigParser
+namespace fleropp_fpm
 {
-public:
-    ConfigParser();
-    ConfigParser(const string &lib_dir);
+    class ConfigParser
+    {
+    public:
+        std::unordered_map<std::string, std::vector<CompUnit<IView>>> _endpoints;
+        ConfigParser(const std::string &lib_dir = "/var/www/html");
 
-    void load(const string &filename);
+        void load(const std::string &filename);
 
-private:
-    unordered_map<string, std::vector<CompUnit>> _endpoints;
-    string _lib_dir;
-};
+    private:
+        std::string _lib_dir;
+    };
+}

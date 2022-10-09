@@ -26,17 +26,14 @@ namespace fleropp_fpm {
             std::string endpoint = FCGX_GetParam("REQUEST_URI", _request.envp);
             auto source = _endpoints.find(endpoint);
             if (source != _endpoints.end()) {
-                auto page = source->second.get_instance();
+                auto page = source->second[0].get_instance();
                 fcgi_ostream fout(_request.out);
                 page->generate(fout);
             }
         }
     }
 
-    void FCGIHandler::add_endpoint(const std::string &path,
-                                    const std::string &basename) {
-        _endpoints.emplace(std::piecewise_construct, 
-                            std::forward_as_tuple(path),
-                            std::forward_as_tuple(basename));
+    void FCGIHandler::add_endpoint(endpoints_map_t &endpoints_map) {
+        _endpoints = endpoints_map;
     }
 }

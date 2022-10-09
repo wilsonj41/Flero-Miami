@@ -1,0 +1,21 @@
+{
+    "endpoint": [{
+            "uri": "/hello.elf",
+            "dependencies": [{
+                "sharedObject": "HelloWorldView.so",
+                "source": [
+                    "HelloWorldView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/time.elf",
+            "dependencies": [{
+                "sharedObject": "TimeView.so",
+                "source": [
+                    "TimeView.cpp"
+                ]
+            }]
+        }
+    ]
+}

@@ -3,6 +3,7 @@
 
 #include "ISOLoader.hpp"
 
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -32,25 +33,19 @@ namespace fleropp_fpm {
          * \param[in] del_sym   The symbol name used for a delete function with
          *                      C linkage (default "deleter").  
          */
-        CompUnit(const std::string &basename,
-                    const std::string &lib_dir = "/var/www/html/", 
-                    const std::string &src_ext = ".cpp",
-                    const std::string &lib_ext = ".so",
+        CompUnit(const std::string &shared_object,
+                    std::vector<std::string> &src_path_list,
                     const std::string &alloc_sym = "allocator", 
                     const std::string &del_sym = "deleter") :
-                        _handle{nullptr}, _basename{basename},
-                        _lib_dir{lib_dir}, _src_ext{src_ext},
-                        _lib_ext{lib_ext}, _alloc_sym{alloc_sym},
-                        _del_sym{del_sym} {
-            _src_path = _lib_dir + _basename + _src_ext;
-            _lib_path = _lib_dir + _basename + _lib_ext;
-        }
+                        _handle{nullptr}, _shared_object{shared_object},
+                        _src_path_list{std::move(src_path_list)},
+                        _alloc_sym{alloc_sym}, _del_sym{del_sym} {}
 
         void open_lib() override {
             // Only do something if the library is not currently open
             if (!_open) {
                 // RTLD_NOW, we could try RTLD_LAZY for performance
-                if (!(_handle = ::dlopen(_lib_path.c_str(), RTLD_NOW))) {
+                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_NOW))) {
                     std::cerr << ::dlerror() << '\n';
                 } else {
                     _open = true;
@@ -102,34 +97,30 @@ namespace fleropp_fpm {
 
       private:
         void *_handle;
-        const std::string _basename;
-        const std::string _lib_dir;
-        const std::string _src_ext;
-        const std::string _lib_ext;
-        const std::string _alloc_sym;
-        const std::string _del_sym;
-        bool _open = false;
+        std::string _shared_object;
+        std::vector<std::string> _src_path_list;
+        std::string _alloc_sym;
+        std::string _del_sym;
 
-        std::string _lib_path;
-        std::vector<string> _src_path;
+        bool _open = false;
 
         // Checks if the source file was modified
         bool was_modified() const {
             // Source and library file stat structs
-            struct stat src_stat, lib_stat;
-            const auto src_ret = ::stat(_src_path[0].c_str(), &src_stat) == 0;
-            const auto lib_ret = ::stat(_lib_path.c_str(), &lib_stat) == 0;
-
+            //struct stat src_stat, lib_stat;
+            //const auto src_ret = ::stat(_src_path.c_str(), &src_stat) == 0;
+            //const auto lib_ret = ::stat(_lib_path.c_str(), &lib_stat) == 0;
+            
             // If library file does not exist, we consider the source file to
             // have been modified. Otherwise, we return whether the source
             // is newer than the library based on mtime.
-            if (src_ret && !lib_ret && errno == ENOENT) {
-                return true;
-            } else if (src_ret && lib_ret) {
-                return src_stat.st_mtim.tv_sec > lib_stat.st_mtim.tv_sec;
-            }
+            if (std::filesystem::exists(_shared_object)) {
+                const auto src_mtim = std::filesystem::last_write_time(_src_path_list[0]);
+                const auto so_mtim = std::filesystem::last_write_time(_shared_object);
+                return src_mtim > so_mtim;
+            } 
 
-            return false;
+            return true;
         } 
 
         // Recompile if necessary
@@ -138,11 +129,9 @@ namespace fleropp_fpm {
                 // Fork and exec
                 auto child_pid = ::fork();
                 if (!child_pid) {
-                    auto src_fname = _basename + _src_ext;
-                    auto lib_fname = _basename + _lib_ext;
-                    ::chdir(_lib_dir.c_str());
-                    ::execlp("g++", "g++", src_fname.c_str(), "-std=c++17",
-                                "-shared", "-fPIC", "-o", lib_fname.c_str(),
+                    ::chdir(_shared_object.substr(0,_shared_object.find_last_of("/")).c_str());
+                    ::execlp("g++", "g++", _src_path_list[0].c_str(), "-std=c++17",
+                                "-shared", "-fPIC", "-o", _shared_object.c_str(),
                                 nullptr);
                 }
                 ::waitpid(child_pid, nullptr, 0);

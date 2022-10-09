@@ -3,24 +3,27 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "fcgiapp.h"
 
 #include "IView.hpp"
-#include "SOLoader.hpp"
+// #include "SOLoader.hpp"
+#include "CompUnit.hpp"
 
 namespace fleropp_fpm {
+  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IView>>>;
     class FCGIHandler {
       public:
         FCGIHandler(const std::string &unix_sock, const unsigned int backlog = 512);
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
         void accept();
-        void add_endpoint(const std::string &path, const std::string &basename);
+        void add_endpoint(endpoints_map_t &endpoints_map);
       
       private:
         int _fd;
         FCGX_Request _request;
-        std::unordered_map<std::string, SOLoader<IView>> _endpoints;
+        endpoints_map_t _endpoints;
     };
 }
 
