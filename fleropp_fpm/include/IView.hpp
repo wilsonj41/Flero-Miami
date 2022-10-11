@@ -6,6 +6,12 @@
 class IView {
   public:
     virtual ~IView() = default;
+    /**
+     * Renders the content of the view that 
+     * will be sent
+     * 
+     * \param os Output stream that will render content
+     */
     virtual void generate(std::ostream &os) = 0;
 };
 
