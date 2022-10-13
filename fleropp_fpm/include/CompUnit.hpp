@@ -41,7 +41,11 @@ namespace fleropp_fpm {
                     const std::string &del_sym = "deleter") :
                         _handle{nullptr}, _shared_object{shared_object},
                         _src_path_list{src_path_list},
-                        _alloc_sym{alloc_sym}, _del_sym{del_sym} {}
+                        _alloc_sym{alloc_sym}, _del_sym{del_sym},
+                        _args{"-std=c++17", "-shared", "-fPIC", "-o", _shared_object},
+                        _open{false} {
+            args.insert(std::end(args), std::begin(_src_path_list), std::end(_src_path_list));
+        }
 
         void open_lib() override {
             // Only do something if the library is not currently open
@@ -104,7 +108,8 @@ namespace fleropp_fpm {
         std::string _alloc_sym;
         std::string _del_sym;
 
-        bool _open = false;
+        std::vector<std::string> _args;
+        bool _open;
 
         // Checks if the source file was modified
         bool was_modified() const {
@@ -125,9 +130,7 @@ namespace fleropp_fpm {
         bool recompile() const {
             namespace bp = boost::process;
             if (was_modified()) {
-                std::vector<std::string> args{"-std=c++17", "-shared", "-fPIC", "-o", _shared_object};
-                args.insert(std::end(args), std::begin(_src_path_list), std::end(_src_path_list));
-                bp::child chld(bp::search_path("g++"), args);
+                bp::child chld(bp::search_path("g++"), _args);
                 chld.wait();
                 return true;
             }            
