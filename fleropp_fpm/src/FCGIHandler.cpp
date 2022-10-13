@@ -1,6 +1,12 @@
 #include "FCGIHandler.hpp"
 
+#include "cgicc/Cgicc.h"
+#include "cgicc/HTTPHTMLHeader.h"
+#include "cgicc/HTMLClasses.h"
+
 #include "fcgio.h"
+
+#include "FCgiIO.hpp"
 
 #include <string>
 
@@ -23,12 +29,12 @@ namespace fleropp_fpm {
 
     void FCGIHandler::accept() {
         while (FCGX_Accept_r(&_request) >= 0) {
-            std::string endpoint = FCGX_GetParam("REQUEST_URI", _request.envp);
-            auto source = _endpoints.find(endpoint);
+            cgicc::FCgiIO fios{_request};
+            cgicc::Cgicc fcgi{&fios};
+            auto source = _endpoints.find(fios.getenv("REQUEST_URI"));
             if (source != _endpoints.end()) {
                 auto page = source->second[0].get_instance();
-                fcgi_ostream fout(_request.out);
-                page->generate(fout);
+                page->generate(fios);
             }
         }
     }
