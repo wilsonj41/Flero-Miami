@@ -22,10 +22,10 @@ void HelloWorldView::generate(std::ostream &os) {
         "\r\n"
         "<html>\n"
         "  <head>\n"
-        "    <title>Hello, World</title>\n"
+        "    <title>Hello, World Can i get a bruh</title>\n"
         "  </head>\n"
         "  <body>\n"
-        "    <h1>Hello, World!</h1>\n"
+        "    <h1>fjdkslajfdkalsj</h1>\n"
         "  </body>\n"
         "</html>\n";
     os << content;
