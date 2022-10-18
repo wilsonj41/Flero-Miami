@@ -1,15 +1,14 @@
 #ifndef FCGI_HANDLER_HPP
 #define FCGI_HANDLER_HPP
 
+#include "IView.hpp"
+#include "CompUnit.hpp"
+
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "fcgiapp.h"
-
-#include "IView.hpp"
-// #include "SOLoader.hpp"
-#include "CompUnit.hpp"
 
 namespace fleropp_fpm {
   using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IView>>>;
@@ -33,13 +32,7 @@ namespace fleropp_fpm {
          * Starts event loop and accepts incoming requests
          */
         void accept();
-
-        /***
-         * Maps an endpoint to a Compilation Unit
-         * \param path Endpoint path 
-         * \param basename Basename of Compilation Unit
-         */ 
-        void add_endpoint(const std::string &path, const std::string &basename);
+        void add_endpoint(endpoints_map_t &endpoints_map);
       
       private:
         int _fd;
