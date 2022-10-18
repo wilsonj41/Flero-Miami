@@ -20,7 +20,7 @@ namespace fleropp_fpm {
         FCGX_Init();
         FCGX_InitRequest(&_request, _fd, 0);
     }
-
+    
     void FCGIHandler::accept() {
         while (FCGX_Accept_r(&_request) >= 0) {
             std::string endpoint = FCGX_GetParam("REQUEST_URI", _request.envp);
