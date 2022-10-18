@@ -3,15 +3,17 @@
 
 #include "ISOLoader.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
 
+#include <boost/filesystem/path.hpp>
+#include <boost/process/child.hpp>
+#include <boost/process/search_path.hpp>
+
 #include <dlfcn.h>
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
 // fleropp_fpm project namespace
@@ -34,12 +36,16 @@ namespace fleropp_fpm {
          *                      C linkage (default "deleter").  
          */
         CompUnit(const std::string &shared_object,
-                    std::vector<std::string> &src_path_list,
+                    const std::vector<std::string> &src_path_list,
                     const std::string &alloc_sym = "allocator", 
                     const std::string &del_sym = "deleter") :
                         _handle{nullptr}, _shared_object{shared_object},
-                        _src_path_list{std::move(src_path_list)},
-                        _alloc_sym{alloc_sym}, _del_sym{del_sym} {}
+                        _src_path_list{src_path_list},
+                        _alloc_sym{alloc_sym}, _del_sym{del_sym},
+                        _args{"-std=c++17", "-shared", "-fPIC", "-o", _shared_object},
+                        _open{false} {
+            _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));
+        }
 
         void open_lib() override {
             // Only do something if the library is not currently open
@@ -102,39 +108,30 @@ namespace fleropp_fpm {
         std::string _alloc_sym;
         std::string _del_sym;
 
-        bool _open = false;
+        std::vector<std::string> _args;
+        bool _open;
 
         // Checks if the source file was modified
         bool was_modified() const {
-            // Source and library file stat structs
-            //struct stat src_stat, lib_stat;
-            //const auto src_ret = ::stat(_src_path.c_str(), &src_stat) == 0;
-            //const auto lib_ret = ::stat(_lib_path.c_str(), &lib_stat) == 0;
-            
             // If library file does not exist, we consider the source file to
             // have been modified. Otherwise, we return whether the source
             // is newer than the library based on mtime.
             if (std::filesystem::exists(_shared_object)) {
-                const auto src_mtim = std::filesystem::last_write_time(_src_path_list[0]);
                 const auto so_mtim = std::filesystem::last_write_time(_shared_object);
-                return src_mtim > so_mtim;
+                return std::any_of(std::begin(_src_path_list), std::end(_src_path_list), 
+                                    [so_mtim] (auto src) { 
+                                        return std::filesystem::last_write_time(src) > so_mtim; 
+                                    });
             } 
-
             return true;
         } 
 
         // Recompile if necessary
-        bool recompile() {
+        bool recompile() const {
+            namespace bp = boost::process;
             if (was_modified()) {
-                // Fork and exec
-                auto child_pid = ::fork();
-                if (!child_pid) {
-                    ::chdir(_shared_object.substr(0,_shared_object.find_last_of("/")).c_str());
-                    ::execlp("g++", "g++", _src_path_list[0].c_str(), "-std=c++17",
-                                "-shared", "-fPIC", "-o", _shared_object.c_str(),
-                                nullptr);
-                }
-                ::waitpid(child_pid, nullptr, 0);
+                bp::child chld(bp::search_path("g++"), _args);
+                chld.wait();
                 return true;
             }            
             return false;
@@ -142,4 +139,4 @@ namespace fleropp_fpm {
     };
 }
 
-#endif /* SO_LOADER_HPP */
+#endif /* COMP_UNIT_HPP */

@@ -1,15 +1,21 @@
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-#include <string>
-#include <set>
-#include <exception>
-#include <iostream>
-#include <unordered_map>
+#ifndef CONFIG_PARSER_HPP
+#define CONFIG_PARSER_HPP
+
 #include "CompUnit.hpp"
 #include "IView.hpp"
 
-namespace fleropp_fpm {
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+
+#include <exception>
+#include <iostream>
+#include <set>
+#include <string>
+#include <unordered_map>
+
+namespace fleropp_fpm
+{
     class ConfigParser
     {
     public:
@@ -22,3 +28,5 @@ namespace fleropp_fpm {
         std::string _lib_dir;
     };
 }
+
+#endif /* CONFIG_PARSER_HPP */

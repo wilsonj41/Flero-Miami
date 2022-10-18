@@ -5,7 +5,9 @@ INCDIR = ./include
 
 CXX=g++
 CXXFLAGS=-std=c++17 -Wall -I $(INCDIR)
-LDLIBS=-lfcgi -lfcgi++
+LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system
+LDFLAGS=-Wl,--start-group
+BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
 
 BIN=fleropp_fpm
 SRC=$(wildcard $(SRCDIR)/*.cpp)
@@ -25,11 +27,11 @@ compile: $(OBJ)
 
 .PHONY : $(OBJDIR)/%.o
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -c $(CXXFLAGS) $< -o $@
+	$(CXX) -c $(CXXFLAGS) $(BOOSTFLAGS) $< -o $@
 
 .PHONY : link
 link: compile
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS)
+	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS) 
 
 .PHONY : clean
 clean:
