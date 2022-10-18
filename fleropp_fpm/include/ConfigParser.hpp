@@ -9,8 +9,7 @@
 #include "CompUnit.hpp"
 #include "IView.hpp"
 
-namespace fleropp_fpm
-{
+namespace fleropp_fpm {
     class ConfigParser
     {
     public:
