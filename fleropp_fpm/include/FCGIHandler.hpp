@@ -3,13 +3,16 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "fcgiapp.h"
 
 #include "IView.hpp"
-#include "SOLoader.hpp"
+// #include "SOLoader.hpp"
+#include "CompUnit.hpp"
 
 namespace fleropp_fpm {
+  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IView>>>;
     class FCGIHandler {
       public:
         /***
@@ -41,7 +44,7 @@ namespace fleropp_fpm {
       private:
         int _fd;
         FCGX_Request _request;
-        std::unordered_map<std::string, SOLoader<IView>> _endpoints;
+        endpoints_map_t _endpoints;
     };
 }
 
