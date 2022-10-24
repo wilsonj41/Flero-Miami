@@ -1,6 +1,8 @@
 #ifndef I_VIEW_HPP
 #define I_VIEW_HPP
 
+//#include "HTMLLiterals.hpp"
+
 #include <ostream>
 
 class IView {
