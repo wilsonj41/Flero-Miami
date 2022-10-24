@@ -42,7 +42,7 @@ namespace fleropp_fpm {
                         _handle{nullptr}, _shared_object{shared_object},
                         _src_path_list{src_path_list},
                         _alloc_sym{alloc_sym}, _del_sym{del_sym},
-                        _args{"-std=c++17", "-shared", "-fPIC", "-o", _shared_object},
+                        _args{"-std=c++20", "-shared", "-fPIC", "-o", _shared_object},
                         _open{false} {
             _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));
         }

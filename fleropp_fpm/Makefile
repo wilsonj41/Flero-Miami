@@ -4,7 +4,7 @@ BINDIR = ./bin
 INCDIR = ./include
 
 CXX=g++
-CXXFLAGS=-std=c++17 -Wall -I $(INCDIR)
+CXXFLAGS=-std=c++20 -Wall -I $(INCDIR)
 LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc
 LDFLAGS=-Wl,--start-group
 BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
