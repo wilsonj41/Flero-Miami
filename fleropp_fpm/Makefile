@@ -12,9 +12,10 @@ BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
 BIN=fleropp_fpm
 SRC=$(wildcard $(SRCDIR)/*.cpp)
 OBJ=$(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
+GCH=$(INCDIR)/HTMLLiterals.hpp
 
 .PHONY : all
-all: $(BINDIR) $(OBJDIR) compile link
+all: $(BINDIR) $(OBJDIR) compile link gch
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
@@ -24,6 +25,10 @@ $(OBJDIR):
 
 .PHONY : compile
 compile: $(OBJ)
+
+.PHONY : gch
+gch: $(GCH)
+	$(CXX) $(CXXFLAGS) $<
 
 .PHONY : $(OBJDIR)/%.o
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp

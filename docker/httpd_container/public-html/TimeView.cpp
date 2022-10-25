@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <ctime>
+#include <cstdlib>
 
 #include <sys/utsname.h>
 
@@ -29,12 +30,9 @@ void TimeView::generate() {
     "<html>"_h;
         "<head>"_h "<title>Uname Info</title>"_h "</head>"_h;
         "<body>"_h;
-            "<h1>"_h; 
-                std::cout << uname.sysname << ' ' << uname.release << ' ' << uname.version << '\n'; 
-            "</h1>_h";
-            "<h2> Current Date: "_h;
-                std::cout << ctime(&now);
-            "</h2>"_h;
+            "<h1>{} {} {}</h1>"_f(uname.sysname, uname.release, uname.version); 
+            "<h2> Current Date: {} </h2>"_f(ctime(&now));
+            "<h3> Here is your lucky number: {} </h3>"_f(rand());
         "</body>"_h;
     "</html>"_h;
 }

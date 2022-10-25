@@ -38,6 +38,7 @@ container_make() {
     # Copy library headers to webroot
     cp "${SELF_DIR}/include/IView.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
     cp "${SELF_DIR}/include/HTMLLiterals.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
+    cp "${SELF_DIR}/include/HTMLLiterals.hpp.gch" "${SELF_DIR}/../docker/httpd_container/public-html"
 }
 
 container_restart() {
