@@ -8,7 +8,7 @@
 class IView {
   public:
     virtual ~IView() = default;
-    virtual void generate(std::ostream &os) = 0;
+    virtual void generate() = 0;
 };
 
 #endif /* I_VIEW_HPP */

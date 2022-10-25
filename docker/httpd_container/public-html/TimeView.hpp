@@ -7,7 +7,7 @@ class TimeView : public IView {
   public:
     TimeView() = default;
     ~TimeView() = default;
-    void generate(std::ostream &os) override;
+    void generate() override;
 };
 
-#endif /* HELLO_WORLD_View_HPP */
+#endif /* TIME_VIEW_HPP */

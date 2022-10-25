@@ -14,7 +14,7 @@ extern "C" {
 
 }
 
-void HelloWorldView::generate(std::ostream &os) {
+void HelloWorldView::generate() {
     using namespace fleropp_literals;
     "Content-type: text/html\r"_h;
     "\r"_h;

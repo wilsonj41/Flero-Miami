@@ -1,3 +1,4 @@
+#include "HTMLLiterals.hpp"
 #include "TimeView.hpp"
 
 #include <chrono>
@@ -16,21 +17,24 @@ extern "C" {
 
 }
 
-void TimeView::generate(std::ostream &os) {
+void TimeView::generate() {
+    using namespace fleropp_literals;
     struct utsname uname;
     ::uname(&uname);
 
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-    os << "Content-type: text/html\r\n"
-       << "\r\n"
-       << "<html>\n"
-       << "  <head>\n"
-       << "    <title>Uname Info</title>\n"
-       << "  </head>\n"
-       << "  <body>\n"
-       << "    <h1>" << uname.sysname << ' ' << uname.release << ' ' << uname.version << "</h1>\n"
-       << "    <h2> Current Date: " << ctime(&now) << "</h2>\n"
-       << "  </body>\n"
-       << "</html>\n";
+    "Content-type: text/html\r"_h;
+    "\r"_h;
+    "<html>"_h;
+        "<head>"_h "<title>Uname Info</title>"_h "</head>"_h;
+        "<body>"_h;
+            "<h1>"_h; 
+                std::cout << uname.sysname << ' ' << uname.release << ' ' << uname.version << '\n'; 
+            "</h1>_h";
+            "<h2> Current Date: "_h;
+                std::cout << ctime(&now);
+            "</h2>"_h;
+        "</body>"_h;
+    "</html>"_h;
 }

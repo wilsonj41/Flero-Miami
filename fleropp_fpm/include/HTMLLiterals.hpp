@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace fleropp_literals {
-  void operator"" _HTML(const char* data, std::size_t len) {
+  void operator"" _h(const char* data, std::size_t len) {
     std::cout << data << '\n';
   };
 }
