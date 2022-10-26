@@ -15,13 +15,14 @@ extern "C" {
     void deleter(TimeView *ptr) {
         delete ptr;
     }
-
 }
 
 void TimeView::generate() {
     using namespace fleropp_literals;
     struct utsname uname;
     ::uname(&uname);
+
+    std::cerr << "Inside View:" << &fleropp_io::fppout << '\n';
 
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
@@ -32,7 +33,8 @@ void TimeView::generate() {
         "<body>"_h;
             "<h1>{} {} {}</h1>"_f(uname.sysname, uname.release, uname.version); 
             "<h2> Current Date: {} </h2>"_f(ctime(&now));
-            "<h3> Here is your lucky number: {} </h3>"_f(rand());
+            "<h3> Here is your first lucky number: {} </h3>"_f(rand());
+            "<h3> Here is your second lucky number: {} </h3>"_f(rand());
         "</body>"_h;
     "</html>"_h;
 }

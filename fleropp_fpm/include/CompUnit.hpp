@@ -42,7 +42,7 @@ namespace fleropp_fpm {
                         _handle{nullptr}, _shared_object{shared_object},
                         _src_path_list{src_path_list},
                         _alloc_sym{alloc_sym}, _del_sym{del_sym},
-                        _args{"-std=c++20", "-shared", "-fPIC", "-o", _shared_object},
+                        _args{"-std=c++20", "-shared", "-fPIC", "--no-gnu-unique", "-o", _shared_object},
                         _open{false} {
             _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));
         }
@@ -51,7 +51,7 @@ namespace fleropp_fpm {
             // Only do something if the library is not currently open
             if (!_open) {
                 // RTLD_NOW, we could try RTLD_LAZY for performance
-                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_NOW))) {
+                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_NOW | RTLD_GLOBAL))) {
                     std::cerr << ::dlerror() << '\n';
                 } else {
                     _open = true;

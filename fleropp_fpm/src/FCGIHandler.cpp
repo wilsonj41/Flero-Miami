@@ -1,4 +1,5 @@
 #include "FCGIHandler.hpp"
+#include "FleroppIO.hpp"
 #include "ScopedRedirect.hpp"
 
 #include "cgicc/Cgicc.h"
@@ -34,7 +35,7 @@ namespace fleropp_fpm {
             cgicc::Cgicc fcgi{&fios};
             auto source = _endpoints.find(fios.getenv("REQUEST_URI"));
             if (source != _endpoints.end()) {
-                ScopedRedirect redir{fios, std::cout};
+                ScopedRedirect redir{fios, fleropp_io::fppout};
                 auto page = source->second[0].get_instance();
                 page->generate();
             }

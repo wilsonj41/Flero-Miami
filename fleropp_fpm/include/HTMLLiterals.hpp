@@ -1,6 +1,8 @@
 #ifndef HTML_LITERALS_HPP
 #define HTML_LITERALS_HPP
 
+#include "FleroppIO.hpp"
+
 //#if __cpp_lib_format
 //#include <format>
 //namespace fmt = std;
@@ -10,6 +12,7 @@
 //#endif
 
 #include <iostream>
+#include <vector>
 
 namespace fleropp_literals {
   class FormatProxy {
@@ -18,7 +21,7 @@ namespace fleropp_literals {
 
       template<typename... Args>
       void operator()(Args&& ...args) {
-        std::cout << fmt::format(fmt::runtime(m_data), std::forward<Args>(args)...) << '\n';
+        fleropp_io::fppout << fmt::format(fmt::runtime(m_data), std::forward<Args>(args)...) << '\n';
       } 
     private:
       std::string m_data;
@@ -29,7 +32,7 @@ namespace fleropp_literals {
   }
 
   void operator"" _h(const char* data, std::size_t len) {
-    std::cout << data << '\n';
+    fleropp_io::fppout << data << '\n';
   }
 }
 
