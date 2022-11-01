@@ -46,6 +46,11 @@ namespace fleropp_fpm {
             _lib_path = _lib_dir + _basename + _lib_ext;
         }
 
+        /**
+         * Loads shared library into memory so that symbols can
+         * be accessed. Will not open if already opened and will
+         * output error if any unresolved symbols are found.
+         */
         void open_lib() override {
             // Only do something if the library is not currently open
             if (!_open) {
@@ -57,7 +62,11 @@ namespace fleropp_fpm {
                 }
             }
         }
-
+        /**
+         * Unloads shared library from memory
+         * 
+         * Errors will be sent to standard error
+         */
         void close_lib() override {
             // Only do something if the library is currently open.
             if (_open) {
@@ -68,7 +77,12 @@ namespace fleropp_fpm {
                 }
             }
         }
-
+        /**
+         * Returns a smart pointer to the shared object with reference 
+         * counting.
+         * 
+         * \return A std::shared_ptr<T> to the shared object. 
+         */
         std::shared_ptr<T> get_instance() override {
             // If the library was recompiled, close it so we can reopen
             if (recompile()) {
@@ -114,6 +128,13 @@ namespace fleropp_fpm {
         std::string _src_path;
 
         // Checks if the source file was modified
+
+        /***
+         * Compares library and source file time modified.
+         *          
+         * \return A Bool if both times modified are the different 
+         * then return true, otherwise false.
+         */
         bool was_modified() const {
             // Source and library file stat structs
             struct stat src_stat, lib_stat;
@@ -132,7 +153,12 @@ namespace fleropp_fpm {
             return false;
         } 
 
-        // Recompile if necessary
+        /***
+         * Recompiles shared object if source files have 
+         * been modified
+         * 
+         * \return a Bool if recompiled
+         */
         bool recompile() {
             if (was_modified()) {
                 // Fork and exec
