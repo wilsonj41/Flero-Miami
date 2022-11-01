@@ -7,7 +7,7 @@ class HelloWorldView : public IView {
   public:
     HelloWorldView() = default;
     ~HelloWorldView() = default;
-    void generate(std::ostream &os) override;
+    void generate() override;
 };
 
 #endif /* HELLO_WORLD_VIEW_HPP */
