@@ -1,6 +1,5 @@
 #include "HelloWorldView.hpp"
-
-#include <string_view>
+#include "HTMLLiterals.hpp"
 
 extern "C" {
     HelloWorldView *allocator() {
@@ -13,20 +12,15 @@ extern "C" {
 
 }
 
-void HelloWorldView::generate(std::ostream &os) {
-    // Compile-time / runtime tradeoff
-    // This will be slower to compile, but faster at runtime
-    // Very little difference at this scale, though.
-    static constexpr auto content = 
-        "Content-type: text/html\r\n"
-        "\r\n"
-        "<html>\n"
-        "  <head>\n"
-        "    <title>Hello, World</title>\n"
-        "  </head>\n"
-        "  <body>\n"
-        "    <h1>Hello, World!</h1>\n"
-        "  </body>\n"
-        "</html>\n";
-    os << content;
+void HelloWorldView::generate() {
+    using namespace fleropp_literals;
+    "Content-type: text/html\r"_h;
+    "\r"_h;
+    "<html>"_h;
+        "<head>"_h "<title>Hello, World</title>"_h "</head>"_h;
+        "<body>"_h;
+            "<h1>Hello, World!</h1>"_h;
+            "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
+        "</body>"_h;
+    "</html>"_h;
 }

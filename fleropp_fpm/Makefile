@@ -4,17 +4,18 @@ BINDIR = ./bin
 INCDIR = ./include
 
 CXX=g++
-CXXFLAGS=-std=c++17 -Wall -I $(INCDIR)
-LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system
-LDFLAGS=-Wl,--start-group
+CXXFLAGS=-std=c++20 -Wall -I $(INCDIR)
+LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc
+LDFLAGS=-rdynamic
 BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
 
 BIN=fleropp_fpm
 SRC=$(wildcard $(SRCDIR)/*.cpp)
 OBJ=$(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
+GCH=$(INCDIR)/HTMLLiterals.hpp
 
 .PHONY : all
-all: $(BINDIR) $(OBJDIR) compile link
+all: $(BINDIR) $(OBJDIR) compile link gch
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
@@ -25,13 +26,17 @@ $(OBJDIR):
 .PHONY : compile
 compile: $(OBJ)
 
+.PHONY : gch
+gch: $(GCH)
+	$(CXX) $(CXXFLAGS) $<
+
 .PHONY : $(OBJDIR)/%.o
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) $(BOOSTFLAGS) $< -o $@
 
 .PHONY : link
 link: compile
-	$(CXX) $(CXXFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS) 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS)
 
 .PHONY : clean
 clean:
