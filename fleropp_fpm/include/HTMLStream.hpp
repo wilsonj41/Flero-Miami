@@ -32,9 +32,12 @@ namespace fleropp_html_stream {
      * 
      * \param[in] str Reference to a const char[N] containing the string data.
      */
-    constexpr StringLiteral(const char (&str)[N]) 
-                            : value{std::to_array(str)} {}
-    std::array<char, N> value;
+    constexpr StringLiteral(const char (&str)[N]) {
+      // Copy to N - 1 to strip null terminator
+      // This overload of std::copy_n is constexpr in >= c++20
+      std::copy_n(std::cbegin(str), N - 1, std::begin(value));
+    }
+    std::array<char, N - 1> value;
   };
 
   /**
@@ -108,7 +111,7 @@ namespace fleropp_html_stream {
        * 
        * \return A reference to `html_stream`.
        */
-      friend HTMLStream &operator<<(HTMLStream &html_stream, const std::string &content) {
+      friend auto& operator<<(HTMLStream &html_stream, const std::string &content) {
         html_stream.m_ss << content;
         return html_stream;
       }
@@ -125,9 +128,10 @@ namespace fleropp_html_stream {
        * 
        * \return A reference to `html_stream`.
        */
-      friend HTMLStream &operator<<(HTMLStream &html_stream, const EndTag &end_tag) { 
+      friend auto& operator<<(HTMLStream &html_stream, const EndTag &end_tag) { 
         // Alternative to explicit specialization, we modify behavior based on the
-        // type of an optional template parameter.
+        // type of an optional template parameter using the std::is_same 
+        // metafunction
         if constexpr (std::is_same_v<EndTagAction, DumpOnEnd>) {
           fleropp_io::fppout << html_stream.m_ss.rdbuf() << html_stream.m_end_tag << '\n';
         } else {
@@ -171,9 +175,8 @@ namespace fleropp_html_stream {
     typename U,
     typename V
   >
-  auto operator<<(HTMLStream<StartT1, EndT1, U> &html_stream1,
-                    const HTMLStream<StartT2, EndT2, V> &html_stream2) 
-                    -> decltype(html_stream1)& {
+  auto& operator<<(HTMLStream<StartT1, EndT1, U> &html_stream1,
+                    const HTMLStream<StartT2, EndT2, V> &html_stream2) {
     html_stream1.ss() << html_stream2.rdbuf();
     return html_stream1;
   }
