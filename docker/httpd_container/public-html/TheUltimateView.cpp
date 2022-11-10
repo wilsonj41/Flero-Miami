@@ -31,6 +31,8 @@ void TheUltimateView::generate() {
     h1 << "Hello, World" << htmls::gen_end_tag();
     h2 << "From inside <em>the ultimate</em> view generated using <code>HTMLStream</code>" << htmls::gen_end_tag();
     sneaky << "Click for free money!" << htmls::gen_end_tag();
-    html << h1 << h2 << sneaky << htmls::gen_end_tag();
+    body << cgicc::p("Hello world, I like pie!");
+    body << h1 << h2 << sneaky << htmls::gen_end_tag();
+    html << body << htmls::gen_end_tag();
 
 }

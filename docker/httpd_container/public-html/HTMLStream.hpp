@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include "cgicc/HTMLClasses.h"
 
 // fleropp HTML stream namespace
 namespace fleropp_html_stream {
@@ -139,6 +140,12 @@ namespace fleropp_html_stream {
         }
         return html_stream;
       }
+
+      friend auto& operator<<(HTMLStream &html_stream, cgicc:pTag &contentHTML) {
+        contentHTML.render(ss());
+        return html_stream;
+      }
+
     private:
       // These can be static constexpr, as the start and end tags are determined
       // at compile time as part of the compiler's template instantiation
