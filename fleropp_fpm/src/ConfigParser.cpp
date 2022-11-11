@@ -39,11 +39,10 @@ namespace fleropp_fpm
                             for (auto const& dir_entry : filesystem::recursive_directory_iterator(this->_lib_dir + "/" + it3.second.data())) {
                                 if (dir_entry.is_regular_file()) {
                                     sources.push_back(dir_entry.path().string());
-                                }
-                            }
-                        } else {
+                                } else {
                             // Else just add this filepath to the sources vector
                             sources.push_back(this->_lib_dir + "/" + it3.second.data());
+                                }
                         }
                     }
 
@@ -51,6 +50,7 @@ namespace fleropp_fpm
                     dependencies.emplace_back(shared_object, sources);
                 }
                 _endpoints[uri] = dependencies;
+            }
             }
         }
         catch (const exception &e)
