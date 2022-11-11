@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include "cgicc/HTMLClasses.h"
+#include "cgicc/MStreamable.h"
 
 // fleropp HTML stream namespace
 namespace fleropp_html_stream {
@@ -141,8 +142,13 @@ namespace fleropp_html_stream {
         return html_stream;
       }
 
-      friend auto& operator<<(HTMLStream &html_stream, cgicc:pTag &contentHTML) {
-        contentHTML.render(ss());
+      friend auto& operator<<(HTMLStream &html_stream, const cgicc::MStreamable &contentHTML) {
+        html_stream.m_ss << contentHTML;
+        return html_stream;
+      }
+
+      friend auto& operator<<(HTMLStream &html_stream, cgicc::MStreamable &&contentHTML) {
+        html_stream.m_ss << contentHTML;
         return html_stream;
       }
 
