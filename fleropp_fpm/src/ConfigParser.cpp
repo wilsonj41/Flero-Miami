@@ -16,6 +16,16 @@ namespace fleropp_fpm
             // Parse the JSON into the property tree.
             pt::read_json(filename, tree);
 
+            boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
+            auto arg_child = tree.get_child_optional("args");
+
+            std::vector<std::string> args;
+            if (arg_child) {
+                for (auto& params : arg_child.get()) {
+                    args.emplace_back(params.second.data());
+                }
+            } 
+            
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint"))
             {
@@ -40,17 +50,22 @@ namespace fleropp_fpm
                                 if (dir_entry.is_regular_file()) {
                                     sources.push_back(dir_entry.path().string());
                                 }
+                                else {
+                                    // Else just add this filepath to the sources vector
+                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
+                                }
                             }
-                        } else {
-                            // Else just add this filepath to the sources vector
-                            sources.push_back(this->_lib_dir + "/" + it3.second.data());
-                        }
+                        } 
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
-                    dependencies.emplace_back(shared_object, sources);
+                    if (compiler) {
+                        dependencies.emplace_back(shared_object, sources, compiler.get(), args);
+                    } else { 
+                        dependencies.emplace_back(shared_object, sources);
+                    }
+                    _endpoints[uri] = dependencies;
                 }
-                _endpoints[uri] = dependencies;
             }
         }
         catch (const exception &e)
