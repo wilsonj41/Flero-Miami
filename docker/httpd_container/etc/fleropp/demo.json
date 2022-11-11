@@ -25,6 +25,15 @@
                     "test_dir"
                 ]
             }]
+        },
+        {
+            "uri": "/ultimate.elf",
+            "dependencies": [{
+                "sharedObject": "TheUltimateView.so",
+                "source": [
+                    "TheUltimateView.cpp"
+                ]
+            }]
         }
     ]
 }
