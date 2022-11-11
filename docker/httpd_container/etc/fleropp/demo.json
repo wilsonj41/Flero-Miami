@@ -16,6 +16,15 @@
                     "TimeView.cpp"
                 ]
             }]
+        },
+        {
+            "uri": "/peetah.elf",
+            "dependencies": [{
+                "sharedObject": "JoeyView.so",
+                "source": [
+                    "test_dir"
+                ]
+            }]
         }
     ]
 }
