@@ -2,6 +2,7 @@
 #define HTML_STREAM_HPP
 
 #include "FleroppIO.hpp"
+#include "HTMLLiterals.hpp"
 
 #include <algorithm>
 #include <array>
@@ -55,6 +56,30 @@ namespace fleropp_html_stream {
   EndTag gen_end_tag() { return {}; }
 
   // TODO(linr5): Make `Content-type:` free function
+
+  /**
+   * Free function that generates the content type for the HTML page.
+   * \param[in] type the content type.
+  */
+  void gen_content_type(std::string &content_type) {
+    fleropp_io::fppout << "Content-type: " << content_type << "\r\n\r\n";
+  }
+
+  /**
+   * Free function that generates the html DOCTYPE.
+  */
+  void gen_html_doctype() {
+    fleropp_io::fppout << "<!DOCTYPE html> \n";
+  }
+
+  /**
+   * Free function that generates the "boiler plate" for a HTML page.
+   * \param[in] type the content type for content type header.
+  */
+  void gen_html_boiler_plate(std::string &content_type) {
+    gen_content_type(content_type);
+    gen_html_doctype();
+  }
   
   /**
    * \brief Tag type for use in template tag dispatching. Results in 
@@ -117,6 +142,25 @@ namespace fleropp_html_stream {
         html_stream.m_ss << content;
         return html_stream;
       }
+
+      /**
+       * Friend stream inseration operator for use with any class
+       * in the cgicc library that implements MStreamable.
+       * 
+       * \param[in, out] html_stream Stream to be written to.
+       * \param[in] content String to be writen to the `HTMLStream`.
+       * 
+       * \return A reference to `html_stream`.
+      */
+      friend auto& operator<<(HTMLStream &html_stream, const cgicc::MStreamable &content_html) {
+        html_stream.m_ss << content_html;
+        return html_stream;
+      }
+
+      /* friend auto& operator<<(HTMLStream &html_stream, cgicc::MStreamable &&contentHTML) {
+        html_stream.m_ss << contentHTML;
+        return html_stream;
+      } */
       
       /**
        * Friend stream insertion operator that recieves end tag. The behavior of this
@@ -139,16 +183,6 @@ namespace fleropp_html_stream {
         } else {
           html_stream.m_ss << m_end_tag << '\n';
         }
-        return html_stream;
-      }
-
-      friend auto& operator<<(HTMLStream &html_stream, const cgicc::MStreamable &contentHTML) {
-        html_stream.m_ss << contentHTML;
-        return html_stream;
-      }
-
-      friend auto& operator<<(HTMLStream &html_stream, cgicc::MStreamable &&contentHTML) {
-        html_stream.m_ss << contentHTML;
         return html_stream;
       }
 
