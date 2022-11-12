@@ -47,13 +47,14 @@ namespace fleropp_fpm {
                         _alloc_sym{alloc_sym}, _del_sym{del_sym},
                         m_compiler{compiler}, _args{args},
                         _open{false} {
+
             if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
                 // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
                 m_compiler = "g++";
-                _args = compiler_defaults::compiler_map.at(compiler);
+                _args = compiler_defaults::compiler_map.at(m_compiler);
             }
             else if (args.empty()){
-                _args = compiler_defaults::compiler_map.at(compiler);
+                _args = compiler_defaults::compiler_map.at(m_compiler);
             }
             _args.emplace_back(shared_object);
             _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));

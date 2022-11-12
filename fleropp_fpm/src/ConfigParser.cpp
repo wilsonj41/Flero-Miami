@@ -25,7 +25,6 @@ namespace fleropp_fpm
                     args.emplace_back(params.second.data());
                 }
             } 
-            
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint"))
             {
@@ -50,21 +49,21 @@ namespace fleropp_fpm
                                 if (dir_entry.is_regular_file()) {
                                     sources.push_back(dir_entry.path().string());
                                 }
-                                else {
-                                    // Else just add this filepath to the sources vector
-                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
-                                }
                             }
                         } 
+                        else {
+                                    // Else just add this filepath to the sources vector
+                                    std::cerr << this->_lib_dir << "/" << it3.second.data() << "\n";
+                        }
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
                     if (compiler) {
-                        dependencies.emplace_back(shared_object, sources, compiler.get(), args);
+                            dependencies.emplace_back(shared_object, sources, compiler.get(), args);
                     } else { 
-                        dependencies.emplace_back(shared_object, sources);
+                            dependencies.emplace_back(shared_object, sources);
                     }
-                    _endpoints[uri] = dependencies;
+                _endpoints[uri] = dependencies;
                 }
             }
         }
