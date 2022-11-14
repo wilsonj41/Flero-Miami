@@ -78,7 +78,6 @@ namespace fleropp_html_stream {
   */
   void gen_html_boiler_plate(std::string &content_type) {
     gen_content_type(content_type);
-    fleropp_io::fppout << "\r\n";
     gen_html_doctype();
   }
   

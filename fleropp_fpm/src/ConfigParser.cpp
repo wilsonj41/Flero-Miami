@@ -29,7 +29,6 @@ namespace fleropp_fpm
                     string shared_object = this->_lib_dir + "/" + dependency.get<string>("sharedObject");
 
                     vector<string> sources;
-<<<<<<< HEAD
 
                     filesystem::path rootPath = filesystem::current_path();
                     for (auto &it3 : dependency.get_child("source"))
@@ -45,11 +44,6 @@ namespace fleropp_fpm
                             sources.push_back(this->_lib_dir + "/" + it3.second.data());
                                 }
                         }
-=======
-                    for (auto &it3 : dependency.get_child("source"))
-                    {
-                        sources.push_back(this->_lib_dir + "/" + it3.second.data());
->>>>>>> Linr5-Cgicc-Wrapper-Class
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
@@ -57,10 +51,7 @@ namespace fleropp_fpm
                 }
                 _endpoints[uri] = dependencies;
             }
-<<<<<<< HEAD
             }
-=======
->>>>>>> Linr5-Cgicc-Wrapper-Class
         }
         catch (const exception &e)
         {
