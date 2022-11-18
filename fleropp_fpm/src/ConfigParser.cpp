@@ -53,7 +53,7 @@ namespace fleropp_fpm
                         } 
                         else {
                                     // Else just add this filepath to the sources vector
-                                    std::cerr << this->_lib_dir << "/" << it3.second.data() << "\n";
+                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
                         }
                     }
 
