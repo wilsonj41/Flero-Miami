@@ -1,9 +1,10 @@
+# This is a demo JSON-like file that supports comments
 {
     "endpoint": [{
-            "uri": "/hello.elf",
-            "dependencies": [{
-                "sharedObject": "HelloWorldView.so",
-                "source": [
+            "uri": "/hello.elf",                        # The URI that, when visited, serves the content
+            "dependencies": [{                          # A list of dependencies
+                "sharedObject": "HelloWorldView.so",    # A shared object to be generatede
+                "source": [                             # The source(s) that compose the shared object
                     "HelloWorldView.cpp"
                 ]
             }]

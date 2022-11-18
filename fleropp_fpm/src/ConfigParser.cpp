@@ -1,5 +1,12 @@
 #include "ConfigParser.hpp"
+
+#include <algorithm>
 #include <filesystem>
+#include <fstream>
+#include <iterator>
+#include <limits>
+#include <sstream>
+
 namespace fleropp_fpm {
     namespace pt = boost::property_tree;
     using namespace std;
@@ -7,11 +14,28 @@ namespace fleropp_fpm {
     ConfigParser::ConfigParser(const string &lib_dir) : _lib_dir(lib_dir) {}
 
     void ConfigParser::load(const string &filename) {
-        try {
+        try { 
+            std::ifstream config_file{filename};
+            std::stringstream config_file_pp;
+
+            // Strip all comments from the JSON file.
+            // Supports comments on their own line OR on the same line as code.
+            std::remove_copy_if(std::istreambuf_iterator<char>{config_file}, {},
+                                std::ostreambuf_iterator<char>{config_file_pp},
+                                [&config_file] (auto l) {
+                                    // If the current character is a '#'
+                                    if (l == '#') {
+                                        // Skip until the end of the line, but back up to include the newline
+                                        config_file.ignore(std::numeric_limits<int>::max(), '\n').unget().unget();
+                                        return true;
+                                    }
+                                    return false;
+                                } );
+
             // Create empty property tree object
             pt::ptree tree;
             // Parse the JSON into the property tree.
-            pt::read_json(filename, tree);
+            pt::read_json(config_file_pp, tree);
 
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
