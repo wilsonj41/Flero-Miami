@@ -25,6 +25,33 @@
                     "test_dir"
                 ]
             }]
+        },
+        {
+            "uri": "/ultimate.elf",
+            "dependencies": [{
+                "sharedObject": "TheUltimateView.so",
+                "source": [
+                    "TheUltimateView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/chin.elf",
+            "dependencies": [{
+                "sharedObject": "DeepView.so",
+                "source": [
+                    "test_three_level_dir/test_first_level/test_second_level/DeepView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/fox.elf",
+            "dependencies": [{
+                "sharedObject": "DeepestView.so",
+                "source": [
+                    "test_three_level_dir/second_level_of_three/DeepestView.cpp"
+                ]
+            }]
         }
     ]
 }
