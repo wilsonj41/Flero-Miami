@@ -34,6 +34,15 @@
                     "TheUltimateView.cpp"
                 ]
             }]
+        },
+        {
+            "uri": "/tableExample.elf",
+            "dependencies": [{
+                    "sharedObject": "TableExampleView.so",
+                    "source": [
+                        "TableExampleView.cpp"
+                    ]
+                }]
         }
     ]
 }
