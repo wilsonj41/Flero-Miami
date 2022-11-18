@@ -43,6 +43,24 @@
                         "TableExampleView.cpp"
                     ]
                 }]
+        },
+        {
+            "uri": "/iframeExample.elf",
+            "dependencies": [{
+                    "sharedObject": "IframeExampleView.so",
+                    "source": [
+                        "IframeExampleView.cpp"
+                    ]
+                }]
+        },
+        {
+            "uri": "/tableBorderExample.elf",
+            "dependencies": [{
+                    "sharedObject": "TableExampleWithBorderView.so",
+                    "source": [
+                        "TableExampleWithBorderView.cpp"
+                    ]
+                }]
         }
     ]
 }
