@@ -1,4 +1,6 @@
 {
+    "compiler": "g++",
+    "args": ["-std=c++20", "-shared", "-fPIC", "-fuse-ld=gold", "-Wl","--no-gnu-unique", "-o"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{
