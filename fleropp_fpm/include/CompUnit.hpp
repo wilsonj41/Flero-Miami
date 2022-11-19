@@ -2,6 +2,7 @@
 #define COMP_UNIT_HPP
 
 #include "ISOLoader.hpp"
+#include "CompilerDefaults.hpp"
 
 #include <algorithm>
 #include <filesystem>
@@ -37,13 +38,25 @@ namespace fleropp_fpm {
          */
         CompUnit(const std::string &shared_object,
                     const std::vector<std::string> &src_path_list,
+                    const std::string &compiler = "g++",
+                    const std::vector<std::string> &args = {},
                     const std::string &alloc_sym = "allocator", 
                     const std::string &del_sym = "deleter") :
                         _handle{nullptr}, _shared_object{shared_object},
                         _src_path_list{src_path_list},
                         _alloc_sym{alloc_sym}, _del_sym{del_sym},
-                        _args{"-std=c++20", "-shared", "-fPIC", "--no-gnu-unique", "-o", _shared_object},
+                        m_compiler{compiler}, _args{args},
                         _open{false} {
+
+            if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
+                // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
+                m_compiler = "g++";
+                _args = compiler_defaults::compiler_map.at(m_compiler);
+            }
+            else if (args.empty()){
+                _args = compiler_defaults::compiler_map.at(m_compiler);
+            }
+            _args.emplace_back(shared_object);
             _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));
         }
 
@@ -107,7 +120,7 @@ namespace fleropp_fpm {
         std::vector<std::string> _src_path_list;
         std::string _alloc_sym;
         std::string _del_sym;
-
+        std::string m_compiler;
         std::vector<std::string> _args;
         bool _open;
 
@@ -130,7 +143,7 @@ namespace fleropp_fpm {
         bool recompile() const {
             namespace bp = boost::process;
             if (was_modified()) {
-                bp::child chld(bp::search_path("g++"), _args);
+                bp::child chld(bp::search_path(m_compiler), _args);
                 chld.wait();
                 return true;
             }            
