@@ -17,7 +17,7 @@ main() {
 
 usage () {
     cat << EOF
-usage: ${0} [-hmbrd]
+usage: ${0} [-hmbrdi]
 
 Tools to assist with building and testing the module.
 
@@ -34,13 +34,14 @@ EOF
 
 container_make() {
     echo "Building software in ${1}..."
-    docker run -v "${SELF_DIR}:${SELF_DIR}" -w "${SELF_DIR}" -i -t "${1}" /bin/bash -c "make all"
+    docker run --rm -v "${SELF_DIR}:${SELF_DIR}" -w "${SELF_DIR}" -i -t "${1}" /bin/bash -c "make all"
     # Copy library headers to webroot
-    cp "${SELF_DIR}/include/IView.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
-    cp "${SELF_DIR}/include/HTMLLiterals.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
-    cp "${SELF_DIR}/include/HTMLLiterals.hpp.gch" "${SELF_DIR}/../docker/httpd_container/public-html"
-    cp "${SELF_DIR}/include/HTMLStream.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
-    cp "${SELF_DIR}/include/FleroppIO.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
+    # ! Deprecated method; prefer system include dir !
+    # cp "${SELF_DIR}/include/IView.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
+    # cp "${SELF_DIR}/include/HTMLLiterals.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
+    # cp "${SELF_DIR}/include/HTMLLiterals.hpp.gch" "${SELF_DIR}/../docker/httpd_container/public-html"
+    # cp "${SELF_DIR}/include/HTMLStream.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
+    # cp "${SELF_DIR}/include/FleroppIO.hpp" "${SELF_DIR}/../docker/httpd_container/public-html"
 }
 
 container_restart() {
