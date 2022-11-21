@@ -61,6 +61,33 @@
                         "TableExampleWithBorderView.cpp"
                     ]
                 }]
+        },
+        {
+            "uri": "/javaScript.elf",
+            "dependencies": [{
+                    "sharedObject": "JavascriptExample.so",
+                    "source": [
+                        "JavascriptExample.cpp"
+                    ]
+                }]
+        },
+        {
+            "uri": "/classAttributeExample.elf",
+            "dependencies": [{
+                    "sharedObject": "ClassAttributeExampleView.so",
+                    "source": [
+                        "ClassAttributeExampleView.cpp"
+                    ]
+                }]
+        },
+        {
+            "uri": "/idAttributeExample.elf",
+            "dependencies": [{
+                    "sharedObject": "IdAttributeExampleView.so",
+                    "source": [
+                        "IdAttributeExampleView.cpp"
+                    ]
+                }]
         }
     ]
 }
