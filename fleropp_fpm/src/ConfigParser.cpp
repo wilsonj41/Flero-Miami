@@ -21,7 +21,11 @@ namespace fleropp_fpm {
                 for (auto& params : arg_child.get()) {
                     args.emplace_back(params.second.data());
                 }
-            } 
+            }
+            
+            // Get source file extension
+            auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
+
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
@@ -40,17 +44,13 @@ namespace fleropp_fpm {
                         if (filesystem::is_directory(this->_lib_dir + "/" + it3.second.data())) {
                             for (const auto& dir_entry : 
                                     filesystem::recursive_directory_iterator(this->_lib_dir + "/" + it3.second.data())) {
-                                if (dir_entry.is_regular_file()) {
+                                if (dir_entry.is_regular_file() && dir_entry.path().extension() == source_ext) {
                                     sources.push_back(dir_entry.path().string());
-                                } else {
-                                    // Else just add this filepath to the sources vector
-                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
                                 }
                             }
-                        } 
-                        else {
-                                    // Else just add this filepath to the sources vector
-                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
+                        } else {
+                            // Else just add this filepath to the sources vector
+                            sources.push_back(this->_lib_dir + "/" + it3.second.data());
                         }
                     }
 
@@ -60,7 +60,8 @@ namespace fleropp_fpm {
                     } else { 
                             dependencies.emplace_back(shared_object, sources);
                     }
-                _endpoints[uri] = dependencies;
+
+                    _endpoints[uri] = dependencies;
                 }
             }
         } catch (const exception &e) {
