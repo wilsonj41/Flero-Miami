@@ -61,6 +61,15 @@
                     "html_literals_examples/TableExampleWithBorderView.cpp"
                 ]
             }]
+        },
+        {
+            "uri": "/iframeExampleLiterals.elf",
+            "dependencies": [{
+                "sharedObject": "obj/IframeExampleViewLiterals.so",
+                "source": [
+                    "html_literals_examples/IframeExampleView.cpp"
+                ]
+            }]
         }
     ]
 }

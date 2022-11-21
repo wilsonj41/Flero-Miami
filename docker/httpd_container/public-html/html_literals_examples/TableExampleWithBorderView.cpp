@@ -25,10 +25,10 @@ void TableExampleWithBorderView::generate() {
     namespace htmls = fleropp_html_stream;
     using entry = std::tuple<std::string_view, std::string_view, unsigned int>;
 
-    std::string content_type{"text/html"};
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boiler_plate("text/html");
     "<html>"_h;
         "<head>"_h;
+            // Raw string literals are fully supported
             R"(<style>
                 table, th, td {
                     border: 1px solid black;
@@ -45,6 +45,8 @@ void TableExampleWithBorderView::generate() {
             static constexpr std::array<entry, 3> people = {entry{"Jill", "Smith", 50},
                                                             entry{"Eve", "Jackson", 94},
                                                             entry{"John", "Doe", 80}};
+
+            // Apply HTML formatting to a 3-tuple of fields
             auto print_row = []<typename... Args>(Args&& ...args) {
                 R"(<tr>
                     <td>{}</td>

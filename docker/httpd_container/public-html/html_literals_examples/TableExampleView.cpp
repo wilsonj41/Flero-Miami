@@ -21,8 +21,7 @@ void TableExampleView::generate() {
     using namespace fleropp_literals;
     namespace htmls = fleropp_html_stream;
 
-    std::string content_type{"text/html"};
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boiler_plate("text/html");
     "<html>"_h;
         "<body>"_h;
             "<h2>HTML Tables</h2>"_h;
