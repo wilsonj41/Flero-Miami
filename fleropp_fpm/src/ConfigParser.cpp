@@ -25,7 +25,7 @@ namespace fleropp_fpm {
             
             // Get source file extension
             auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
-
+            
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
