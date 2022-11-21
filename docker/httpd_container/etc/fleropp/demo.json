@@ -45,6 +45,15 @@
                         "TableExampleView.cpp"
                     ]
                 }]
+        },
+        {
+            "uri": "/crawzone.elf",
+            "dependencies": [{
+                    "sharedObject": "CrawView.so",
+                    "source": [
+                        "TableExampleView.cpp"
+                    ]
+                }]
         }
     ]
 }
