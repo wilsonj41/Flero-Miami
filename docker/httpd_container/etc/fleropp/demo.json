@@ -49,9 +49,9 @@
         {
             "uri": "/crawzone.elf",
             "dependencies": [{
-                    "sharedObject": "CrawView.so",
+                    "sharedObject": "CrawfordView.so",
                     "source": [
-                        "TableExampleView.cpp"
+                        "testDirsWithExtension.cpp"
                     ]
                 }]
         }

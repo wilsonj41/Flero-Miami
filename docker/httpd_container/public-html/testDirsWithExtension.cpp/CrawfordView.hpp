@@ -1,7 +1,7 @@
 #ifndef CRAWFORD_VIEW_HPP
 #define CRAWFORD_VIEW_HPP
 
-#include "IView.hpp"
+#include "../IView.hpp"
 
 class CrawfordView : public IView {
   public:
