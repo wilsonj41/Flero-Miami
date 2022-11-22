@@ -90,14 +90,12 @@ void FFTView::generate() {
     // Generate symmetric input data
     std::generate_n(std::begin(time), time.size() / 2,
                     [z = std::complex<double>{0, 0}]() mutable {
-                        z = z + std::complex<double>{1, 1};
-                        return z;
+                        return z += std::complex<double>{1, 1};
                     });
 
     std::generate_n(std::rbegin(time), time.size() / 2, 
                     [z = std::complex<double>{0, 0}]() mutable {
-                        z = z + std::complex<double>{1, 1};
-                        return z;
+                        return z += std::complex<double>{1, 1};
                     });
     
     const auto freq = fft(time);
