@@ -38,15 +38,6 @@
             }]
         },
         {
-            "uri": "/tableExampleStreams.elf",
-            "dependencies": [{
-                "sharedObject": "obj/TableExampleViewStreams.so",
-                "source": [
-                    "html_streams_examples/TableExampleView.cpp"
-                ]
-            }]
-        },
-        {
             "uri": "/tableExampleLiterals.elf",
             "dependencies": [{
                 "sharedObject": "obj/TableExampleViewLiterals.so",
@@ -80,6 +71,69 @@
                 "source": [
                     "hpc_examples/FFTView.cpp"
                 ]
+            }]
+        },
+        {
+            "uri": "/tableExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/TableExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/TableExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/iframeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/IframeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/IframeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/tableBorderExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/TableExampleWithBorderViewStreams.so",
+                    "source": [
+                        "html_streams_examples/TableExampleWithBorderView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/javaScriptStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "JavascriptExampleStreams.so",
+                    "source": [
+                        "html_streams_examples/JavascriptExample.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/classAttributeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "ClassAttributeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/ClassAttributeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/idAttributeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "IdAttributeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/IdAttributeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/crawzone.elf",
+            "dependencies": [{
+                    "sharedObject": "CrawfordView.so",
+                    "source": [
+                        "testDirsWithExtension.cpp"
+                    ]
             }]
         }
     ]

@@ -1,8 +1,15 @@
-#include "TableExampleView.hpp"
 #include <fleropp/HTMLStream.hpp>
 #include <fleropp/HTMLLiterals.hpp>
 #include <cgicc/HTMLClasses.h>
 #include <string>
+
+#include "TableExampleView.hpp"
+
+using namespace fleropp_literals;
+using namespace cgicc;
+namespace htmls = fleropp_html_stream;
+
+// link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
 extern "C" {
     TableExampleView *allocator() {
@@ -15,97 +22,88 @@ extern "C" {
 
 }
 
-/* 
-<!DOCTYPE html>
-<html>
-<body>
+namespace table_example_util {
+  void firstBuildTable(htmls::HTMLStream<"<table>","</table>"> &table1) {
+      htmls::HTMLStream<"<tr>","</tr>"> tr;
 
-<h2>HTML Tables</h2>
+      tr << td("100") << htmls::gen_end_tag();
+      table1 << tr << htmls::gen_end_tag();
+  }
 
-<p>HTML tables start with a table tag.</p>
-<p>Table rows start with a tr tag.</p>
-<p>Table data start with a td tag.</p>
+  void secondBuildTable(htmls::HTMLStream<"<table>","</table>"> &table2) {
+      htmls::HTMLStream<"<tr>","</tr>"> tr;
 
-<hr>
-<h2>1 Column:</h2>
+      for (int i = 100; i < 400; i=i+100) {
+        std::string s = std::to_string(i);
+        tr << td(s);
+      }
 
-<table>
-  <tr>
-    <td>100</td>
-  </tr>
-</table>
+      tr << htmls::gen_end_tag();
+      table2 << tr << htmls::gen_end_tag();
+  }
 
-<hr>
-<h2>1 Row and 3 Columns:</h2>
-<table>
-  <tr>
-    <td>100</td>
-    <td>200</td>
-    <td>300</td>
-  </tr>
-</table>
+  void thirdBuildTable(htmls::HTMLStream<"<table>","</table>"> &table3) {
+      htmls::HTMLStream<"<tr>","</tr>"> tr1; // 100 200 300
+      htmls::HTMLStream<"<tr>","</tr>"> tr2; // 400 500 600
+      htmls::HTMLStream<"<tr>","</tr>"> tr3; // 700 800 900
 
-<hr>
-<h2>3 Rows and 3 Columns:</h2>
-<table>
-  <tr>
-    <td>100</td>
-    <td>200</td>
-    <td>300</td>
-  </tr>
-  <tr>
-    <td>400</td>
-    <td>500</td>
-    <td>600</td>
-  </tr>
-  <tr>
-    <td>700</td>
-    <td>800</td>
-    <td>900</td>
-  </tr>
-</table>
+      for (int i = 100; i < 1000; i=i+100) {
+        if (i >= 100 && i <= 300) {
+          tr1 << td(std::to_string(i));
+        }
+        else if (i >= 400 && i <= 600) {
+          tr2 << td(std::to_string(i));
+        }
+        else {
+          tr3 << td(std::to_string(i));
+        }
+      }
 
-<hr>
+      // closing all ray tags
+      tr1 << htmls::gen_end_tag();
+      tr2 << htmls::gen_end_tag();
+      tr3 << htmls::gen_end_tag();
 
-</body>
-</html>
-*/
-
+      // add to table3
+      table3 << tr1 << tr2 << tr3 << htmls::gen_end_tag();
+  }
+}
 
 void TableExampleView::generate() {
-  using namespace fleropp_literals;
-  using namespace cgicc;
-  namespace htmls = fleropp_html_stream;
-
+    using namespace table_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;
 
     std::string content_type("text/html");
     htmls::gen_html_boiler_plate(content_type);
 
+    /* --------------- NOTE: All the tables are built first before adding into the body. ---------------  */
     // builds the first table
     htmls::HTMLStream<"<table>","</table>"> table1;
-    htmls::HTMLStream<"<tr>","</tr>"> tr1;
-
-    tr1 << td("100") << htmls::gen_end_tag();
-    table1 << tr1 << htmls::gen_end_tag();
+    firstBuildTable(table1);
 
     // builds the second table
     htmls::HTMLStream<"<table>","</table>"> table2;
-    htmls::HTMLStream<"<tr>","</tr>"> tr2;
-
-    for (int i = 1; i < 4; i++) {
-      std::string s = std::to_string(i);
-      tr2 << td(s);
-    }
-
-    tr2 << htmls::gen_end_tag();
-    table2 << tr2 << htmls::gen_end_tag();
+    secondBuildTable(table2);
 
     // builds the third table
+    htmls::HTMLStream<"<table>","</table>"> table3;
+    thirdBuildTable(table3);
+
+    /* --------------------- NOTE: Building the <body> tag of the webpage ---------------------  */
+    body << h2("HTML Tables")
+        << p("HTML tables start with a table tag.")
+        << p("Table rows start with a tr tag.")
+        << p("Table data start with a td tag.");
+    
+    // add all the tables to the body tag.
+    body << hr() << table1 << hr() << table2 << hr() << table3;
 
 
-    body << table1 << table2 << htmls::gen_end_tag();
+
+
+    // close off the body and html tags when done.
+    body << htmls::gen_end_tag();
     html << body << htmls::gen_end_tag();
 
 
