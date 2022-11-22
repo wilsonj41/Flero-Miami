@@ -31,7 +31,7 @@ static unsigned int bit_reverse(unsigned int x, int log2n) {
     return n;
 }
 
-// Computes the fourier transform of a using
+// Computes the fourier transform of a vector using
 // the decimation-in-time radix-2 FFT algorithm
 static auto fft(const std::vector<std::complex<double>>& a) {
     // J = i
@@ -100,7 +100,7 @@ void FFTView::generate() {
                         return z;
                     });
     
-    auto freq = fft(time);
+    const auto freq = fft(time);
 
     auto print_complex = []<typename T>(const std::complex<T>& z) {
         "<td>{} + {}<i>i</i></td>"_f(z.real(), z.imag());
