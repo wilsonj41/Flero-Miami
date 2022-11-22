@@ -1,4 +1,6 @@
 {
+    "compiler": "g++",
+    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-o"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{
@@ -68,6 +70,15 @@
                 "sharedObject": "obj/IframeExampleViewLiterals.so",
                 "source": [
                     "html_literals_examples/IframeExampleView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/parallelFFT.elf",
+            "dependencies": [{
+                "sharedObject": "obj/FFTView.so",
+                "source": [
+                    "hpc_examples/FFTView.cpp"
                 ]
             }]
         }
