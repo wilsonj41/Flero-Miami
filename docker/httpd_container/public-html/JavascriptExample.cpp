@@ -32,6 +32,7 @@ void generateJS(htmls::HTMLStream<"<script type=\"text/javascript\">", "</script
 void JavascriptExample::generate() {
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;
+    htmls::HTMLStream<"<head>", "</head>"> head;
 
     htmls::HTMLStream<"<script type=\"text/javascript\">", "</script>"> script;
     generateJS(script);
@@ -39,6 +40,6 @@ void JavascriptExample::generate() {
     body << h1("My Web Page") 
         << p("A Paragraph").set("id","demo") 
         << button("Try it").set("type","button").set("onclick","myFunction()") << htmls::gen_end_tag();
-    
-    html << body << script << htmls::gen_end_tag();
+    head << script << htmls::gen_end_tag();
+    html << head << body << htmls::gen_end_tag();
 }
