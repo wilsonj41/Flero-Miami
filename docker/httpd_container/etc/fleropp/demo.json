@@ -1,50 +1,140 @@
 {
     "compiler": "g++",
-    "args": ["-std=c++20", "-shared", "-fPIC", "-fuse-ld=gold", "-Wl","--no-gnu-unique", "-o"],
+    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-o"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{
-                "sharedObject": "HelloWorldView.so",
+                "sharedObject": "obj/HelloWorldView.so",
                 "source": [
-                    "HelloWorldView.cpp"
+                    "early_examples/HelloWorldView.cpp"
                 ]
             }]
         },
         {
             "uri": "/time.elf",
             "dependencies": [{
-                "sharedObject": "TimeView.so",
+                "sharedObject": "obj/TimeView.so",
                 "source": [
-                    "TimeView.cpp"
+                    "early_examples/TimeView.cpp"
                 ]
             }]
         },
         {
             "uri": "/peetah.elf",
             "dependencies": [{
-                "sharedObject": "JoeyView.so",
+                "sharedObject": "obj/JoeyView.so",
                 "source": [
-                    "test_dir"
+                    "early_examples/joey_view"
                 ]
             }]
         },
         {
             "uri": "/ultimate.elf",
             "dependencies": [{
-                "sharedObject": "TheUltimateView.so",
+                "sharedObject": "obj/TheUltimateView.so",
                 "source": [
-                    "TheUltimateView.cpp"
+                    "early_examples/TheUltimateView.cpp"
                 ]
             }]
         },
         {
-            "uri": "/tableExample.elf",
+            "uri": "/tableExampleLiterals.elf",
             "dependencies": [{
-                    "sharedObject": "TableExampleView.so",
+                "sharedObject": "obj/TableExampleViewLiterals.so",
+                "source": [
+                    "html_literals_examples/TableExampleView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/tableExampleWithBorderLiterals.elf",
+            "dependencies": [{
+                "sharedObject": "obj/TableExampleWithBorderViewLiterals.so",
+                "source": [
+                    "html_literals_examples/TableExampleWithBorderView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/iframeExampleLiterals.elf",
+            "dependencies": [{
+                "sharedObject": "obj/IframeExampleViewLiterals.so",
+                "source": [
+                    "html_literals_examples/IframeExampleView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/parallelFFT.elf",
+            "dependencies": [{
+                "sharedObject": "obj/FFTView.so",
+                "source": [
+                    "hpc_examples/FFTView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/tableExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/TableExampleViewStreams.so",
                     "source": [
-                        "TableExampleView.cpp"
+                        "html_streams_examples/TableExampleView.cpp"
                     ]
-                }]
+            }]
+        },
+        {
+            "uri": "/iframeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/IframeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/IframeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/tableBorderExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "obj/TableExampleWithBorderViewStreams.so",
+                    "source": [
+                        "html_streams_examples/TableExampleWithBorderView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/javaScriptStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "JavascriptExampleStreams.so",
+                    "source": [
+                        "html_streams_examples/JavascriptExample.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/classAttributeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "ClassAttributeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/ClassAttributeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/idAttributeExampleStreams.elf",
+            "dependencies": [{
+                    "sharedObject": "IdAttributeExampleViewStreams.so",
+                    "source": [
+                        "html_streams_examples/IdAttributeExampleView.cpp"
+                    ]
+            }]
+        },
+        {
+            "uri": "/crawzone.elf",
+            "dependencies": [{
+                    "sharedObject": "CrawfordView.so",
+                    "source": [
+                        "testDirsWithExtension.cpp"
+                    ]
+            }]
         }
     ]
 }

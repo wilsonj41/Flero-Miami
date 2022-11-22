@@ -13,6 +13,7 @@ namespace fleropp_fpm {
             // Parse the JSON into the property tree.
             pt::read_json(filename, tree);
 
+            // Get compiler configuration elements
             boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
             auto arg_child = tree.get_child_optional("args");
 
@@ -22,6 +23,10 @@ namespace fleropp_fpm {
                     args.emplace_back(params.second.data());
                 }
             } 
+
+            // Get source file extension
+            auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
+
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
@@ -40,27 +45,24 @@ namespace fleropp_fpm {
                         if (filesystem::is_directory(this->_lib_dir + "/" + it3.second.data())) {
                             for (const auto& dir_entry : 
                                     filesystem::recursive_directory_iterator(this->_lib_dir + "/" + it3.second.data())) {
-                                if (dir_entry.is_regular_file()) {
+                                if (dir_entry.is_regular_file() && dir_entry.path().extension() == source_ext) {
                                     sources.push_back(dir_entry.path().string());
-                                } else {
-                                    // Else just add this filepath to the sources vector
-                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
                                 }
                             }
-                        } 
-                        else {
-                                    // Else just add this filepath to the sources vector
-                                    sources.push_back(this->_lib_dir + "/" + it3.second.data());
+                        } else {
+                            // Else just add this filepath to the sources vector
+                            sources.push_back(this->_lib_dir + "/" + it3.second.data());
                         }
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
                     if (compiler) {
-                            dependencies.emplace_back(shared_object, sources, compiler.get(), args);
+                        dependencies.emplace_back(shared_object, sources, compiler.get(), args);
                     } else { 
-                            dependencies.emplace_back(shared_object, sources);
+                        dependencies.emplace_back(shared_object, sources);
                     }
-                _endpoints[uri] = dependencies;
+
+                    _endpoints[uri] = dependencies;
                 }
             }
         } catch (const exception &e) {
