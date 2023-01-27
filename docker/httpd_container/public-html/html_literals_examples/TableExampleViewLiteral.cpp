@@ -3,21 +3,21 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <ranges>
 
-#include "TableExampleView.hpp"
+#include "TableExampleViewLiteral.hpp"
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
 extern "C" {
-    TableExampleView *allocator() {
-        return new TableExampleView();
+    TableExampleViewLiteral *allocator() {
+        return new TableExampleViewLiteral();
     }
 
-    void deleter(TableExampleView *ptr) {
+    void deleter(TableExampleViewLiteral *ptr) {
         delete ptr;
     }
 }
 
-void TableExampleView::generate() {
+void TableExampleViewLiteral::generate() {
     using namespace fleropp_literals;
     namespace htmls = fleropp_html_stream;
 
@@ -26,7 +26,7 @@ void TableExampleView::generate() {
         "<body>"_h;
             "<h2>HTML Tables</h2>"_h;
 
-            "<p>HTML tables start with a table tag.</p>"_h;
+            "<p>HTML tables start with a table tag 1000.</p>"_h;
             "<p>Table rows start with a tr tag.</p>"_h;
             "<p>Table data start with a td tag.</p>"_h;
 

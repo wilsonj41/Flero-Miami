@@ -92,7 +92,7 @@ void TableExampleView::generate() {
 
     /* --------------------- NOTE: Building the <body> tag of the webpage ---------------------  */
     body << h2("HTML Tables")
-        << p("HTML tables start with a table tag.")
+        << p("HTML tables start with a table tag 40.")
         << p("Table rows start with a tr tag.")
         << p("Table data start with a td tag.");
     

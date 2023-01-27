@@ -42,7 +42,7 @@
             "dependencies": [{
                 "sharedObject": "obj/TableExampleViewLiterals.so",
                 "source": [
-                    "html_literals_examples/TableExampleView.cpp"
+                    "html_literals_examples/TableExampleViewLiteral.cpp"
                 ]
             }]
         },
@@ -51,7 +51,7 @@
             "dependencies": [{
                 "sharedObject": "obj/TableExampleWithBorderViewLiterals.so",
                 "source": [
-                    "html_literals_examples/TableExampleWithBorderView.cpp"
+                    "html_literals_examples/TableExampleWithBorderViewLiteral.cpp"
                 ]
             }]
         },
@@ -60,7 +60,7 @@
             "dependencies": [{
                 "sharedObject": "obj/IframeExampleViewLiterals.so",
                 "source": [
-                    "html_literals_examples/IframeExampleView.cpp"
+                    "html_literals_examples/IframeExampleViewLiteral.cpp"
                 ]
             }]
         },
