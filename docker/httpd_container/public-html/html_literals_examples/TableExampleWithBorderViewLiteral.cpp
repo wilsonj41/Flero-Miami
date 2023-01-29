@@ -42,7 +42,7 @@ void TableExampleWithBorderViewLiteral::generate() {
             "<p>If you want the borders to collapse into one border, "
                 "add the CSS border-collapse property.</p>"_h;
 
-            static constexpr std::array<entry, 3> people = {entry{"Bill", "Smith", 50},
+            static constexpr std::array<entry, 3> people = {entry{"Jill", "Smith", 50},
                                                             entry{"Eve", "Jackson", 94},
                                                             entry{"John", "Doe", 80}};
 
