@@ -26,7 +26,7 @@ void TableExampleViewLiteral::generate() {
         "<body>"_h;
             "<h2>HTML Tables</h2>"_h;
 
-            "<p>HTML tables start with a table tag 1000.</p>"_h;
+            "<p>HTML tables start with a table tag.</p>"_h;
             "<p>Table rows start with a tr tag.</p>"_h;
             "<p>Table data start with a td tag.</p>"_h;
 

@@ -103,7 +103,7 @@
         {
             "uri": "/javaScriptStreams.elf",
             "dependencies": [{
-                    "sharedObject": "JavascriptExampleStreams.so",
+                    "sharedObject": "obj/JavascriptExampleStreams.so",
                     "source": [
                         "html_streams_examples/JavascriptExample.cpp"
                     ]
@@ -112,7 +112,7 @@
         {
             "uri": "/classAttributeExampleStreams.elf",
             "dependencies": [{
-                    "sharedObject": "ClassAttributeExampleViewStreams.so",
+                    "sharedObject": "obj/ClassAttributeExampleViewStreams.so",
                     "source": [
                         "html_streams_examples/ClassAttributeExampleView.cpp"
                     ]
@@ -121,7 +121,7 @@
         {
             "uri": "/idAttributeExampleStreams.elf",
             "dependencies": [{
-                    "sharedObject": "IdAttributeExampleViewStreams.so",
+                    "sharedObject": "obj/IdAttributeExampleViewStreams.so",
                     "source": [
                         "html_streams_examples/IdAttributeExampleView.cpp"
                     ]
@@ -130,7 +130,7 @@
         {
             "uri": "/crawzone.elf",
             "dependencies": [{
-                    "sharedObject": "CrawfordView.so",
+                    "sharedObject": "obj/CrawfordView.so",
                     "source": [
                         "testDirsWithExtension.cpp"
                     ]
