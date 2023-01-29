@@ -17,7 +17,7 @@ void HelloWorldView::generate() {
     "Content-type: text/html\r"_h;
     "\r"_h;
     "<html>"_h;
-        "<head>"_h "<title>Hello, World</title>"_h "</head>"_h;
+        "<head>"_h "<title>Hello!, World</title>"_h "</head>"_h;
         "<body>"_h;
             "<h1>Hello, World!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");

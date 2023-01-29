@@ -11,8 +11,11 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/process.hpp>
 #include <boost/process/child.hpp>
 #include <boost/process/search_path.hpp>
+
+#include "spdlog/spdlog.h"
 
 #include <dlfcn.h>
 #include <unistd.h>
@@ -63,11 +66,11 @@ namespace fleropp_fpm {
         void open_lib() override {
             // Only do something if the library is not currently open
             if (!_open) {
-                // RTLD_NOW, we could try RTLD_LAZY for performance
                 if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
-                    std::cerr << ::dlerror() << '\n';
+                    spdlog::error("Unable to load DSO '{}': {}", _shared_object, ::dlerror());
                 } else {
                     _open = true;
+                    spdlog::debug("Opened '{}'", _shared_object);
                 }
             }
         }
@@ -76,9 +79,10 @@ namespace fleropp_fpm {
             // Only do something if the library is currently open.
             if (_open) {
                 if (::dlclose(_handle) != 0) {
-                    std::cerr << ::dlerror() << '\n';
+                    spdlog::error("Unable to unload DSO '{}': {}", _shared_object, ::dlerror());
                 } else {
                     _open = false;
+                    spdlog::debug("Closed '{}'", _shared_object);
                 }
             }
         }
@@ -105,7 +109,7 @@ namespace fleropp_fpm {
             // If either is nullptr, something went wrong
             if (!alloc_fun || !del_fun) {
                 close_lib();
-                std::cerr << ::dlerror() << '\n';
+                spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", _shared_object, ::dlerror());
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
@@ -131,6 +135,7 @@ namespace fleropp_fpm {
             // is newer than the library based on mtime.
             if (std::filesystem::exists(_shared_object)) {
                 const auto so_mtim = std::filesystem::last_write_time(_shared_object);
+                //spdlog::debug("'{}' last modified on {}", _shared_object, so_mtim);
                 return std::any_of(std::begin(_src_path_list), std::end(_src_path_list), 
                                     [so_mtim] (auto src) { 
                                         return std::filesystem::last_write_time(src) > so_mtim; 
@@ -143,8 +148,18 @@ namespace fleropp_fpm {
         bool recompile() const {
             namespace bp = boost::process;
             if (was_modified()) {
-                bp::child chld(bp::search_path(m_compiler), _args);
+                spdlog::info("Compiling '{}'", _shared_object);
+                boost::asio::io_context ioc;
+                std::future<std::string> stderr;
+                bp::child chld(bp::search_path(m_compiler), _args, bp::std_in.close(),
+                                               bp::std_out > bp::null, bp::std_err > stderr, ioc);
+                ioc.run();
                 chld.wait();
+                const auto exit_code = chld.exit_code();
+                if (exit_code) {
+                    spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                    return false;
+                }
                 return true;
             }            
             return false;

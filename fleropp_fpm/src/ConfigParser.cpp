@@ -1,5 +1,9 @@
 #include "ConfigParser.hpp"
+
 #include <filesystem>
+
+#include "spdlog/spdlog.h"
+
 namespace fleropp_fpm {
     namespace pt = boost::property_tree;
     using namespace std;
@@ -63,10 +67,12 @@ namespace fleropp_fpm {
                     }
 
                     _endpoints[uri] = dependencies;
+                    spdlog::info("Registered endpoint '{}'", uri);
                 }
             }
+            spdlog::info("Finished reading configuration file '{}'", filename);
         } catch (const exception &e) {
-            cerr << e.what() << '\n';
+            spdlog::critical("Unable to parse configuration file '{}': {}", filename, e.what());
         }
     }
 }
