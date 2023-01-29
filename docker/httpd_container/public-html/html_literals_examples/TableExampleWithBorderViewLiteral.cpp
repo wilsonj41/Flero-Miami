@@ -6,21 +6,21 @@
 #include <string_view>
 #include <tuple>
 
-#include "TableExampleWithBorderView.hpp"
+#include "TableExampleWithBorderViewLiteral.hpp"
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
 extern "C" {
-    TableExampleWithBorderView *allocator() {
-        return new TableExampleWithBorderView();
+    TableExampleWithBorderViewLiteral *allocator() {
+        return new TableExampleWithBorderViewLiteral();
     }
 
-    void deleter(TableExampleWithBorderView *ptr) {
+    void deleter(TableExampleWithBorderViewLiteral *ptr) {
         delete ptr;
     }
 }
 
-void TableExampleWithBorderView::generate() {
+void TableExampleWithBorderViewLiteral::generate() {
     using namespace fleropp_literals;
     namespace htmls = fleropp_html_stream;
     using entry = std::tuple<std::string_view, std::string_view, unsigned int>;

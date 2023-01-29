@@ -3,21 +3,21 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <ranges>
 
-#include "IframeExampleView.hpp"
+#include "IframeExampleViewLiteral.hpp"
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
 extern "C" {
-    IframeExampleView *allocator() {
-        return new IframeExampleView();
+    IframeExampleViewLiteral *allocator() {
+        return new IframeExampleViewLiteral();
     }
 
-    void deleter(IframeExampleView *ptr) {
+    void deleter(IframeExampleViewLiteral *ptr) {
         delete ptr;
     }
 }
 
-void IframeExampleView::generate() {
+void IframeExampleViewLiteral::generate() {
     using namespace fleropp_literals;
     namespace htmls = fleropp_html_stream;
 

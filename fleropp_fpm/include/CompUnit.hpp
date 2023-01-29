@@ -64,7 +64,7 @@ namespace fleropp_fpm {
             // Only do something if the library is not currently open
             if (!_open) {
                 // RTLD_NOW, we could try RTLD_LAZY for performance
-                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_NOW | RTLD_GLOBAL))) {
+                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
                     std::cerr << ::dlerror() << '\n';
                 } else {
                     _open = true;
