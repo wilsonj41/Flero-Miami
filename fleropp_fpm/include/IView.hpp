@@ -1,9 +1,17 @@
 #ifndef I_VIEW_HPP
 #define I_VIEW_HPP
 
-//#include "HTMLLiterals.hpp"
-
 #include <ostream>
+
+#define INIT_VIEW(NAME)                       \
+extern "C" {                                  \
+    NAME* allocator() {                       \
+        return new NAME();                    \
+    }                                         \
+    void deleter(NAME* ptr) {                 \
+        delete ptr;                           \
+    }                                         \
+}                                             \
 
 class IView {
   public:

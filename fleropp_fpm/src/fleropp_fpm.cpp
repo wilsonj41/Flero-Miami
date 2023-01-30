@@ -37,7 +37,7 @@ int main (int argc, char **argv) {
     // Construct a handler that will listen on TCP port 50001
     FCGIHandler handler{50001};
     // Add some endpoint mappings
-    handler.add_endpoint(config._endpoints);
+    handler.load_endpoints(config.endpoints);
     // Start accepting connections (blocking)
     handler.accept();
 }

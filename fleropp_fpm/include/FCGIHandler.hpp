@@ -32,12 +32,12 @@ namespace fleropp_fpm {
          * Starts event loop and accepts incoming requests
          */
         void accept();
-        void add_endpoint(endpoints_map_t &endpoints_map);
+        void load_endpoints(const endpoints_map_t& endpoints_map);
       
       private:
-        int _fd;
-        FCGX_Request _request;
-        endpoints_map_t _endpoints;
+        int m_fd;
+        FCGX_Request m_request;
+        endpoints_map_t m_endpoints;
     };
 }
 
