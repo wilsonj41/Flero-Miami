@@ -14,16 +14,8 @@ namespace htmls = fleropp_html_stream;
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_classes_capitals
 // Note: Inline javascript seems to only work when it is not inside of a header.
 
-extern "C" {
-    ClassAttributeExampleView *allocator() {
-        return new ClassAttributeExampleView();
-    }
 
-    void deleter(ClassAttributeExampleView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(ClassAttributeExampleView)
 
 namespace class_attr_example_util {
     void defineStyle(htmls::HTMLStream<"<style>","</style>"> &style) {

@@ -7,15 +7,7 @@
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    IframeExampleViewLiteral *allocator() {
-        return new IframeExampleViewLiteral();
-    }
-
-    void deleter(IframeExampleViewLiteral *ptr) {
-        delete ptr;
-    }
-}
+INIT_VIEW(IframeExampleViewLiteral)
 
 void IframeExampleViewLiteral::generate() {
     using namespace fleropp_literals;

@@ -11,8 +11,11 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/process.hpp>
 #include <boost/process/child.hpp>
 #include <boost/process/search_path.hpp>
+
+#include "spdlog/spdlog.h"
 
 #include <dlfcn.h>
 #include <unistd.h>
@@ -42,43 +45,45 @@ namespace fleropp_fpm {
                     const std::vector<std::string> &args = {},
                     const std::string &alloc_sym = "allocator", 
                     const std::string &del_sym = "deleter") :
-                        _handle{nullptr}, _shared_object{shared_object},
-                        _src_path_list{src_path_list},
-                        _alloc_sym{alloc_sym}, _del_sym{del_sym},
-                        m_compiler{compiler}, _args{args},
-                        _open{false} {
+                        m_handle{nullptr}, m_shared_object{shared_object},
+                        m_src_path_list{src_path_list},
+                        m_alloc_sym{alloc_sym}, m_del_sym{del_sym},
+                        m_compiler{compiler}, m_args{args},
+                        m_open{false} {
 
             if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
                 // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
                 m_compiler = "g++";
-                _args = compiler_defaults::compiler_map.at(m_compiler);
+                m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
             else if (args.empty()){
-                _args = compiler_defaults::compiler_map.at(m_compiler);
+                m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
-            _args.emplace_back(shared_object);
-            _args.insert(std::end(_args), std::begin(_src_path_list), std::end(_src_path_list));
+            m_args.emplace_back(shared_object);
+            m_args.insert(std::end(m_args), std::begin(m_src_path_list), std::end(m_src_path_list));
+            spdlog::info("Compiler loaded: '{}'. Args loaded: '{}'", m_compiler, fmt::join(m_args, ", "));
         }
 
         void open_lib() override {
             // Only do something if the library is not currently open
-            if (!_open) {
-                // RTLD_NOW, we could try RTLD_LAZY for performance
-                if (!(_handle = ::dlopen(_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
-                    std::cerr << ::dlerror() << '\n';
+            if (!m_open) {
+                if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
+                    spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
                 } else {
-                    _open = true;
+                    m_open = true;
+                    spdlog::debug("Opened '{}'", m_shared_object);
                 }
             }
         }
 
         void close_lib() override {
             // Only do something if the library is currently open.
-            if (_open) {
-                if (::dlclose(_handle) != 0) {
-                    std::cerr << ::dlerror() << '\n';
+            if (m_open) {
+                if (::dlclose(m_handle) != 0) {
+                    spdlog::error("Unable to unload DSO '{}': {}", m_shared_object, ::dlerror());
                 } else {
-                    _open = false;
+                    m_open = false;
+                    spdlog::debug("Closed '{}'", m_shared_object);
                 }
             }
         }
@@ -99,13 +104,13 @@ namespace fleropp_fpm {
 
             // dlsym returns a void pointer, so we reinterpret cast it to our
             // type aliases above
-            auto alloc_fun = reinterpret_cast<alloc_fun_t>(::dlsym(_handle, _alloc_sym.c_str()));
-            auto del_fun = reinterpret_cast<del_fun_t>(::dlsym(_handle, _del_sym.c_str()));
+            auto alloc_fun = reinterpret_cast<alloc_fun_t>(::dlsym(m_handle, m_alloc_sym.c_str()));
+            auto del_fun = reinterpret_cast<del_fun_t>(::dlsym(m_handle, m_del_sym.c_str()));
 
             // If either is nullptr, something went wrong
             if (!alloc_fun || !del_fun) {
                 close_lib();
-                std::cerr << ::dlerror() << '\n';
+                spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", m_shared_object, ::dlerror());
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
@@ -115,23 +120,24 @@ namespace fleropp_fpm {
         } 
 
       private:
-        void *_handle;
-        std::string _shared_object;
-        std::vector<std::string> _src_path_list;
-        std::string _alloc_sym;
-        std::string _del_sym;
+        void *m_handle;
+        std::string m_shared_object;
+        std::vector<std::string> m_src_path_list;
+        std::string m_alloc_sym;
+        std::string m_del_sym;
         std::string m_compiler;
-        std::vector<std::string> _args;
-        bool _open;
+        std::vector<std::string> m_args;
+        bool m_open;
 
         // Checks if the source file was modified
         bool was_modified() const {
             // If library file does not exist, we consider the source file to
             // have been modified. Otherwise, we return whether the source
             // is newer than the library based on mtime.
-            if (std::filesystem::exists(_shared_object)) {
-                const auto so_mtim = std::filesystem::last_write_time(_shared_object);
-                return std::any_of(std::begin(_src_path_list), std::end(_src_path_list), 
+            if (std::filesystem::exists(m_shared_object)) {
+                const auto so_mtim = std::filesystem::last_write_time(m_shared_object);
+                //spdlog::debug("'{}' last modified on {}", m_shared_object, so_mtim);
+                return std::any_of(std::begin(m_src_path_list), std::end(m_src_path_list), 
                                     [so_mtim] (auto src) { 
                                         return std::filesystem::last_write_time(src) > so_mtim; 
                                     });
@@ -143,8 +149,20 @@ namespace fleropp_fpm {
         bool recompile() const {
             namespace bp = boost::process;
             if (was_modified()) {
-                bp::child chld(bp::search_path(m_compiler), _args);
+                spdlog::info("Compiling '{}'", m_shared_object);
+                boost::asio::io_context ioc;
+                std::future<std::string> stderr;
+                bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
+                                               bp::std_out > bp::null, bp::std_err > stderr, ioc);
+                ioc.run();
                 chld.wait();
+                const auto exit_code = chld.exit_code();
+                if (exit_code) {
+                    spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                    return false;
+                } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
+                    spdlog::info("Sucessfully compiled '{}'", m_shared_object);
+                }
                 return true;
             }            
             return false;

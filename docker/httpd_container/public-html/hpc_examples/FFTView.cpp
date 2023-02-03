@@ -9,15 +9,7 @@
 
 #include "FFTView.hpp"
 
-extern "C" {
-    FFTView *allocator() {
-        return new FFTView();
-    }
-
-    void deleter(FFTView *ptr) {
-        delete ptr;
-    }
-}
+INIT_VIEW(FFTView)
 
 namespace fft_util {
     constexpr double PI = 3.1415926536;

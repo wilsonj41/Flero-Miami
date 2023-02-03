@@ -15,16 +15,7 @@ using entry = std::tuple<std::string, std::string, int>;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_collapse
 
-extern "C" {
-    TableExampleWithBorderView *allocator() {
-        return new TableExampleWithBorderView();
-    }
-
-    void deleter(TableExampleWithBorderView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(TableExampleWithBorderView)
 
 namespace table_border_example_util {
     void defineStyle(htmls::HTMLStream<"<style>","</style>"> &style) {

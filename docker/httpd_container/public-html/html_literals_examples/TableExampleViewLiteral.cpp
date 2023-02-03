@@ -7,15 +7,7 @@
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    TableExampleViewLiteral *allocator() {
-        return new TableExampleViewLiteral();
-    }
-
-    void deleter(TableExampleViewLiteral *ptr) {
-        delete ptr;
-    }
-}
+INIT_VIEW(TableExampleViewLiteral)
 
 void TableExampleViewLiteral::generate() {
     using namespace fleropp_literals;

@@ -11,16 +11,7 @@ namespace htmls = fleropp_html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    TableExampleView *allocator() {
-        return new TableExampleView();
-    }
-
-    void deleter(TableExampleView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(TableExampleView)
 
 namespace table_example_util {
   void firstBuildTable(htmls::HTMLStream<"<table>","</table>"> &table1) {
@@ -92,7 +83,7 @@ void TableExampleView::generate() {
 
     /* --------------------- NOTE: Building the <body> tag of the webpage ---------------------  */
     body << h2("HTML Tables")
-        << p("HTML tables start with a table tag.")
+        << p("HTML tables start with a table tag 40.")
         << p("Table rows start with a tr tag.")
         << p("Table data start with a td tag.");
     
