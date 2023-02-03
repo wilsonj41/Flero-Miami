@@ -7,15 +7,7 @@
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    TableExampleViewLiteral *allocator() {
-        return new TableExampleViewLiteral();
-    }
-
-    void deleter(TableExampleViewLiteral *ptr) {
-        delete ptr;
-    }
-}
+INIT_VIEW(TableExampleViewLiteral)
 
 void TableExampleViewLiteral::generate() {
     using namespace fleropp_literals;
@@ -26,7 +18,7 @@ void TableExampleViewLiteral::generate() {
         "<body>"_h;
             "<h2>HTML Tables</h2>"_h;
 
-            "<p>HTML tables start with a table tag 1000.</p>"_h;
+            "<p>HTML tables start with a table tag.</p>"_h;
             "<p>Table rows start with a tr tag.</p>"_h;
             "<p>Table data start with a td tag.</p>"_h;
 

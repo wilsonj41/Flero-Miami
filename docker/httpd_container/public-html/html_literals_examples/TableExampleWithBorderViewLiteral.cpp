@@ -10,15 +10,7 @@
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    TableExampleWithBorderViewLiteral *allocator() {
-        return new TableExampleWithBorderViewLiteral();
-    }
-
-    void deleter(TableExampleWithBorderViewLiteral *ptr) {
-        delete ptr;
-    }
-}
+INIT_VIEW(TableExampleWithBorderViewLiteral)
 
 void TableExampleWithBorderViewLiteral::generate() {
     using namespace fleropp_literals;

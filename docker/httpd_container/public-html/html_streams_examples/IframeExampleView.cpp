@@ -10,16 +10,7 @@ using namespace cgicc;
 namespace htmls = fleropp_html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_iframe
-extern "C" {
-    IframeExampleView *allocator() {
-        return new IframeExampleView();
-    }
-
-    void deleter(IframeExampleView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(IframeExampleView)
 
 void IframeExampleView::generate() {
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;

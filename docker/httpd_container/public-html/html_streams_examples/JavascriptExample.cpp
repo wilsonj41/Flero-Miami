@@ -13,16 +13,7 @@ namespace htmls = fleropp_html_stream;
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_head_script
 // Note: Inline javascript seems to only work when it is not inside of a header.
 
-extern "C" {
-    JavascriptExample *allocator() {
-        return new JavascriptExample();
-    }
-
-    void deleter(JavascriptExample *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(JavascriptExample)
 
 namespace js_example_util {
     // Generates the Javascript logic that runs this page.

@@ -12,16 +12,7 @@ namespace htmls = fleropp_html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_id_css
 
-extern "C" {
-    IdAttributeExampleView *allocator() {
-        return new IdAttributeExampleView();
-    }
-
-    void deleter(IdAttributeExampleView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(IdAttributeExampleView)
 
 namespace id_attr_example_util {
     void defineStyle(htmls::HTMLStream<"<style>","</style>"> &style) {

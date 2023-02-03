@@ -11,16 +11,7 @@ namespace htmls = fleropp_html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 
-extern "C" {
-    TableExampleView *allocator() {
-        return new TableExampleView();
-    }
-
-    void deleter(TableExampleView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(TableExampleView)
 
 namespace table_example_util {
   void firstBuildTable(htmls::HTMLStream<"<table>","</table>"> &table1) {

@@ -67,7 +67,9 @@ namespace fleropp_fpm {
                     }
 
                     endpoints[uri] = dependencies;
-                    spdlog::info("Registered endpoint '{}'", uri);
+                    spdlog::info("Registered endpoint: '{}'", uri);
+                    spdlog::info("Share Object name: '{}'", shared_object);
+                    spdlog::info("Source file(s): '{}'", fmt::join(sources, ", "));
                 }
             }
             spdlog::info("Finished reading configuration file '{}'", filename);

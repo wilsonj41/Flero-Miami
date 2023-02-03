@@ -61,6 +61,7 @@ namespace fleropp_fpm {
             }
             m_args.emplace_back(shared_object);
             m_args.insert(std::end(m_args), std::begin(m_src_path_list), std::end(m_src_path_list));
+            spdlog::info("Compiler loaded: '{}'. Args loaded: '{}'", m_compiler, fmt::join(m_args, ", "));
         }
 
         void open_lib() override {
@@ -159,6 +160,8 @@ namespace fleropp_fpm {
                 if (exit_code) {
                     spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
                     return false;
+                } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
+                    spdlog::info("Sucessfully compiled '{}'", m_shared_object);
                 }
                 return true;
             }            
