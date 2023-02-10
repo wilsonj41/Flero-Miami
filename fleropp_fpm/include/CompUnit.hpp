@@ -53,7 +53,7 @@ namespace fleropp_fpm {
 
             if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
                 // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
-                spdlog::get("compiler")->warn("{} was not found to have default argument list, will revert to g++ default paramters \n", m_compiler);
+                spdlog::get("compiler")->warn("{} was not found to have default argument list, will revert to g++ default parameters", m_compiler);
                 m_compiler = "g++";
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
