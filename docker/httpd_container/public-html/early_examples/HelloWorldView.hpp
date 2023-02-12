@@ -3,7 +3,7 @@
 
 #include <fleropp/IView.hpp>
 
-class HelloWorldView : public IView {
+class HelloWorldView : public IView<HelloWorldView> {
   public:
     HelloWorldView() = default;
     ~HelloWorldView() = default;

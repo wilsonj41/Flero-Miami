@@ -14,6 +14,7 @@ extern "C" {                                  \
 
 struct IViewInterface {
     virtual ~IViewInterface() = default;
+    virtual void generate() = 0;
     virtual void get() = 0;
     virtual void post() = 0;
     virtual void post_impl() = 0;
@@ -28,11 +29,11 @@ class IView : IViewInterface {
         static_cast<DerivedView*>(this)->get_impl();
     }
     void post() {
-        static_cost<DerivedView*>(this)->post_impl();
+        static_cast<DerivedView*>(this)->post_impl();
     }
-    virtual void generate() = 0;
+    void generate() {};
     void get_impl() {}
-    void post_imp() {}
+    void post_impl() {}
 };
 
 #endif /* I_VIEW_HPP */
