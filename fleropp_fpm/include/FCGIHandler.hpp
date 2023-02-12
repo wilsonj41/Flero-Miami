@@ -11,7 +11,7 @@
 #include "fcgiapp.h"
 
 namespace fleropp_fpm {
-  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IView>>>;
+  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IViewInterface>>>;
     class FCGIHandler {
       public:
         /***

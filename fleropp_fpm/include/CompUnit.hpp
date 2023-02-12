@@ -58,7 +58,7 @@ namespace fleropp_fpm {
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
             else if (args.empty()){
-                spdlog::debug("{} has no arguments, will use default parameters", m_compiler)
+                spdlog::debug("{} has no arguments, will use default parameters", m_compiler);
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
             m_args.emplace_back(shared_object);
