@@ -2,6 +2,7 @@
 #define I_VIEW_HPP
 
 #include <ostream>
+#include "RequestData.hpp"
 
 #define INIT_VIEW(NAME)                       \
 extern "C" {                                  \
@@ -16,7 +17,7 @@ extern "C" {                                  \
 class IView {
   public:
     virtual ~IView() = default;
-    virtual void generate() = 0;
+    virtual void generate(const fleropp_io::RequestData& request) = 0;
 };
 
 #endif /* I_VIEW_HPP */

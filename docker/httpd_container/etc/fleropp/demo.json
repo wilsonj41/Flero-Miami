@@ -1,6 +1,6 @@
 {
     "compiler": "g++",
-    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-o"],
+    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-L/lib/fleropp", "-lfleropp", "-o"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{

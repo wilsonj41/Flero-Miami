@@ -1,27 +1,32 @@
 SRCDIR = ./src
 OBJDIR = ./obj
 BINDIR = ./bin
+SODIR = ./so
 INCDIR = ./include
 
 CXX=g++
-CXXFLAGS=-std=c++20 -Wall -I $(INCDIR)
+CXXFLAGS=-std=c++20 -Wall -I $(INCDIR) -fPIC
 LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc -lspdlog -lfmt
 LDFLAGS=-rdynamic
 BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
 
 BIN=fleropp_fpm
+SO=libfleropp.so
 SRC=$(wildcard $(SRCDIR)/*.cpp)
 OBJ=$(addprefix $(OBJDIR)/,$(notdir $(SRC:.cpp=.o)))
 GCH=$(INCDIR)/HTMLLiterals.hpp
 
 .PHONY : all
-all: $(BINDIR) $(OBJDIR) compile link gch
+all: $(BINDIR) $(OBJDIR) $(SODIR) compile link gch shared
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
+
+$(SODIR):
+	mkdir -p $(SODIR)
 
 .PHONY : compile
 compile: $(OBJ)
@@ -38,9 +43,14 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 link: compile
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BINDIR)/$(BIN) $(OBJ) $(LDLIBS)
 
+.PHONY : shared
+shared: compile
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $(SODIR)/$(SO) $(OBJ) $(LDLIBS)
+
 .PHONY : clean
 clean:
 	find -type f -name "$(BIN)" -delete
+	find -type f -name "$(SO)" -delete
 	find -type f -name "*.o" -delete
 	find -type f -name "*~" -delete
 

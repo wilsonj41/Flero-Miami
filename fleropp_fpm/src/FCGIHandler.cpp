@@ -47,9 +47,11 @@ namespace fleropp_fpm {
                                           fios.getenv("REQUEST_URI"),
                                           fios.getenv("SERVER_PROTOCOL"));
             if (source != m_endpoints.end()) {
-                ScopedRedirect redir{fios, fleropp_io::fppout};
+                ScopedRedirect redir_out{fios, fleropp_io::fppout};
+                ScopedRedirect redir_in{fios, fleropp_io::fppin};
                 auto page = source->second[0].get_instance();
-                page->generate();
+                std::invoke(cmap[fios.getenv("REQUEST_METHOD")], page, fios.getenv("QUERY_STRING"));
+                //page->generate();
             }
         }
     }

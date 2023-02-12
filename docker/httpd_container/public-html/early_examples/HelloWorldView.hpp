@@ -7,7 +7,7 @@ class HelloWorldView : public IView {
   public:
     HelloWorldView() = default;
     ~HelloWorldView() = default;
-    void generate() override;
+    void generate(const fleropp_io::RequestData& request) override;
 };
 
 #endif /* HELLO_WORLD_VIEW_HPP */

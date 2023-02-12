@@ -1,5 +1,6 @@
 #include "HelloWorldView.hpp"
 #include <fleropp/HTMLLiterals.hpp>
+#include <fleropp/RequestData.hpp>
 
 extern "C" {
     HelloWorldView *allocator() {
@@ -12,7 +13,7 @@ extern "C" {
 
 }
 
-void HelloWorldView::generate() {
+void HelloWorldView::generate(const fleropp_io::RequestData& request) {
     using namespace fleropp_literals;
     "Content-type: text/html\r"_h;
     "\r"_h;
@@ -21,6 +22,7 @@ void HelloWorldView::generate() {
         "<body>"_h;
             "<h1>Hello, World!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
+            "<h1>Hello, {}!</h1>"_f(request.query().get("name"));
         "</body>"_h;
     "</html>"_h;
 }
