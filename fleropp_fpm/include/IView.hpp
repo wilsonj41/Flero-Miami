@@ -43,10 +43,10 @@ struct IViewWrapper {
 template <class DerivedView>
 class IView : public IViewWrapper {
     using member_arg_t = const fleropp_io::RequestData&;
-    using view_base_member_t = base_member_t<IView, member_arg_t>;
-    using view_derived_member_t = derived_member_t<DerivedView, member_arg_t>;
-    using view_member_variant_t = member_variant_t<IView, DerivedView, member_arg_t>;
-    using view_member_map_t = member_map_t<IView, DerivedView, 4, member_arg_t>;
+    using view_base_member_t = fleropp_util::base_member_t<IView, member_arg_t>;
+    using view_derived_member_t = fleropp_util::derived_member_t<DerivedView, member_arg_t>;
+    using view_member_variant_t = fleropp_util::member_variant_t<IView, DerivedView, member_arg_t>;
+    using view_member_map_t = fleropp_util::member_map_t<IView, DerivedView, 4, member_arg_t>;
     
   public:
     virtual ~IView() = default;
@@ -87,9 +87,9 @@ class IView : public IViewWrapper {
             "Content-length: 27\r\n\r\n"
             "<h1>Method Not Allowed</h1>";
         static constexpr auto n_supported = 
-            count_overridden<IView, DerivedView, 4, member_arg_t>(members);
+            fleropp_util::count_overridden<IView, DerivedView, 4, member_arg_t>(members);
         static constexpr auto supported = 
-            supported_methods<IView, DerivedView, 4, n_supported, member_arg_t>(members); 
+            fleropp_util::supported_methods<IView, DerivedView, 4, n_supported, member_arg_t>(members); 
     };
 
     static void print_supported() {

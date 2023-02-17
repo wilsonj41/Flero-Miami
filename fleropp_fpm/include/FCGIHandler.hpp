@@ -13,17 +13,7 @@
 #include "fcgiapp.h"
 
 namespace fleropp_fpm {
-  //using view_member_t = void (IView::*)(const fleropp_io::RequestData&);
-  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>>;
-
-  static constexpr std::array<std::pair<std::string_view, void (IViewWrapper::*)(const fleropp_io::RequestData&)>, 4> req_vals{{{"GET", &IViewWrapper::get_dispatch}, 
-                                                                                                                                {"POST", &IViewWrapper::post_dispatch},
-                                                                                                                                {"PUT", &IViewWrapper::put_dispatch},
-                                                                                                                                {"DELETE", &IViewWrapper::del_dispatch}}};
-  //static constexpr auto request_dispatch = ConstexprMap<std::string_view, view_member_t, 2>{{req_vals}};
-  static constexpr auto request_dispatch = 
-      ConstexprMap<std::string_view, void (IViewWrapper::*)(const fleropp_io::RequestData&), req_vals.size()>{{req_vals}};
-
+    using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>>; 
     class FCGIHandler {
       public:
         /***

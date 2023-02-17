@@ -16,7 +16,7 @@ extern "C" {
 
 }
 
-void HelloWorldView::get(const fleropp_io::RequestData& request) {
+/*void HelloWorldView::get(const fleropp_io::RequestData& request) {
     using namespace fleropp_literals;
     "Content-type: text/html\r"_h;
     "\r"_h;
@@ -30,7 +30,7 @@ void HelloWorldView::get(const fleropp_io::RequestData& request) {
     "</html>"_h;
     std::string test;
     fleropp_io::fppin >> test;
-}
+}*/
 
 void HelloWorldView::post(const fleropp_io::RequestData& request) {
     using namespace fleropp_literals;
