@@ -3,11 +3,12 @@
 
 #include <fleropp/IView.hpp>
 
-class HelloWorldView : public IView {
+class HelloWorldView : public IView<HelloWorldView> {
   public:
     HelloWorldView() = default;
     ~HelloWorldView() = default;
-    void generate(const fleropp_io::RequestData& request) override;
+    void get(const fleropp_io::RequestData& request);
+    void post(const fleropp_io::RequestData& request);
 };
 
 #endif /* HELLO_WORLD_VIEW_HPP */

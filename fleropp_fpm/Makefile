@@ -5,7 +5,7 @@ SODIR = ./so
 INCDIR = ./include
 
 CXX=g++
-CXXFLAGS=-std=c++20 -Wall -I $(INCDIR) -fPIC
+CXXFLAGS=-std=c++20 -Wall -I $(INCDIR) -fPIC -DFPM_BUILD
 LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc -lspdlog -lfmt
 LDFLAGS=-rdynamic
 BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS
@@ -50,7 +50,6 @@ shared: compile
 .PHONY : clean
 clean:
 	find -type f -name "$(BIN)" -delete
-	find -type f -name "$(SO)" -delete
 	find -type f -name "*.o" -delete
 	find -type f -name "*~" -delete
 

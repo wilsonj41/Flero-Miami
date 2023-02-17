@@ -113,7 +113,7 @@ namespace cgicc {
     {
       return FCGX_GetStr(data, length, fRequest.in);
     }
-    
+
     /*!
      * \brief Query the value of an environment variable stored in the request.
      *
@@ -147,6 +147,7 @@ namespace cgicc {
     
   protected:
     FCGX_Request& 			fRequest;
+    fcgi_streambuf      finBuf;
     fcgi_streambuf 			fOutBuf;
     fcgi_streambuf 			fErrBuf;
     std::ostream 			fErr;

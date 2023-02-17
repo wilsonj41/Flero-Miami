@@ -19,7 +19,7 @@ namespace fleropp_fpm
     class ConfigParser
     {
     public:
-        std::unordered_map<std::string, std::vector<CompUnit<IView>>> endpoints;
+        std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
         ConfigParser(const std::string &lib_dir = "/var/www/html");
 
         void load(const std::string &filename);
