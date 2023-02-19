@@ -5,10 +5,10 @@
 
 #include "JavascriptExample.hpp"
 
-using namespace fleropp_literals;
+using namespace fleropp::literals;
 using namespace cgicc;
 using namespace std;
-namespace htmls = fleropp_html_stream;
+namespace htmls = fleropp::html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_head_script
 // Note: Inline javascript seems to only work when it is not inside of a header.

@@ -14,7 +14,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace fleropp_fpm
+namespace fleropp::fpm
 {
     class ConfigParser
     {

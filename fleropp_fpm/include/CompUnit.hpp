@@ -1,6 +1,15 @@
 #ifndef COMP_UNIT_HPP
 #define COMP_UNIT_HPP
 
+/**
+ * \file CompUnit.hpp
+ * \brief Flero++ compilation unit.
+ * 
+ * This file contains the header-only implementation of compilation units that
+ * are tracked and updated as needed by each process spawned by the process 
+ * manager.
+ */
+
 #include "ISOLoader.hpp"
 #include "CompilerDefaults.hpp"
 
@@ -20,24 +29,42 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-// fleropp_fpm project namespace
-namespace fleropp_fpm {
+/**
+ * \namespace fleropp::fpm 
+ */
+namespace fleropp::fpm {
+    /**
+     * \brief Class template representinig a dynamically-loaded shared object.
+     * 
+     * A compilation unit is responsible for:
+     * - Tracking the state of its shared object in memory.
+     * - Providing an instance of the underlying class that serves as an interface
+     *   with the shared library in memory.
+     * - Recompiling itself in the event that the in-memory version becomes stale.
+     * 
+     * \tparam T The class that is exposed via invocation of `CompUnit<T>::get_instance`. 
+     */
     template <class T> 
     class CompUnit : public ISOLoader<T> { 
       public:
         /**
          * Constructor.
          * 
-         * \param[in] basename The basename for all files related to the shared
-         *                     object.
-         * \param[in] lib_dir The directory in which all files related to the
-         *                    shared object are located (default "/var/www/html/").
-         * \param[in] src_ext The extension used by source files (default ".cpp").  
-         * \param[in] lib_ext The extension used by shared library files (default ".so").  
+         * \param[in] shared_object The name of the shared object that represents
+         *                          this compilation unit.
+         * \param[in] src_path_list A vector containing a list of paths to all of
+         *                          the source files belonging to this compilation
+         *                          unit.
+         * \param[in] compiler The name of the compiler executable to be used to
+         *                     compile this compilation unit. Will search $PATH.
+         *                     (default "g++").
+         * \param[in] args A vector of additional arguments supplied to the compiler.
          * \param[in] alloc_sym The symbol name used for an allocator function with
-         *                      C linkage (default "allocator").
-         * \param[in] del_sym   The symbol name used for a delete function with
-         *                      C linkage (default "deleter").  
+         *                      C linkage (default "allocator"). Used on invocation
+         *                      of `CompUnit<T>::get_instance`.
+         * \param[in] del_sym The symbol name used for a delete function with
+         *                    C linkage (default "deleter"). Used on invocation of
+         *                    `CompUnit<T>::get_instance`.
          */
         CompUnit(const std::string &shared_object,
                     const std::vector<std::string> &src_path_list,
@@ -66,7 +93,12 @@ namespace fleropp_fpm {
             spdlog::info("Compiler loaded: '{}'. Args loaded: '{}'", m_compiler, fmt::join(m_args, ", "));
         }
 
-        void open_lib() override {
+        /**
+         * Loads the shared object into memory, if it is not already open. As
+         * with any call to `::dlopen`, the reference count to the shared object
+         * will be incremented. 
+         */
+        void open_lib() final {
             // Only do something if the library is not currently open
             if (!m_open) {
                 if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
@@ -78,7 +110,15 @@ namespace fleropp_fpm {
             }
         }
 
-        void close_lib() override {
+        /**
+         * Unloads the shared object from memory, if: it is already open AND
+         * decrementing the reference count would lead to a reference count
+         * of zero AND no other translation units depend on its exported
+         * symbols. The OS does not guarantee if or when the DSO will be
+         * unloaded, but under normal circumstances it should be unloaded
+         * upon invocation of this function.
+         */
+        void close_lib() final {
             // Only do something if the library is currently open.
             if (m_open) {
                 if (::dlclose(m_handle) != 0) {
@@ -90,7 +130,17 @@ namespace fleropp_fpm {
             }
         }
 
-        std::shared_ptr<T> get_instance() override {
+        /**
+         * Provides a smart pointer to an instance of the class contained
+         * within this compilation unit. The compilation unit will be
+         * compiled prior to returning an instance if the shared object
+         * on disk is stale OR not yet present. If present, the shared object
+         * residing in memory will be reloaded prior to return if compilation 
+         * occurs.
+         * 
+         * \return A `std::shared_ptr` to an instance of the contained class.
+         */
+        std::shared_ptr<T> get_instance() final {
             // If the library was recompiled, close it so we can reopen
             if (recompile()) {
                 close_lib();

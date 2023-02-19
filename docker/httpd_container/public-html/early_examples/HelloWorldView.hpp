@@ -7,8 +7,8 @@ class HelloWorldView : public IView<HelloWorldView> {
   public:
     HelloWorldView() = default;
     ~HelloWorldView() = default;
-    //void get(const fleropp_io::RequestData& request);
-    void post(const fleropp_io::RequestData& request);
+    void get(const fleropp::io::RequestData& request);
+    void post(const fleropp::io::RequestData& request);
 };
 
 #endif /* HELLO_WORLD_VIEW_HPP */

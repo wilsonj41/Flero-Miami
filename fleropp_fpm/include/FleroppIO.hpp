@@ -5,9 +5,9 @@
 #include <ostream>
 
 // fleropp IO namespace
-namespace fleropp_io {
+namespace fleropp::io {
     /**
-     * \brief A \code thread_local output stream with external linkage
+     * \brief A `thread_local` output stream with external linkage
      * to enable writing to an arbitrary output stream within a
      * 0-ary or signature-restricted function (such as UDLs).
      * 
@@ -16,7 +16,7 @@ namespace fleropp_io {
     inline thread_local std::ostream fppout{nullptr};
 
     /**
-     * \brief A \code thread_local input stream with external linkage to
+     * \brief A `thread_local` input stream with external linkage to
      * enable reading from an arbitrary input stream.
      * 
      * See \link ScopedRedirect ScopedRedirect \endlink

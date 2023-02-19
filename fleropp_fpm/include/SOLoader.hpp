@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 // fleropp_fpm project namespace
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     template <class T> 
     class SOLoader : public ISOLoader<T> { 
       public:

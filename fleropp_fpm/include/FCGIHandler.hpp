@@ -12,25 +12,25 @@
 
 #include "fcgiapp.h"
 
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>>; 
     class FCGIHandler {
       public:
-        /***
+        /**
          * Constructor
          * 
          * \param unix_socket Path to unix socket file
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const std::string &unix_sock, const unsigned int backlog = 512);
-        /***
+        /**
          * Constructor
          * 
          * \param tcp_sock Port number assigned to socket
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
-        /***
+        /**
          * Starts event loop and accepts incoming requests
          */
         void accept();

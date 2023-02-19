@@ -5,7 +5,7 @@ SODIR = ./so
 INCDIR = ./include
 
 CXX=g++
-CXXFLAGS=-std=c++20 -Wall -I $(INCDIR) -fPIC -DFPM_BUILD
+CXXFLAGS=-std=c++20 -Wall -Wextra -Wpedantic -Wconversion -O3 -I $(INCDIR) -fPIC -DFPM_BUILD
 LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc -lspdlog -lfmt
 LDFLAGS=-rdynamic
 BOOSTFLAGS=-DBOOST_BIND_GLOBAL_PLACEHOLDERS

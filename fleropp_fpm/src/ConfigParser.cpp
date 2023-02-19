@@ -4,7 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     namespace pt = boost::property_tree;
     using namespace std;
 

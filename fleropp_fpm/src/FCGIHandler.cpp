@@ -1,24 +1,17 @@
+#include "CGIEnvironment.hpp"
 #include "dispatch.hpp"
 #include "FCGIHandler.hpp"
 #include "FleroppIO.hpp"
+#include "RequestData.hpp"
 #include "ScopedRedirect.hpp"
 
-#include "boost/lexical_cast.hpp"
-
-#include "cgicc/Cgicc.h"
-#include "cgicc/HTTPHTMLHeader.h"
-#include "cgicc/HTTPStatusHeader.h"
-#include "cgicc/HTMLClasses.h"
-
 #include "fcgio.h"
-
-#include "FCgiIO.hpp"
 
 #include "spdlog/spdlog.h"
 
 #include <string>
 
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     FCGIHandler::FCGIHandler(const std::string &unix_sock, 
                                 const unsigned int backlog) {
         // TODO: Implement permissions management for UNIX domain sockets
@@ -40,48 +33,39 @@ namespace fleropp_fpm {
     void FCGIHandler::accept() {
         spdlog::info("Accepting requests with file descriptor {}", m_fd);
         while (FCGX_Accept_r(&m_request) >= 0) {
-            cgicc::FCgiIO fios{m_request};
-            cgicc::Cgicc fcgi{&fios};
-            auto source = m_endpoints.find(fios.getenv("SCRIPT_NAME"));
+            fleropp::io::CGIEnvironment env{m_request.envp};
+            auto source = m_endpoints.find(env.get("SCRIPT_NAME"));
             // This information is already logged by your HTTP server; prefer
             // that log in most cases.
-            spdlog::debug("{} - {} {} {}", fios.getenv("REMOTE_ADDR"),
-                                          fios.getenv("REQUEST_METHOD"),
-                                          fios.getenv("REQUEST_URI"),
-                                          fios.getenv("SERVER_PROTOCOL"));
+            spdlog::debug("{} - {} {} {}", env.get("REMOTE_ADDR"),
+                                           env.get("REQUEST_METHOD"),
+                                           env.get("REQUEST_URI"),
+                                           env.get("SERVER_PROTOCOL"));
             if (source != m_endpoints.end()) { 
-                // Get the content length so that we can build the input
-                // buffer
-                int content_length;
-                try {
-                    content_length = boost::lexical_cast<decltype(content_length)>(fios.getenv("CONTENT_LENGTH"));
-                } catch (const boost::bad_lexical_cast&) {
-                    content_length = 0;
-                }
-
-                // At some point in the future, implementing a maximum POST
-                // length would be smart.
-                std::vector<char> buf;
-                buf.reserve(content_length);
-                fcgi_streambuf in_buf{m_request.in, std::data(buf), content_length};
+                fcgi_streambuf in_buf{m_request.in}, out_buf{m_request.out};
                 std::istream in{&in_buf};
+                std::ostream out{&out_buf};
 
                 // Redirect the streams to the global convenience variables.
-                ScopedRedirect redir_out{fios, fleropp_io::fppout};
-                ScopedRedirect redir_in{in, fleropp_io::fppin};
+                fleropp::io::ScopedRedirect redir_in{in, fleropp::io::fppin};
+                fleropp::io::ScopedRedirect redir_out{out, fleropp::io::fppout};
 
                 // Prepare to dispatch the request by getting the request
                 // method and getting an instance of the page. 
-                const auto request_method = fios.getenv("REQUEST_METHOD");
+                const auto request_method = env.get("REQUEST_METHOD");
                 auto page = source->second[0].get_instance();
 
                 // Dispatch the request, logging a warning if the request
                 // method was not understood (not in the dispatch map).
                 try {
                     std::invoke(dispatch::request_dispatch_funs[request_method], 
-                                page, fios.getenv("QUERY_STRING"));
+                                page, fleropp::io::RequestData{env});
                 } catch (const std::range_error&) {
                     spdlog::warn("Invalid request method received: '{}'", request_method);
+                    fleropp::io::fppout << "Status: 418 I'm a teapot\r\n"
+                                           "Content-type: text/html\r\n"
+                                           "Content-length: 25\r\n\r\n"
+                                           "<h1>418 I'm a teapot</h1>";
                 }
             }
         }

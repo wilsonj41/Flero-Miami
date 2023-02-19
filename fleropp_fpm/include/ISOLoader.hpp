@@ -4,7 +4,7 @@
 #include <memory>
 
 // fleropp_fpm project namespace
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     /**
      * Interface that represents a shared object loader. 
      */

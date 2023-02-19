@@ -5,7 +5,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace fleropp_fpm {
+namespace fleropp::io {
   /**
    * \brief A wrapper class template implementing RAII for iostream 
    * redirection.
