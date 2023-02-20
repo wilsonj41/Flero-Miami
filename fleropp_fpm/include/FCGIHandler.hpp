@@ -23,6 +23,7 @@ namespace fleropp::fpm {
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const std::string &unix_sock, const unsigned int backlog = 512);
+        
         /**
          * Constructor
          * 
@@ -30,10 +31,18 @@ namespace fleropp::fpm {
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
+        
         /**
          * Starts event loop and accepts incoming requests
          */
         void accept();
+
+        /**
+         * Loads in a map of endpoints to their corresponding compilation units.
+         * This will generally be created by a `fleropp::fpm::ConfigParser`.
+         * 
+         * \param endpoints_map The map of endpoints to compilation units.
+         */
         void load_endpoints(const endpoints_map_t& endpoints_map);
       
       private: 

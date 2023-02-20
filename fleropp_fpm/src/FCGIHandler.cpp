@@ -55,6 +55,17 @@ namespace fleropp::fpm {
                 const auto request_method = env.get("REQUEST_METHOD");
                 auto page = source->second[0].get_instance();
 
+                // If page is `nullptr`, we abort the request.
+                if (!page) {
+                    fleropp::io::fppout << "Status: 500 Internal Server Error\r\n"
+                                           "Content-type: text/html\r\n"
+                                           "Content-length: 34\r\n\r\n"
+                                           "<h1>500 Internal Server Error</h1>";
+                    spdlog::error("Instance of page for '{}' not found. Aborting request.", source);
+                    continue;
+                }
+
+                // From this point on, we assume that the page handle is good
                 // Dispatch the request, logging a warning if the request
                 // method was not understood (not in the dispatch map).
                 try {

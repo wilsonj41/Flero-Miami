@@ -83,8 +83,7 @@ namespace fleropp::fpm {
                 spdlog::get("compiler")->warn("{} was not found to have default argument list, will revert to g++ default parameters", m_compiler);
                 m_compiler = "g++";
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
-            }
-            else if (args.empty()){
+            } else if (args.empty()) {
                 spdlog::debug("{} has no arguments, will use default parameters", m_compiler);
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
@@ -141,18 +140,18 @@ namespace fleropp::fpm {
          * \return A `std::shared_ptr` to an instance of the contained class.
          */
         std::shared_ptr<T> get_instance() final {
-            // If the library was recompiled, close it so we can reopen
-            if (recompile()) {
-                close_lib();
-            }
-            open_lib();
-
             // Type alias for a function pointer to a function that returns a
             // pointer to T
             using alloc_fun_t = T *(*)();
             // Type alias for a function pointer to a void function that 
             // accepts a pointer to T
             using del_fun_t = void (*)(T *);
+
+            // If the library was recompiled, close it so we can reopen
+            if (recompile()) {
+                close_lib();
+            }
+            open_lib(); 
 
             // dlsym returns a void pointer, so we reinterpret cast it to our
             // type aliases above
@@ -163,12 +162,13 @@ namespace fleropp::fpm {
             if (!alloc_fun || !del_fun) {
                 close_lib();
                 spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", m_shared_object, ::dlerror());
+                return std::shared_ptr<T>{};
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
             // calling alloc_fun) with a custom deleter closure that calls
             // del_fun.
-            return std::shared_ptr<T>(alloc_fun(), [del_fun] (T *p) { del_fun(p); });
+            return std::shared_ptr<T>{alloc_fun(), [del_fun] (T *p) { del_fun(p); }};
         } 
 
       private:
