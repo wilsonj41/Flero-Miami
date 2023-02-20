@@ -7,6 +7,7 @@
 
 #include "fcgio.h"
 
+#include <fmt/format.h>
 #include "spdlog/spdlog.h"
 
 #include <string>
@@ -61,7 +62,7 @@ namespace fleropp::fpm {
                                            "Content-type: text/html\r\n"
                                            "Content-length: 34\r\n\r\n"
                                            "<h1>500 Internal Server Error</h1>";
-                    spdlog::error("Instance of page for '{}' not found. Aborting request.", source);
+                    spdlog::error("Instance of page not found. Aborting request.");
                     continue;
                 }
 
