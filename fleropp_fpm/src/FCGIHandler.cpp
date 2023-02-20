@@ -35,7 +35,7 @@ namespace fleropp::fpm {
         spdlog::info("Accepting requests with file descriptor {}", m_fd);
         while (FCGX_Accept_r(&m_request) >= 0) {
             fleropp::io::CGIEnvironment env{m_request.envp};
-            auto source = m_endpoints.find(env.get("SCRIPT_NAME"));
+            const auto source = m_endpoints.find(env.get("SCRIPT_NAME"));
             // This information is already logged by your HTTP server; prefer
             // that log in most cases.
             spdlog::debug("{} - {} {} {}", env.get("REMOTE_ADDR"),
@@ -54,7 +54,7 @@ namespace fleropp::fpm {
                 // Prepare to dispatch the request by getting the request
                 // method and getting an instance of the page. 
                 const auto request_method = env.get("REQUEST_METHOD");
-                auto page = source->second[0].get_instance();
+                const auto page = source->second[0].get_instance();
 
                 // If page is `nullptr`, we abort the request.
                 if (!page) {
