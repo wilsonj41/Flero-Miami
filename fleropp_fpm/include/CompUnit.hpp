@@ -13,6 +13,7 @@
 #include "ISOLoader.hpp"
 #include "CompilerDefaults.hpp"
 
+#include <atomic>
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
@@ -77,8 +78,7 @@ namespace fleropp::fpm {
                         m_handle{nullptr}, m_shared_object{shared_object},
                         m_src_path_list{src_path_list},
                         m_alloc_sym{alloc_sym}, m_del_sym{del_sym},
-                        m_compiler{compiler}, m_args{args},
-                        m_open{false} {
+                        m_compiler{compiler}, m_args{args} {
 
             if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
                 // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
@@ -194,7 +194,7 @@ namespace fleropp::fpm {
         std::string m_del_sym;
         std::string m_compiler;
         std::vector<std::string> m_args;
-        bool m_open;
+        static inline std::atomic_bool m_open = false;
 
         // Checks if the source file was modified
         bool was_modified() const {
