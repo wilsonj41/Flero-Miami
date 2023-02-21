@@ -18,6 +18,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
@@ -101,26 +102,26 @@ namespace fleropp::fpm {
         void open_lib() final {
             // Only do something if the library is not currently open
             if (!m_open) {
-                static std::mutex open_mtx;
-                static std::condition_variable open_cvar;
-                static bool opened;
-                {
+                static std::shared_mutex open_mtx;
+                {   
+                    // We attempt to acquire an exclusive lock, but don't block if we
+                    // cannot acquire it. 
                     std::unique_lock lock(open_mtx, std::try_to_lock);
                     if (lock) {
-                        opened = false;
                         if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
                             spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
                         } else {
                             m_open = true;
                             spdlog::debug("Opened '{}'", m_shared_object);
                         }
-                        opened = true;
-                        open_cvar.notify_all();
                     }
-                } 
+                }
+                // Having skipped the previous section if we couldn't acquire
+                // a lock, we now block until the thread that could acquire a
+                // lock finishes. All threads should be able to acquire this
+                // lock once the exclusive lock is released. 
                 {
-                    std::unique_lock lock(open_mtx);
-                    open_cvar.wait(lock, [] { return opened; });
+                    std::shared_lock lock(open_mtx);
                 }
             }
         }
@@ -215,13 +216,12 @@ namespace fleropp::fpm {
         void recompile() {
             namespace bp = boost::process;
             if (was_modified()) {
-                static std::mutex recompile_mtx;
-                static std::condition_variable recompile_cvar;
-                static bool recompiled;
+                static std::shared_mutex recompile_mtx;
                 {
+                    // We attempt to acquire an exclusive lock, but don't block if we
+                    // cannot acquire it.
                     std::unique_lock lock(recompile_mtx, std::try_to_lock);
                     if (lock) {
-                        recompiled = false;
                         spdlog::info("Compiling '{}'", m_shared_object);
                         boost::asio::io_context ioc;
                         std::future<std::string> stderr;
@@ -236,13 +236,14 @@ namespace fleropp::fpm {
                             spdlog::info("Sucessfully compiled '{}'", m_shared_object);
                             close_lib();
                         }
-                        recompiled = true;
-                        recompile_cvar.notify_all();
                     }
                 }
+                // Having skipped the previous section if we couldn't acquire
+                // a lock, we now block until the thread that could acquire a
+                // lock finishes. All threads should be able to acquire this
+                // lock once the exclusive lock releases.
                 {
-                    std::unique_lock lock(recompile_mtx);
-                    recompile_cvar.wait(lock, [] { return recompiled; });
+                    std::shared_lock lock(recompile_mtx);
                 }
             }            
         }
