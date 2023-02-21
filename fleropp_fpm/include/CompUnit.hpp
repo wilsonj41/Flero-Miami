@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
@@ -100,11 +101,26 @@ namespace fleropp::fpm {
         void open_lib() final {
             // Only do something if the library is not currently open
             if (!m_open) {
-                if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
-                    spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
-                } else {
-                    m_open = true;
-                    spdlog::debug("Opened '{}'", m_shared_object);
+                static std::mutex open_mtx;
+                static std::condition_variable open_cvar;
+                static bool opened;
+                {
+                    std::unique_lock lock(open_mtx, std::try_to_lock);
+                    if (lock) {
+                        opened = false;
+                        if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
+                            spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
+                        } else {
+                            m_open = true;
+                            spdlog::debug("Opened '{}'", m_shared_object);
+                        }
+                        opened = true;
+                        open_cvar.notify_all();
+                    }
+                } 
+                {
+                    std::unique_lock lock(open_mtx);
+                    open_cvar.wait(lock, [] { return opened; });
                 }
             }
         }
@@ -148,10 +164,8 @@ namespace fleropp::fpm {
             using del_fun_t = void (*)(T *);
 
             // If the library was recompiled, close it so we can reopen
-            if (recompile()) {
-                close_lib();
-            }
-            open_lib(); 
+            recompile();
+            open_lib();
 
             // dlsym returns a void pointer, so we reinterpret cast it to our
             // type aliases above
@@ -198,26 +212,39 @@ namespace fleropp::fpm {
         } 
 
         // Recompile if necessary
-        bool recompile() const {
+        void recompile() {
             namespace bp = boost::process;
             if (was_modified()) {
-                spdlog::info("Compiling '{}'", m_shared_object);
-                boost::asio::io_context ioc;
-                std::future<std::string> stderr;
-                bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
-                                               bp::std_out > bp::null, bp::std_err > stderr, ioc);
-                ioc.run();
-                chld.wait();
-                const auto exit_code = chld.exit_code();
-                if (exit_code) {
-                    spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
-                    return false;
-                } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
-                    spdlog::info("Sucessfully compiled '{}'", m_shared_object);
+                static std::mutex recompile_mtx;
+                static std::condition_variable recompile_cvar;
+                static bool recompiled;
+                {
+                    std::unique_lock lock(recompile_mtx, std::try_to_lock);
+                    if (lock) {
+                        recompiled = false;
+                        spdlog::info("Compiling '{}'", m_shared_object);
+                        boost::asio::io_context ioc;
+                        std::future<std::string> stderr;
+                        bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
+                                    bp::std_out > bp::null, bp::std_err > stderr, ioc);
+                        ioc.run();
+                        chld.wait();
+                        const auto exit_code = chld.exit_code();
+                        if (exit_code) {
+                            spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                        } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
+                            spdlog::info("Sucessfully compiled '{}'", m_shared_object);
+                            close_lib();
+                        }
+                        recompiled = true;
+                        recompile_cvar.notify_all();
+                    }
                 }
-                return true;
+                {
+                    std::unique_lock lock(recompile_mtx);
+                    recompile_cvar.wait(lock, [] { return recompiled; });
+                }
             }            
-            return false;
         }
     };
 }

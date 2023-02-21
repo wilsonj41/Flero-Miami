@@ -31,11 +31,13 @@ namespace fleropp::fpm {
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
-        
+
         /**
-         * Starts event loop and accepts incoming requests
+         * Spawns pool of worker threads. 
          */
-        void accept();
+        void spawn(std::size_t n_thr);
+
+        void wait();
 
         /**
          * Loads in a map of endpoints to their corresponding compilation units.
@@ -49,6 +51,7 @@ namespace fleropp::fpm {
         int m_fd;
         FCGX_Request m_request;
         endpoints_map_t m_endpoints;
+        std::vector<std::thread> m_workers;
     };
 }
 

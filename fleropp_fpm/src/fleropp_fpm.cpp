@@ -37,5 +37,6 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Add some endpoint mappings
     handler.load_endpoints(config.endpoints);
     // Start accepting connections (blocking)
-    handler.accept();
+    handler.spawn(10);
+    handler.wait();
 }
