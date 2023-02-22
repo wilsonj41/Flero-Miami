@@ -35,15 +35,15 @@ namespace fleropp::fpm::concurrency {
                                            env.get("REQUEST_METHOD"),
                                            env.get("REQUEST_URI"),
                                            env.get("SERVER_PROTOCOL"));
-            if (source != m_endpoints->end()) { 
-                fcgi_streambuf in_buf{m_request.in}, out_buf{m_request.out};
-                std::istream in{&in_buf};
-                std::ostream out{&out_buf};
+            fcgi_streambuf in_buf{m_request.in}, out_buf{m_request.out};
+            std::istream in{&in_buf};
+            std::ostream out{&out_buf};
 
-                // Redirect the streams to the global convenience variables.
-                fleropp::io::ScopedRedirect redir_in{in, fleropp::io::fppin};
-                fleropp::io::ScopedRedirect redir_out{out, fleropp::io::fppout};
+            // Redirect the streams to the global convenience variables.
+            fleropp::io::ScopedRedirect redir_in{in, fleropp::io::fppin};
+            fleropp::io::ScopedRedirect redir_out{out, fleropp::io::fppout};
 
+            if (source != m_endpoints->end()) {  
                 // Prepare to dispatch the request by getting the request
                 // method and getting an instance of the page. 
                 const auto request_method = env.get("REQUEST_METHOD");
@@ -53,8 +53,8 @@ namespace fleropp::fpm::concurrency {
                 if (!page) {
                     fleropp::io::fppout << "Status: 500 Internal Server Error\r\n"
                                            "Content-type: text/html\r\n"
-                                           "Content-length: 34\r\n\r\n"
-                                           "<h1>500 Internal Server Error</h1>";
+                                           "Content-length: 35\r\n\r\n"
+                                           "<h1>500 Internal Server Error</h1>\n";
                     spdlog::error("Instance of page not found. Aborting request.");
                     FCGX_Finish_r(&m_request);
                     continue;
@@ -70,9 +70,14 @@ namespace fleropp::fpm::concurrency {
                     spdlog::warn("Invalid request method received: '{}'", request_method);
                     fleropp::io::fppout << "Status: 418 I'm a teapot\r\n"
                                            "Content-type: text/html\r\n"
-                                           "Content-length: 25\r\n\r\n"
-                                           "<h1>418 I'm a teapot</h1>";
+                                           "Content-length: 26\r\n\r\n"
+                                           "<h1>418 I'm a teapot</h1>\n";
                 }
+            } else {
+                fleropp::io::fppout << "Status: 404 Not Found\r\n"
+                                       "Content-type: text/html\r\n"
+                                       "Content-length: 23\r\n\r\n"
+                                       "<h1>404 Not Found</h1>\n";
             }
             FCGX_Finish_r(&m_request);
         }

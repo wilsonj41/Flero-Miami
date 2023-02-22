@@ -15,6 +15,7 @@
 
 #include <atomic>
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -23,6 +24,7 @@
 #include <string>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/process.hpp>
 #include <boost/process/child.hpp>
 #include <boost/process/search_path.hpp>
@@ -101,28 +103,24 @@ namespace fleropp::fpm {
          */
         void open_lib() final {
             // Only do something if the library is not currently open
-            if (!m_open) {
-                static std::shared_mutex open_mtx;
+            static std::shared_mutex open_mtx;
+            if (!m_open.test()) {
                 {   
                     // We attempt to acquire an exclusive lock, but don't block if we
                     // cannot acquire it. 
                     std::unique_lock lock(open_mtx, std::try_to_lock);
-                    if (lock) {
+                    if (lock && !m_open.test()) {
                         if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
                             spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
                         } else {
-                            m_open = true;
+                            m_open.test_and_set();
                             spdlog::debug("Opened '{}'", m_shared_object);
                         }
                     }
-                }
-                // Having skipped the previous section if we couldn't acquire
-                // a lock, we now block until the thread that could acquire a
-                // lock finishes. All threads should be able to acquire this
-                // lock once the exclusive lock is released. 
-                {
-                    std::shared_lock lock(open_mtx);
-                }
+                } 
+            }
+            {
+                std::shared_lock lock(open_mtx);
             }
         }
 
@@ -136,11 +134,11 @@ namespace fleropp::fpm {
          */
         void close_lib() final {
             // Only do something if the library is currently open.
-            if (m_open) {
+            if (m_open.test()) {
                 if (::dlclose(m_handle) != 0) {
                     spdlog::error("Unable to unload DSO '{}': {}", m_shared_object, ::dlerror());
                 } else {
-                    m_open = false;
+                    m_open.clear();
                     spdlog::debug("Closed '{}'", m_shared_object);
                 }
             }
@@ -177,7 +175,7 @@ namespace fleropp::fpm {
             if (!alloc_fun || !del_fun) {
                 close_lib();
                 spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", m_shared_object, ::dlerror());
-                return std::shared_ptr<T>{};
+                return {};
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
@@ -194,7 +192,7 @@ namespace fleropp::fpm {
         std::string m_del_sym;
         std::string m_compiler;
         std::vector<std::string> m_args;
-        static inline std::atomic_bool m_open = false;
+        static inline std::atomic_flag m_open = ATOMIC_FLAG_INIT;
 
         // Checks if the source file was modified
         bool was_modified() const {
@@ -215,13 +213,13 @@ namespace fleropp::fpm {
         // Recompile if necessary
         void recompile() {
             namespace bp = boost::process;
+            static std::shared_mutex recompile_mtx;
             if (was_modified()) {
-                static std::shared_mutex recompile_mtx;
                 {
                     // We attempt to acquire an exclusive lock, but don't block if we
                     // cannot acquire it.
                     std::unique_lock lock(recompile_mtx, std::try_to_lock);
-                    if (lock) {
+                    if (lock && was_modified()) {
                         spdlog::info("Compiling '{}'", m_shared_object);
                         boost::asio::io_context ioc;
                         std::future<std::string> stderr;
@@ -232,20 +230,22 @@ namespace fleropp::fpm {
                         const auto exit_code = chld.exit_code();
                         if (exit_code) {
                             spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                            if (std::filesystem::exists(m_shared_object)) {
+                                boost::filesystem::last_write_time(m_shared_object, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                            } else {
+                                std::ofstream fd{m_shared_object};
+                            }
                         } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
                             spdlog::info("Sucessfully compiled '{}'", m_shared_object);
                             close_lib();
                         }
                     }
                 }
-                // Having skipped the previous section if we couldn't acquire
-                // a lock, we now block until the thread that could acquire a
-                // lock finishes. All threads should be able to acquire this
-                // lock once the exclusive lock releases.
-                {
-                    std::shared_lock lock(recompile_mtx);
-                }
-            }            
+                
+            }
+            {
+                std::shared_lock lock(recompile_mtx);   
+            }
         }
     };
 }
