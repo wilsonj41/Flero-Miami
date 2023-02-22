@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 // fleropp IO namespace
-namespace fleropp_io {
+namespace fleropp::io {
     /**
      * \brief Simple pattern that matches a query string.
      * 
@@ -56,6 +56,8 @@ namespace fleropp_io {
       private:
         std::string m_contents;
         std::unordered_map<std::string, std::string> m_qstring_map;
+
+        static std::string url_decode(const std::string& url);
     };
 }
 

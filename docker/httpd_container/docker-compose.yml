@@ -13,4 +13,5 @@ services:
       - ./etc/fleropp:/etc/fleropp
       - ./etc/override:/etc/apache2/override
       - ../../fleropp_fpm/bin:/opt/fleropp_fpm
+      - ../../fleropp_fpm/so:/usr/lib/fleropp
       - ../../fleropp_fpm/include:/usr/include/fleropp

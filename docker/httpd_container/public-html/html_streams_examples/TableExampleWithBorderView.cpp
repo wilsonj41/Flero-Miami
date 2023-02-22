@@ -7,10 +7,10 @@
 
 #include "TableExampleWithBorderView.hpp"
 
-using namespace fleropp_literals;
+using namespace fleropp::literals;
 using namespace cgicc;
 using namespace std;
-namespace htmls = fleropp_html_stream;
+namespace htmls = fleropp::html_stream;
 using entry = std::tuple<std::string, std::string, int>;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_collapse

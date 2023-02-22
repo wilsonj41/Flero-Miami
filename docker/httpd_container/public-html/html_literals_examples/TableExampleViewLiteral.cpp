@@ -10,8 +10,8 @@
 INIT_VIEW(TableExampleViewLiteral)
 
 void TableExampleViewLiteral::generate() {
-    using namespace fleropp_literals;
-    namespace htmls = fleropp_html_stream;
+    using namespace fleropp::literals;
+    namespace htmls = fleropp::html_stream;
 
     htmls::gen_html_boiler_plate("text/html");
     "<html>"_h;

@@ -15,8 +15,8 @@ extern "C" {
 }
 
 void TheUltimateView::generate() {
-    using namespace fleropp_literals;
-    namespace htmls = fleropp_html_stream;
+    using namespace fleropp::literals;
+    namespace htmls = fleropp::html_stream;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;
     htmls::HTMLStream<"<h2>", "</h2>"> h2;

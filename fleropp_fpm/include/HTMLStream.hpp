@@ -14,7 +14,7 @@
 #include "cgicc/MStreamable.h"
 
 // fleropp HTML stream namespace
-namespace fleropp_html_stream {
+namespace fleropp::html_stream {
 
   /**
    * \brief Class that represents a string literal that is usable as a non-type
@@ -62,14 +62,14 @@ namespace fleropp_html_stream {
    * \param[in] type the content type.
   */
   void gen_content_type(const std::string &content_type) {
-    fleropp_io::fppout << "Content-type: " << content_type << "\r\n\r\n";
+    fleropp::io::fppout << "Content-type: " << content_type << "\r\n\r\n";
   }
 
   /**
    * Free function that generates the html DOCTYPE.
   */
   void gen_html_doctype() {
-    fleropp_io::fppout << "<!DOCTYPE html> \n";
+    fleropp::io::fppout << "<!DOCTYPE html> \n";
   }
 
   /**
@@ -179,7 +179,7 @@ namespace fleropp_html_stream {
         // type of an optional template parameter using the std::is_same 
         // metafunction
         if constexpr (std::is_same_v<EndTagAction, DumpOnEnd>) {
-          fleropp_io::fppout << html_stream.m_ss.rdbuf() << html_stream.m_end_tag << '\n';
+          fleropp::io::fppout << html_stream.m_ss.rdbuf() << html_stream.m_end_tag << '\n';
         } else {
           html_stream.m_ss << m_end_tag << '\n';
         }

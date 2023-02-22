@@ -78,8 +78,8 @@ namespace fft_util {
 
 void FFTView::generate() {
     using namespace fft_util;
-    using namespace fleropp_literals;
-    namespace htmls = fleropp_html_stream;
+    using namespace fleropp::literals;
+    namespace htmls = fleropp::html_stream;
 
     std::vector<std::complex<double>> time(1UL << 14);
     // Generate symmetric input data

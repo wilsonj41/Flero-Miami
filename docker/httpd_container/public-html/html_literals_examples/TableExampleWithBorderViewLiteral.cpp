@@ -13,8 +13,8 @@
 INIT_VIEW(TableExampleWithBorderViewLiteral)
 
 void TableExampleWithBorderViewLiteral::generate() {
-    using namespace fleropp_literals;
-    namespace htmls = fleropp_html_stream;
+    using namespace fleropp::literals;
+    namespace htmls = fleropp::html_stream;
     using entry = std::tuple<std::string_view, std::string_view, unsigned int>;
 
     htmls::gen_html_boiler_plate("text/html");

@@ -4,7 +4,7 @@
 
 #include "spdlog/spdlog.h"
 
-namespace fleropp_fpm {
+namespace fleropp::fpm {
     namespace pt = boost::property_tree;
     using namespace std;
 
@@ -36,7 +36,7 @@ namespace fleropp_fpm {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
                 string uri = endpoint.get<string>("uri");
 
-                vector<CompUnit<IView>> dependencies;
+                vector<CompUnit<IViewWrapper>> dependencies;
                 for (auto &it2 : endpoint.get_child("dependencies")) {
                     pt::ptree dependency = it2.second; // stores the data of the curr idx of the dependencies array
                     string shared_object = this->m_lib_dir + "/" + dependency.get<string>("sharedObject");
