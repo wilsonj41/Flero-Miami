@@ -6,9 +6,7 @@
 #include "spdlog/fmt/fmt.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 
-using namespace fleropp_fpm;
-
-int main (int argc, char **argv) {
+int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Maximum log file size before rotation (5 MiB) and maximum number of log
     // files
     static constexpr auto max_log_size = 5'242'880, max_log_files = 5;
@@ -32,10 +30,10 @@ int main (int argc, char **argv) {
     spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
     spdlog::info("Flero++ FastCGI Process Manager (Flero++ FPM) version {}", "0.1");
 
-    ConfigParser config;
+    fleropp::fpm::ConfigParser config;
     config.load("/etc/fleropp/demo.json");
     // Construct a handler that will listen on TCP port 50001
-    FCGIHandler handler{50001};
+    fleropp::fpm::FCGIHandler handler{50001};
     // Add some endpoint mappings
     handler.load_endpoints(config.endpoints);
     // Start accepting connections (blocking)

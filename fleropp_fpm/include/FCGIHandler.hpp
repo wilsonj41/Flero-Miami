@@ -3,38 +3,49 @@
 
 #include "IView.hpp"
 #include "CompUnit.hpp"
+#include "ConstexprMap.hpp"
 
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
 #include "fcgiapp.h"
 
-namespace fleropp_fpm {
-  using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IView>>>;
+namespace fleropp::fpm {
+    using endpoints_map_t = std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>>; 
     class FCGIHandler {
       public:
-        /***
+        /**
          * Constructor
          * 
          * \param unix_socket Path to unix socket file
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const std::string &unix_sock, const unsigned int backlog = 512);
-        /***
+        
+        /**
          * Constructor
          * 
          * \param tcp_sock Port number assigned to socket
          * \param backlog The number of incoming requests in the background
          */
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
-        /***
+        
+        /**
          * Starts event loop and accepts incoming requests
          */
         void accept();
+
+        /**
+         * Loads in a map of endpoints to their corresponding compilation units.
+         * This will generally be created by a `fleropp::fpm::ConfigParser`.
+         * 
+         * \param endpoints_map The map of endpoints to compilation units.
+         */
         void load_endpoints(const endpoints_map_t& endpoints_map);
       
-      private:
+      private: 
         int m_fd;
         FCGX_Request m_request;
         endpoints_map_t m_endpoints;

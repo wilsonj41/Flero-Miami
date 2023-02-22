@@ -5,9 +5,9 @@
 
 #include "TableExampleView.hpp"
 
-using namespace fleropp_literals;
+using namespace fleropp::literals;
 using namespace cgicc;
-namespace htmls = fleropp_html_stream;
+namespace htmls = fleropp::html_stream;
 
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_table_basic
 

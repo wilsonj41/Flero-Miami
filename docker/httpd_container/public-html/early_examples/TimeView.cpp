@@ -18,11 +18,11 @@ extern "C" {
 }
 
 void TimeView::generate() {
-    using namespace fleropp_literals;
+    using namespace fleropp::literals;
     struct utsname uname;
     ::uname(&uname);
 
-    std::cerr << "Inside View:" << &fleropp_io::fppout << '\n';
+    std::cerr << "Inside View:" << &fleropp::io::fppout << '\n';
 
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
