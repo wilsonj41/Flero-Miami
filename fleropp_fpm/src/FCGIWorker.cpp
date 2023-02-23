@@ -1,5 +1,6 @@
 #include "CGIEnvironment.hpp"
 #include "dispatch.hpp"
+#include "error_codes.hpp"
 #include "FCGIHandler.hpp"
 #include "FCGIWorker.hpp"
 #include "FleroppIO.hpp"
@@ -51,10 +52,7 @@ namespace fleropp::fpm::concurrency {
 
                 // If page is `nullptr`, we abort the request.
                 if (!page) {
-                    fleropp::io::fppout << "Status: 500 Internal Server Error\r\n"
-                                           "Content-type: text/html\r\n"
-                                           "Content-length: 35\r\n\r\n"
-                                           "<h1>500 Internal Server Error</h1>\n";
+                    fleropp::util::error_response<"500", "Internal Server Error">(); 
                     spdlog::error("Instance of page not found. Aborting request.");
                     FCGX_Finish_r(&m_request);
                     continue;
@@ -67,17 +65,11 @@ namespace fleropp::fpm::concurrency {
                     std::invoke(dispatch::request_dispatch_funs[request_method], 
                                 page, fleropp::io::RequestData{env});
                 } catch (const std::range_error&) {
-                    spdlog::warn("Invalid request method received: '{}'", request_method);
-                    fleropp::io::fppout << "Status: 418 I'm a teapot\r\n"
-                                           "Content-type: text/html\r\n"
-                                           "Content-length: 26\r\n\r\n"
-                                           "<h1>418 I'm a teapot</h1>\n";
+                    spdlog::info("Invalid request method received: '{}'", request_method);
+                    fleropp::util::error_response<"418", "I'm a teapot">();
                 }
             } else {
-                fleropp::io::fppout << "Status: 404 Not Found\r\n"
-                                       "Content-type: text/html\r\n"
-                                       "Content-length: 23\r\n\r\n"
-                                       "<h1>404 Not Found</h1>\n";
+                fleropp::util::error_response<"404", "Not Found">();
             }
             FCGX_Finish_r(&m_request);
         }
