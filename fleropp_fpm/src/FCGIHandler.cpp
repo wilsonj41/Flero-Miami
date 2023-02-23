@@ -19,6 +19,10 @@ namespace fleropp::fpm {
                                 const unsigned int backlog) {
         // TODO: Implement permissions management for UNIX domain sockets
         m_fd = FCGX_OpenSocket(unix_sock.c_str(), backlog);
+        if ( m_fd == -1 ) {
+            spdlog::critical("Unable to open Unix Socket '{}'", unix_sock);
+            return;
+        }
         FCGX_Init();
         spdlog::info("Initialized Unix domain FastCGI handler at {}", unix_sock);
     }
