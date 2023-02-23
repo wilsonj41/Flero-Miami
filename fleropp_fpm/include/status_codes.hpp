@@ -1,5 +1,5 @@
-#ifndef ERROR_CODES_HPP
-#define ERROR_CODES_HPP
+#ifndef STATUS_CODES_HPP
+#define STATUS_CODES_HPP
 
 #include "FleroppIO.hpp"
 #include "StringLiteral.hpp"
@@ -12,13 +12,13 @@
 
 namespace fleropp::util {
     /**
-     * \brief Prints an error code and description as an HTTP response.
+     * \brief Prints a status code and description as an HTTP response.
      * 
      * \tparam code A string literal representing the error code.
      * \tparam desc A string literal representing the error descriptio. 
      */
     template <StringLiteral code, StringLiteral desc>
-    void error_response() {
+    void status_response() {
         using namespace std::literals::string_view_literals;
         constexpr std::string_view response_str = "Status: {} {}\r\n"
                                                   "Content-Type: text/html\r\n"
@@ -36,4 +36,4 @@ namespace fleropp::util {
     }
 }
 
-#endif /* ERROR_CODES_HPP */
+#endif /* STATUS_CODES_HPP */

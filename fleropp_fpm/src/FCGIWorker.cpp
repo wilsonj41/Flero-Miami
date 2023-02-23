@@ -1,6 +1,6 @@
 #include "CGIEnvironment.hpp"
 #include "dispatch.hpp"
-#include "error_codes.hpp"
+#include "status_codes.hpp"
 #include "FCGIHandler.hpp"
 #include "FCGIWorker.hpp"
 #include "FleroppIO.hpp"
@@ -52,7 +52,7 @@ namespace fleropp::fpm::concurrency {
 
                 // If page is `nullptr`, we abort the request.
                 if (!page) {
-                    fleropp::util::error_response<"500", "Internal Server Error">(); 
+                    fleropp::util::status_response<"500", "Internal Server Error">(); 
                     spdlog::error("Instance of page not found. Aborting request.");
                     FCGX_Finish_r(&m_request);
                     continue;
@@ -66,10 +66,10 @@ namespace fleropp::fpm::concurrency {
                                 page, fleropp::io::RequestData{env});
                 } catch (const std::range_error&) {
                     spdlog::info("Invalid request method received: '{}'", request_method);
-                    fleropp::util::error_response<"418", "I'm a teapot">();
+                    fleropp::util::status_response<"418", "I'm a teapot">();
                 }
             } else {
-                fleropp::util::error_response<"404", "Not Found">();
+                fleropp::util::status_response<"404", "Not Found">();
             }
             FCGX_Finish_r(&m_request);
         }
