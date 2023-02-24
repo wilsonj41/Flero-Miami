@@ -10,6 +10,7 @@ namespace fleropp::io {
         : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
           m_query_string{m_request_env->get("QUERY_STRING")} {
             m_query_string.parse();
+            m_post_data = HttpPostData::loadPostData(fppin);
     }
 
     std::string RequestData::get_header(const std::string& key) const {
@@ -28,4 +29,9 @@ namespace fleropp::io {
     QueryString RequestData::get_query_string() const {
         return m_query_string;
     }
+
+    std::vector<HttpPostData> RequestData::get_post_data() const {
+        return m_post_data;
+    }
+
 }

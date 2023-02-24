@@ -8,6 +8,8 @@
 
 #include "CGIEnvironment.hpp"
 #include "QueryString.hpp"
+#include "HttpPostData.h"
+#include "FleroppIO.hpp"
 
 // fleropp IO namespace
 namespace fleropp::io {
@@ -54,10 +56,18 @@ namespace fleropp::io {
              * Returns the request type.
              */
             std::string method() const;
+
+            /**
+             * Returns a vector of HttpPostData objects.
+             * These objects represent individual files.
+             */
+            std::vector<HttpPostData> get_post_data() const;
+            
         private:
             CGIEnvironment* m_request_env;
             std::string m_request_method;
             QueryString m_query_string;
+            std::vector<HttpPostData> m_post_data;
     };
 }
 
