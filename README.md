@@ -25,7 +25,7 @@ TBD.
 TBD.
 
 ## Authors and acknowledgment
-Baxter Huntington, Jose Salinas, Joey Woods, Raymond Lin
+Baxter Huntington, Jose Salinas, Joey Woods, Raymond Lin, Wilson Yu
 
 ## License
 TBD.
