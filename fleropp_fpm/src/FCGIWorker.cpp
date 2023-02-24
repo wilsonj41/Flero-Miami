@@ -25,7 +25,7 @@ namespace fleropp::fpm::concurrency {
     }
 
     void FCGIWorker::accept() {
-        spdlog::info("Accepting requests with file descriptor {}", m_fd);
+        spdlog::info("New worker accepting requests (file descriptor {})", m_fd);
         while (FCGX_Accept_r(&m_request) >= 0) {
             fleropp::io::CGIEnvironment env{m_request.envp};
             const auto source = m_endpoints->find(env.get("SCRIPT_NAME"));
