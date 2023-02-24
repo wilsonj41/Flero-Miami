@@ -33,10 +33,10 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     fleropp::fpm::ConfigParser config;
     config.load("/etc/fleropp/demo.json");
     // Construct a handler that will listen on TCP port 50001
-    fleropp::fpm::FCGIHandler handler{50001};
+    fleropp::fpm::FCGIHandler handler{"/tmp/bruh"};
     // Add some endpoint mappings
     handler.load_endpoints(config.endpoints);
     // Start accepting connections (blocking)
-    handler.spawn(10);
+    handler.spawn(1);
     handler.wait();
 }
