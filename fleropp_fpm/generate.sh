@@ -23,6 +23,7 @@ main() {
 		esac
 	done
 	shift "$(($OPTIND -1))"
+	[[ $# -eq 0 ]] && usage && exit 1
 	for i in "$@"; do
 		init_scripts/init.sh $GET $POST $PUT $DELETE $i
 	done
