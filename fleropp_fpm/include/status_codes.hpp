@@ -15,7 +15,7 @@ namespace fleropp::util {
      * \brief Prints a status code and description as an HTTP response.
      * 
      * \tparam code A string literal representing the error code.
-     * \tparam desc A string literal representing the error descriptio. 
+     * \tparam desc A string literal representing the error description. 
      */
     template <StringLiteral code, StringLiteral desc>
     void status_response() {
