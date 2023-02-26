@@ -17,13 +17,13 @@ void MultiPartPostView::get(const fleropp::io::RequestData& request) {
     "<html>"_h;
         "<head>"_h "<title>Hello!, World</title>"_h "</head>"_h;
         "<body>"_h;
-            "<h1>Hello, World2!</h1>"_h;
+            "<h1>Hello, World 2!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
             "<h1>Hello, {}!</h1>"_f(request.get_query_string().get("name"));
             "<h1>User-Agent: {}</h1>"_f(request.get_header("User-Agent"));
             "<h1>Request type: {}</h1>"_f(request.method());
             "<h1>Random number: {}</h1>"_f(rand());
-            "<form action='hello.elf' method='post' enctype='multipart/form-data' target='out_iframe'>"_h;
+            "<form action='multipart.elf' method='post' enctype='multipart/form-data' target='out_iframe'>"_h;
                 "Name: <input type='text' name='person'><br>"_h;
                 "File: <input type='file' name='secret'><br>"_h;
                 "<input type='submit'>"_h;
@@ -36,10 +36,14 @@ void MultiPartPostView::get(const fleropp::io::RequestData& request) {
 void MultiPartPostView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     std::vector<HttpPostData> dataVec = request.get_post_data();
-    auto name1 = dataVec[0].data;
-    std::string result(name1.begin(),name1.end());
+    auto form1 = dataVec[0].data;
+    auto form2 = dataVec[1].data;
+    std::string result(form1.begin(),form1.end());
+    std::string txtFileResult(form2.begin(),form2.end());
     "Content-type: text/html\r"_h;
     "\r"_h;
-    "<h1>Result: {}</h1>"_f(result);
+    "<h1>Number of things in the Post Data form: {}</h1>"_f(dataVec.size());
+    "<h1>The {}'s name is: {}</h1>"_f(dataVec[0].name,result);
+    "<h1>The {}'s content is: {}</h1>"_f(dataVec[1].filename,txtFileResult);
     "<h1>Request type: {}</h1>"_f(request.method());
 }

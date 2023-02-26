@@ -17,7 +17,7 @@ namespace fleropp::io {
                 fppin >> line;
                 m_form_data = QueryString(line);
                 m_form_data.parse();
-            } else if(m_request_env->get("CONTENT_TYPE") == "multipart/form-data") {
+            } else if(m_request_env->get("CONTENT_TYPE").substr(0,19) == "multipart/form-data") {
                 m_post_data = HttpPostData::loadPostData(fppin);
             }
     }
