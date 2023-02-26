@@ -13,6 +13,7 @@
 
 // fleropp IO namespace
 namespace fleropp::io {
+    typedef class QueryString FormText;
     /**
      * \brief The pattern for key:value pairs in a header.
      * 
@@ -53,6 +54,11 @@ namespace fleropp::io {
             QueryString get_query_string() const;
 
             /**
+             * Returns a copy of the FormText object to the user.
+             */
+            FormText get_form_text() const;
+
+            /**
              * Returns the request type.
              */
             std::string method() const;
@@ -67,8 +73,10 @@ namespace fleropp::io {
             CGIEnvironment* m_request_env;
             std::string m_request_method;
             QueryString m_query_string;
+            FormText m_form_data;
             std::vector<HttpPostData> m_post_data;
     };
+    
 }
 
 #endif /* REQUEST_DATA_HPP */

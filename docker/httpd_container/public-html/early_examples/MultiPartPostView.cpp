@@ -1,25 +1,16 @@
 #include <cstdlib>
 #include <iterator>
 
-#include "HelloWorldView.hpp"
+#include "MultiPartPostView.hpp"
 
 #include <fleropp/HTMLLiterals.hpp>
 #include <fleropp/QueryString.hpp>
 #include <fleropp/RequestData.hpp>
 #include <fleropp/HttpPostData.h>
 
-extern "C" {
-    HelloWorldView *allocator() {
-        return new HelloWorldView();
-    }
+INIT_VIEW(MultiPartPostView);
 
-    void deleter(HelloWorldView *ptr) {
-        delete ptr;
-    }
-
-}
-
-void HelloWorldView::get(const fleropp::io::RequestData& request) {
+void MultiPartPostView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     "Content-type: text/html\r"_h;
     "\r"_h;
@@ -32,8 +23,9 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "<h1>User-Agent: {}</h1>"_f(request.get_header("User-Agent"));
             "<h1>Request type: {}</h1>"_f(request.method());
             "<h1>Random number: {}</h1>"_f(rand());
-            "<form action='hello.elf' method='post' target='out_iframe'>"_h;
-                "<input type='text' name='some_text' value='florp'>"_h;
+            "<form action='hello.elf' method='post' enctype='multipart/form-data' target='out_iframe'>"_h;
+                "Name: <input type='text' name='person'><br>"_h;
+                "File: <input type='file' name='secret'><br>"_h;
                 "<input type='submit'>"_h;
             "</form>"_h;
             "<iframe name='out_iframe'></iframe>"_h;
@@ -41,11 +33,13 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
     "</html>"_h;
 }
 
-void HelloWorldView::post(const fleropp::io::RequestData& request) {
+void MultiPartPostView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
+    std::vector<HttpPostData> dataVec = request.get_post_data();
+    auto name1 = dataVec[0].data;
+    std::string result(name1.begin(),name1.end());
     "Content-type: text/html\r"_h;
     "\r"_h;
-    auto pstring = request.get_form_text();
-    "<h1>Result: {}</h1>"_f(pstring.get("some_text"));
+    "<h1>Result: {}</h1>"_f(result);
     "<h1>Request type: {}</h1>"_f(request.method());
 }

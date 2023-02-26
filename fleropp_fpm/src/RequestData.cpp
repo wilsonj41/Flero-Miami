@@ -1,4 +1,6 @@
 #include "RequestData.hpp"
+#include "FleroppIO.hpp"
+#include "spdlog/spdlog.h"
 
 #include <algorithm>
 #include <cctype>
@@ -10,7 +12,14 @@ namespace fleropp::io {
         : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
           m_query_string{m_request_env->get("QUERY_STRING")} {
             m_query_string.parse();
-            m_post_data = HttpPostData::loadPostData(fppin);
+            if(m_request_env->get("CONTENT_TYPE") == "application/x-www-form-urlencoded"){
+                std::string line;
+                fppin >> line;
+                m_form_data = QueryString(line);
+                m_form_data.parse();
+            } else if(m_request_env->get("CONTENT_TYPE") == "multipart/form-data") {
+                m_post_data = HttpPostData::loadPostData(fppin);
+            }
     }
 
     std::string RequestData::get_header(const std::string& key) const {
@@ -32,6 +41,10 @@ namespace fleropp::io {
 
     std::vector<HttpPostData> RequestData::get_post_data() const {
         return m_post_data;
+    }
+
+    FormText RequestData::get_form_text() const {
+        return m_form_data;
     }
 
 }
