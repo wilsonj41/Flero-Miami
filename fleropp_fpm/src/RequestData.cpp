@@ -11,13 +11,23 @@ namespace fleropp::io {
     RequestData::RequestData(CGIEnvironment& request_env) 
         : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
           m_query_string{m_request_env->get("QUERY_STRING")} {
+            // Changing the content_type to lower case
+            const std::string content_type = m_request_env->get("CONTENT_TYPE");
+            std::string lower_case_content_type;
+            std::transform(std::cbegin(content_type), std::cend(content_type),
+                       std::back_inserter(lower_case_content_type),
+                       [] (unsigned char c) { return std::tolower(c); });
+            
+            // Parsing the query string. If there is not one, just has the empty string.
             m_query_string.parse();
-            if(m_request_env->get("CONTENT_TYPE") == "application/x-www-form-urlencoded"){
+
+            // Dealing with the 2 main encoding types of Post method
+            if(lower_case_content_type == "application/x-www-form-urlencoded"){
                 std::string line;
                 fppin >> line;
                 m_form_data = QueryString(line);
                 m_form_data.parse();
-            } else if(m_request_env->get("CONTENT_TYPE").substr(0,19) == "multipart/form-data") {
+            } else if(lower_case_content_type.substr(0,19) == "multipart/form-data") {
                 m_post_data = HttpPostData::loadPostData(fppin);
             }
     }

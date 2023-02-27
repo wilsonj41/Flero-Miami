@@ -19,7 +19,6 @@ void MultiPartPostView::get(const fleropp::io::RequestData& request) {
         "<body>"_h;
             "<h1>Hello, World 2!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
-            "<h1>Hello, {}!</h1>"_f(request.get_query_string().get("name"));
             "<h1>User-Agent: {}</h1>"_f(request.get_header("User-Agent"));
             "<h1>Request type: {}</h1>"_f(request.method());
             "<h1>Random number: {}</h1>"_f(rand());
