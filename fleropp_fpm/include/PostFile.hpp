@@ -1,5 +1,5 @@
-#ifndef HTTP_POST_DATA_H
-#define HTTP_POST_DATA_H
+#ifndef POST_FILE_HPP
+#define POST_FILE_HPP
 
 #include <vector>
 #include <string>
@@ -32,7 +32,7 @@ typedef unsigned char byte;
 /** A simple class to encapsulate data from a multi-part POST request.
 
     \note The primary interface method is the static
-    HttpPostData::loadPostData() method.
+    PostFile::loadPostData() method.
     
     Typically HTTP POST requests are associated with processing HTML
     forms where the user may submit different types of data in
@@ -74,38 +74,9 @@ typedef unsigned char byte;
     Upload^M
     -----------------------------198994908615659096011560184689--^M
     </pre>
-
-    \note The data members are exposed as public to keep the API
-    simple and easy to use.
 */
-class HttpPostData {
+class PostFile {
 public:
-    /** The actual data associated with this post entry.  Note the
-        following exception: If the entry is for a file, and a
-        temporary directory was specified in load, then data is
-        written to a file in the temproary directory and not stored in
-        this vector.  That way a large file does not need to be held
-        in memory until it is really needed.
-    */
-    std::vector<byte> data;
-
-    /** The name set for the mime field in the HTML form */
-    std::string name;
-
-    /** The content type for this field.  The default content-type is
-        is set to text/plain (as per RFC 822). */
-    std::string contentType;
-
-    /** The file name (if any) associated with this field.  The file
-        name is valid only if the HTML form involved an input of type
-        file as shown below:
-
-        <pre>
-        <input type="file" name="fileToUpload" id="fileToUpload"/>
-        </pre>
-     */
-    std::string filename;
-
     /** The top-level convenience method to load data for this post
         data entry object.
 
@@ -131,7 +102,7 @@ public:
         This method is a top-level helper method that can be used to
         process data from a HTTP POST request to create convenient
         objects for further processing.  This method uses the
-        HttpPostData::load() method to load data into each object.
+        PostFile::load() method to load data into each object.
 
         \param[in] is The input stream from where the POST data is to
         be processed.  This input stream must start at the first
@@ -141,12 +112,35 @@ public:
         \param[in] storeDir An optional directory into which files
         (supplied by the user as input) is to be stored.  If this
         string is empty then all input is stored in the corresponding
-        HttpPostData::data vector.  If this string is not empty then
+        PostFile::data vector.  If this string is not empty then
         files are stored on directories created on disk.  The actual
-        storing operation is performed by HttpPostData::load() method.
+        storing operation is performed by PostFile::load() method.
     */
-    static std::vector<HttpPostData>
+    static std::vector<PostFile>
     loadPostData(std::istream& is, const std::string& storeDir = "");
+
+    /**
+     * Getter method to return the vector that contains the data of
+     * the post file.
+    */
+    std::vector<byte> get_data() const;
+
+   /**
+    * Getter method to return the name of the form element that
+    * the file was attached to in the HTML form.
+   */
+    std::string get_name() const;
+
+  /**
+   * Getter method to return the content-type of the Post file
+   * request.
+  */
+    std::string get_content_type() const;
+
+ /**
+  * Getter method to return the name of the file name.
+ */
+    std::string get_file_name() const;
 
 private:
     /** Helper method to parse a given field out of a given HTTP header.
@@ -210,6 +204,32 @@ private:
     */
     void storeData(const std::string& input, std::ostream& os,
                    int skipLast = 0);
+
+    /** The actual data associated with this post entry.  Note the
+        following exception: If the entry is for a file, and a
+        temporary directory was specified in load, then data is
+        written to a file in the temproary directory and not stored in
+        this vector.  That way a large file does not need to be held
+        in memory until it is really needed.
+    */
+    std::vector<byte> m_data;
+
+    /** The name set for the mime field in the HTML form */
+    std::string m_name;
+
+    /** The content type for this field.  The default content-type is
+        is set to text/plain (as per RFC 822). */
+    std::string m_contentType;
+
+    /** The file name (if any) associated with this field.  The file
+        name is valid only if the HTML form involved an input of type
+        file as shown below:
+
+        <pre>
+        <input type="file" name="fileToUpload" id="fileToUpload"/>
+        </pre>
+     */
+    std::string m_filename;
 };
 
 #endif

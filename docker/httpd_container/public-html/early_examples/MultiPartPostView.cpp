@@ -6,7 +6,7 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <fleropp/QueryString.hpp>
 #include <fleropp/RequestData.hpp>
-#include <fleropp/HttpPostData.h>
+#include <fleropp/PostFile.hpp>
 
 INIT_VIEW(MultiPartPostView);
 
@@ -34,15 +34,15 @@ void MultiPartPostView::get(const fleropp::io::RequestData& request) {
 
 void MultiPartPostView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
-    std::vector<HttpPostData> dataVec = request.get_post_data();
-    auto form1 = dataVec[0].data;
-    auto form2 = dataVec[1].data;
+    std::vector<PostFile> dataVec = request.get_post_files();
+    auto form1 = dataVec[0].get_data();
+    auto form2 = dataVec[1].get_data();
     std::string result(form1.begin(),form1.end());
     std::string txtFileResult(form2.begin(),form2.end());
     "Content-type: text/html\r"_h;
     "\r"_h;
     "<h1>Number of things in the Post Data form: {}</h1>"_f(dataVec.size());
-    "<h1>The {}'s name is: {}</h1>"_f(dataVec[0].name,result);
-    "<h1>The {}'s content is: {}</h1>"_f(dataVec[1].filename,txtFileResult);
+    "<h1>The {}'s name is: {}</h1>"_f(dataVec[0].get_name(),result);
+    "<h1>The {}'s content is: {}</h1>"_f(dataVec[1].get_file_name(),txtFileResult);
     "<h1>Request type: {}</h1>"_f(request.method());
 }

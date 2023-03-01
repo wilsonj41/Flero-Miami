@@ -25,10 +25,10 @@ namespace fleropp::io {
             if(lower_case_content_type == "application/x-www-form-urlencoded"){
                 std::string line;
                 fppin >> line;
-                m_form_data = QueryString(line);
-                m_form_data.parse();
+                m_post_text = QueryString(line);
+                m_post_text.parse();
             } else if(lower_case_content_type.substr(0,19) == "multipart/form-data") {
-                m_post_data = HttpPostData::loadPostData(fppin);
+                m_post_files = PostFile::loadPostData(fppin);
             }
     }
 
@@ -49,12 +49,12 @@ namespace fleropp::io {
         return m_query_string;
     }
 
-    std::vector<HttpPostData> RequestData::get_post_data() const {
-        return m_post_data;
+    std::vector<PostFile> RequestData::get_post_files() const {
+        return m_post_files;
     }
 
-    FormText RequestData::get_form_text() const {
-        return m_form_data;
+    PostText RequestData::get_post_text() const {
+        return m_post_text;
     }
 
 }

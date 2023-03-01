@@ -6,7 +6,7 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <fleropp/QueryString.hpp>
 #include <fleropp/RequestData.hpp>
-#include <fleropp/HttpPostData.h>
+#include <fleropp/PostFile.hpp>
 
 extern "C" {
     HelloWorldView *allocator() {
@@ -45,7 +45,7 @@ void HelloWorldView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     "Content-type: text/html\r"_h;
     "\r"_h;
-    auto pstring = request.get_form_text();
+    auto pstring = request.get_post_text();
     "<h1>Result: {}</h1>"_f(pstring.get("some_text"));
     "<h1>Request type: {}</h1>"_f(request.method());
 }

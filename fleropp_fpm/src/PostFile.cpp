@@ -24,14 +24,14 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include "HttpPostData.h"
+#include "PostFile.hpp"
 
 
 // Parse out values for "name" or "filename" (specified as field) from
 // HTTP headers of the form:
 // Content-Disposition: form-data; name="file"; filename="test.txt"
 std::string
-HttpPostData::getHeaderVal(const std::string& header, std::string field) const {
+PostFile::getHeaderVal(const std::string& header, std::string field) const {
     std::istringstream data_stream(header);
     field += "=\"";
     std::string nameVal;
@@ -47,25 +47,25 @@ HttpPostData::getHeaderVal(const std::string& header, std::string field) const {
 // Convenience method to parse HTTP headers until a blank line in encountered
 // This method also suitably sets values of instance variables.
 void
-HttpPostData::loadHeaders(std::istream& is) {
+PostFile::loadHeaders(std::istream& is) {
     std::string header;
     while (std::getline(is, header) && (header != "\r")) {
         // Setup values of variaous instance variables based on header values
         if (header.find("Content-Disposition:") == 0) {
-            name     = getHeaderVal(header, "name");
-            filename = getHeaderVal(header, "filename");
+            m_name     = getHeaderVal(header, "name");
+            m_filename = getHeaderVal(header, "filename");
         } else if (header.find("Content-Type:") == 0) {
-            contentType = header.substr(14);
+            m_contentType = header.substr(14);
         }
     }
 }
 
 void
-HttpPostData::storeData(const std::string& input, std::ostream& out,
+PostFile::storeData(const std::string& input, std::ostream& out,
                         int skipLast) {
     // Suitably handle data.
     if (!out.good() && !input.empty()) {
-        data.insert(data.end(), input.begin(), input.end() - skipLast);
+        m_data.insert(m_data.end(), input.begin(), input.end() - skipLast);
     } else if (!input.empty()) {
         out.write(input.data(), input.size() - skipLast);
     }
@@ -74,14 +74,14 @@ HttpPostData::storeData(const std::string& input, std::ostream& out,
 // Load one multi-part POST entry while optinally saving file data in
 // a given directory (sotreDir).
 bool
-HttpPostData::load(std::istream& is, const std::string& bndry,
+PostFile::load(std::istream& is, const std::string& bndry,
                    const std::string& storeDir) {
     const std::string lBndry = bndry.substr(0, bndry.size() - 1) + "--\r";
     loadHeaders(is);  // Load necessary information into the headers
     // Create output stream to write data to file if requested
     std::ofstream out;
-    if ((storeDir != "") && (filename != "")) {
-        out.open(storeDir + "/" + filename);
+    if ((storeDir != "") && (m_filename != "")) {
+        out.open(storeDir + "/" + m_filename);
     } else {
         out.setstate(std::ios::badbit);
     }
@@ -106,21 +106,37 @@ HttpPostData::load(std::istream& is, const std::string& bndry,
     return (currLine == lBndry);
 }
 
-std::vector<HttpPostData>
-HttpPostData::loadPostData(std::istream& is, const std::string& storeDir) {
+std::vector<PostFile>
+PostFile::loadPostData(std::istream& is, const std::string& storeDir) {
     is >> std::noskipws;  // Don't skip white space as we need that data!
-    std::vector<HttpPostData> postData;
+    std::vector<PostFile> postData;
     // First line is always mime boundary string
     std::string mimeBoundary;
     std::getline(is, mimeBoundary);
     // process each part of the multi-part HTTP POST data.
     bool lastBoundaryFound = false;
     while (is.good() && !lastBoundaryFound) {
-        HttpPostData pde;
+        PostFile pde;
         lastBoundaryFound = pde.load(is, mimeBoundary, storeDir);
         postData.push_back(pde);
     }
     return postData;
+}
+
+std::vector<byte> PostFile::get_data() const {
+    return m_data;
+ }
+
+std::string PostFile::get_name() const {
+    return m_name;
+}
+
+std::string PostFile::get_content_type() const {
+    return m_contentType;
+}
+
+std::string PostFile::get_file_name() const {
+    return m_filename;
 }
 
 // End of source code

@@ -8,12 +8,12 @@
 
 #include "CGIEnvironment.hpp"
 #include "QueryString.hpp"
-#include "HttpPostData.h"
+#include "PostFile.hpp"
 #include "FleroppIO.hpp"
 
 // fleropp IO namespace
 namespace fleropp::io {
-    typedef class QueryString FormText;
+    typedef class QueryString PostText;
     /**
      * \brief The pattern for key:value pairs in a header.
      * 
@@ -56,7 +56,7 @@ namespace fleropp::io {
             /**
              * Returns a copy of the FormText object to the user.
              */
-            FormText get_form_text() const;
+            PostText get_post_text() const;
 
             /**
              * Returns the request type.
@@ -64,17 +64,17 @@ namespace fleropp::io {
             std::string method() const;
 
             /**
-             * Returns a vector of HttpPostData objects.
+             * Returns a vector of PostFile objects.
              * These objects represent individual files.
              */
-            std::vector<HttpPostData> get_post_data() const;
+            std::vector<PostFile> get_post_files() const;
             
         private:
             CGIEnvironment* m_request_env;
             std::string m_request_method;
             QueryString m_query_string;
-            FormText m_form_data;
-            std::vector<HttpPostData> m_post_data;
+            PostText m_post_text;
+            std::vector<PostFile> m_post_files;
     };
     
 }
