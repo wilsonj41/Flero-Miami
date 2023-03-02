@@ -1,0 +1,12 @@
+{
+	"dockerComposeFile": "../docker/docker-compose.yml",
+	"service": "apache2_fcgi_dev",
+	"workspaceFolder": "/fleropp",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools"
+			]
+		}
+	}
+}
