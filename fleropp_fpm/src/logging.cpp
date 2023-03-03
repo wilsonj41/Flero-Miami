@@ -18,7 +18,7 @@ namespace fleropp::logging {
         spdlog::register_logger(compiler_logger);
         
         // We must call these functions *after* registering any loggers
-        spdlog::flush_on(spdlog::level::info);
+        spdlog::flush_on(spdlog::level::debug);
         spdlog::cfg::load_env_levels();
         
         // Set the pattern to empty so we can print the figlet

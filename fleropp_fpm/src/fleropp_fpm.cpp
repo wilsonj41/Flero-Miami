@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string>
+#include <thread>
 
 #include <boost/program_options.hpp>
 
@@ -18,7 +19,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
         ("log,l", opts::value<std::string>()->default_value("/var/log/fleropp.log"), "log file location.")
         ("port,p", opts::value<unsigned int>(), "listen on a TCP socket with this port.")
         ("ipc-path,u", opts::value<std::string>(), "listen on a Unix-domain socket with this path.")
-        ("workers,w", opts::value<std::size_t>()->default_value(10), "the number of FastCGI workers to spawn.")
+        ("workers,w", opts::value<std::size_t>()->default_value(std::thread::hardware_concurrency()), "the number of FastCGI workers to spawn.")
     ;
 
     // Parse the command line options

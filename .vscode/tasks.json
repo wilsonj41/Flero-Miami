@@ -14,7 +14,7 @@
         {
             "label": "Run Fleropp...",
             "type": "shell",
-            "command": "export SPDLOG_LEVEL=info && export LC_ALL=C && unset LANGUAGE && { { { [ -f '/opt/fleropp_fpm/fleropp_fpm' ] || { echo 'Please compile fleropp first'; exit 1; } ;} && /opt/fleropp_fpm/fleropp_fpm; }; }"
+            "command": "export SPDLOG_LEVEL=info && export LC_ALL=C && unset LANGUAGE && { { { [ -f '/opt/fleropp_fpm/fleropp_fpm' ] || { echo 'Please compile fleropp first'; exit 1; }; } && /opt/fleropp_fpm/fleropp_fpm -p 50001; }; }"
         },
         {
             "label": "Build and Run Fleropp...",
