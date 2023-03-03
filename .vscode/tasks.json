@@ -6,7 +6,7 @@
         {
             "label": "Build Fleropp...",
             "type": "shell",
-            "command": "make -j$(nproc) all",
+            "command": "make clean && make -j$(nproc) all",
             "options": {
                 "cwd": "${workspaceFolder}/fleropp_fpm"
             }
