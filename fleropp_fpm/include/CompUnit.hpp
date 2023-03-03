@@ -110,7 +110,8 @@ namespace fleropp::fpm {
                     // cannot acquire it. 
                     std::unique_lock lock(open_mtx, std::try_to_lock);
                     if (lock && !m_open.test()) {
-                        if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
+                        if ((std::filesystem::file_size(m_shared_object) == 0) || 
+                            !(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
                             spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
                         } else {
                             m_open.test_and_set();
@@ -135,7 +136,13 @@ namespace fleropp::fpm {
         void close_lib() final {
             // Only do something if the library is currently open.
             if (m_open.test()) {
-                if (::dlclose(m_handle) != 0) {
+                // If the handle is valid (i.e., not `nullptr`) *but* we fail to close
+                // it, log an error. Otherwise, we assume the handle was never acquired
+                // in the first place (or freed at some point earlier) and clear the flag.
+                // 
+                // The first case also prevents invocation of `::dlclose(nullptr)`, a scenario
+                // that, although not well-documented, is likely to be bad news.
+                if (m_handle && (::dlclose(m_handle) != 0)) {
                     spdlog::error("Unable to unload DSO '{}': {}", m_shared_object, ::dlerror());
                 } else {
                     m_open.clear();
@@ -175,12 +182,14 @@ namespace fleropp::fpm {
             if (!alloc_fun || !del_fun) {
                 close_lib();
                 spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", m_shared_object, ::dlerror());
+                // Return a default-constructed std::shared_ptr whose value shall be `nullptr`
                 return {};
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
             // calling alloc_fun) with a custom deleter closure that calls
             // del_fun.
+            spdlog::debug("Returning instance of '{}'", m_shared_object);
             return std::shared_ptr<T>{alloc_fun(), [del_fun] (T *p) { del_fun(p); }};
         } 
 
@@ -221,6 +230,12 @@ namespace fleropp::fpm {
                     std::unique_lock lock(recompile_mtx, std::try_to_lock);
                     if (lock && was_modified()) {
                         spdlog::info("Compiling '{}'", m_shared_object);
+
+                        // Set up and execute the compiler
+                        // We use boost::process to simplify this process
+                        //
+                        // Important note: we capture the stderr stream from the compiler
+                        // so that it can be logged in the event of a compilation failure.
                         boost::asio::io_context ioc;
                         std::future<std::string> stderr;
                         bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
@@ -228,12 +243,29 @@ namespace fleropp::fpm {
                         ioc.run();
                         chld.wait();
                         const auto exit_code = chld.exit_code();
+
+                        // If the compilation failed, log the exit code and the errors that were
+                        // reported. If it was successful, we can simply close the library.
                         if (exit_code) {
                             spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                            
+                            // Update the modification time of the existing shared object, if it exists.
+                            // If it does not exist, we create an empty file to serve as a 
+                            // placeholder.
+                            //
+                            // This signals to `CompUnit` that a recompile has happened---and it
+                            // shouldn't happen again until another modification. A failed compile
+                            // is, in all likelihood, not going to be resolved until another
+                            // modification occurs.
                             if (std::filesystem::exists(m_shared_object)) {
-                                boost::filesystem::last_write_time(m_shared_object, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+                                // Set the mtime to now
+                                const auto new_mtime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                                boost::filesystem::last_write_time(m_shared_object, new_mtime);
+                                spdlog::debug("Updated '{}' modification time to '{}' after failed compile", m_shared_object, new_mtime);
                             } else {
+                                // Create an empty file
                                 std::ofstream fd{m_shared_object};
+                                spdlog::debug("Created empty placeholder for '{}' after failed compile", m_shared_object);
                             }
                         } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
                             spdlog::info("Sucessfully compiled '{}'", m_shared_object);

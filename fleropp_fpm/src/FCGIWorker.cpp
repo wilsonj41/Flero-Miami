@@ -37,12 +37,10 @@ namespace fleropp::fpm::concurrency {
                                            env.get("REQUEST_URI"),
                                            env.get("SERVER_PROTOCOL"));
             fcgi_streambuf in_buf{m_request.in}, out_buf{m_request.out};
-            std::istream in{&in_buf};
-            std::ostream out{&out_buf};
 
             // Redirect the streams to the global convenience variables.
-            fleropp::io::ScopedRedirect redir_in{in, fleropp::io::fppin};
-            fleropp::io::ScopedRedirect redir_out{out, fleropp::io::fppout};
+            fleropp::io::ScopedRedirect redir_in{in_buf, fleropp::io::fppin};
+            fleropp::io::ScopedRedirect redir_out{out_buf, fleropp::io::fppout};
 
             if (source != m_endpoints->end()) {  
                 // Prepare to dispatch the request by getting the request

@@ -33,10 +33,15 @@ namespace fleropp::fpm {
         FCGIHandler(const unsigned int tcp_sock, const unsigned int backlog = 512);
 
         /**
-         * Spawns pool of worker threads. 
+         * Spawns pool of worker threads.
+         * 
+         * \param n_thr The number of threads to spawn 
          */
         void spawn(std::size_t n_thr);
 
+        /**
+         * Wait on the worker threads (blocking). 
+         */
         void wait();
 
         /**

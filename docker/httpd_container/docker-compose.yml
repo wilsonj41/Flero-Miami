@@ -3,7 +3,7 @@ services:
     build: 
       context: .
     container_name: httpd_container
-    command: /bin/sh -c "export SPDLOG_LEVEL=info && /usr/sbin/apachectl start && /opt/fleropp_fpm/fleropp_fpm -p 50001 -w 20"
+    command: /bin/sh -c "export SPDLOG_LEVEL=debug && /usr/sbin/apachectl start && /opt/fleropp_fpm/fleropp_fpm -p 50001 -w 20"
     ports:
       - 8080:80
       - 8443:443
