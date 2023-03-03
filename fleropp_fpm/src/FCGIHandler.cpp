@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <grp.h>
 
+#include "Group.hpp"
 #include "fcgio.h"
 #include "fcgios.h"
 
@@ -22,9 +23,10 @@ namespace fleropp::fpm {
                                 const unsigned int backlog) {
         // TODO: Implement permissions management for UNIX domain sockets
         umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
-        if (!change_sock_perms()) {
-             spdlog::critical("Unable to change Unix Socket Permissions");
-        }
+       if (!change_sock_perms()) {
+            spdlog::critical("Unable to change Unix Socket Permissions");
+       }
+
         m_fd = FCGX_OpenSocket(unix_sock.c_str(), backlog);
         
         if ( m_fd == -1 ) {
@@ -68,11 +70,9 @@ namespace fleropp::fpm {
     bool FCGIHandler::change_sock_perms() {
         std::string uid_str = "www-data";
         //passwd* apache_user = getpwnam(uid_str.c_str());
-        group*  apache_group = getgrnam(uid_str.c_str());
+        Group apache_group(uid_str);
 
-        spdlog::info("{}, group uid", apache_group->gr_gid);
-
-        if (setgid(apache_group->gr_gid) == -1) {
+        if (setgid(apache_group.get_group_gid()) == -1) {
             return false;
         }
         return true;
