@@ -8,16 +8,7 @@
 #include <fleropp/RequestData.hpp>
 #include <fleropp/PostFile.hpp>
 
-extern "C" {
-    HelloWorldView *allocator() {
-        return new HelloWorldView();
-    }
-
-    void deleter(HelloWorldView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(HelloWorldView);
 
 void HelloWorldView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;

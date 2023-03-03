@@ -3,11 +3,11 @@
 
 #include <fleropp/IView.hpp>
 
-class IframeExampleView : public IView {
+class IframeExampleView : public IView<IframeExampleView> {
   public:
     IframeExampleView() = default;
     ~IframeExampleView() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* IFRAME_EXAMPLE_VIEW_HPP */

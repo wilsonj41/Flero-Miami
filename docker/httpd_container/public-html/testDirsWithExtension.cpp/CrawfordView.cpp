@@ -15,7 +15,7 @@ extern "C" {
 
 }
 
-void CrawfordView::generate() {
+void CrawfordView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp_literals;
     namespace htmls = fleropp_html_stream;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;

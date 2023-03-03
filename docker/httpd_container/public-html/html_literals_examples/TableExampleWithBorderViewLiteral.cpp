@@ -12,7 +12,7 @@
 
 INIT_VIEW(TableExampleWithBorderViewLiteral)
 
-void TableExampleWithBorderViewLiteral::generate() {
+void TableExampleWithBorderViewLiteral::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
     using entry = std::tuple<std::string_view, std::string_view, unsigned int>;
