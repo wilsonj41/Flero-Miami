@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Fleropp...",
+            "type": "shell",
+            "command": "make clean && make -j$(nproc) all",
+            "options": {
+                "cwd": "${workspaceFolder}/fleropp_fpm"
+            }
+        },
+        {
+            "label": "Run Fleropp...",
+            "type": "shell",
+            "command": "export SPDLOG_LEVEL=info && export LC_ALL=C && unset LANGUAGE && { { { [ -f '/opt/fleropp_fpm/fleropp_fpm' ] || { echo 'Please compile fleropp first'; exit 1; } ;} && /opt/fleropp_fpm/fleropp_fpm; }; }"
+        },
+        {
+            "label": "Build and Run Fleropp...",
+            "dependsOn": ["Build Fleropp...", "Run Fleropp..."],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
