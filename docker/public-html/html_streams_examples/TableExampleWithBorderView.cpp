@@ -40,7 +40,7 @@ namespace table_border_example_util {
     }
 }
 
-void TableExampleWithBorderView::generate() {
+void TableExampleWithBorderView::get(const fleropp::io::RequestData& request) {
     using namespace table_border_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<head>", "</head>"> head;

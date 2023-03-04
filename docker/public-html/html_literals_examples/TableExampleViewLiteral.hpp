@@ -3,11 +3,11 @@
 
 #include <fleropp/IView.hpp>
 
-class TableExampleViewLiteral : public IView {
+class TableExampleViewLiteral : public IView<TableExampleViewLiteral> {
   public:
     TableExampleViewLiteral() = default;
     ~TableExampleViewLiteral() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* TABLE_EXAMPLE_VIEW_LITERAL_HPP */

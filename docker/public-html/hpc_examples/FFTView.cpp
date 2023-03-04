@@ -76,7 +76,7 @@ namespace fft_util {
     }
 }
 
-void FFTView::generate() {
+void FFTView::get(const fleropp::io::RequestData& request) {
     using namespace fft_util;
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;

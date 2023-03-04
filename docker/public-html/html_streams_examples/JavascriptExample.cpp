@@ -22,7 +22,7 @@ namespace js_example_util {
     }
 }
 
-void JavascriptExample::generate() {
+void JavascriptExample::get(const fleropp::io::RequestData& request) {
     using namespace js_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;

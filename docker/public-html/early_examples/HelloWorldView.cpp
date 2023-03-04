@@ -6,17 +6,9 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <fleropp/QueryString.hpp>
 #include <fleropp/RequestData.hpp>
+#include <fleropp/PostFile.hpp>
 
-extern "C" {
-    HelloWorldView *allocator() {
-        return new HelloWorldView();
-    }
-
-    void deleter(HelloWorldView *ptr) {
-        delete ptr;
-    }
-
-}
+INIT_VIEW(HelloWorldView);
 
 void HelloWorldView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
@@ -25,7 +17,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
     "<html>"_h;
         "<head>"_h "<title>Hello!, World</title>"_h "</head>"_h;
         "<body>"_h;
-            "<h1>Hello, World!</h1>"_h;
+            "<h1>Hello, World2!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
             "<h1>Hello, {}!</h1>"_f(request.get_query_string().get("name"));
             "<h1>User-Agent: {}</h1>"_f(request.get_header("User-Agent"));
@@ -44,10 +36,7 @@ void HelloWorldView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     "Content-type: text/html\r"_h;
     "\r"_h;
-    std::string form_data; 
-    fleropp::io::fppin >> form_data;
-    fleropp::io::QueryString qstring{form_data};
-    qstring.parse(); 
-    "<h1>Result: {}</h1>"_f(qstring.get("some_text"));
+    auto pstring = request.get_post_text();
+    "<h1>Result: {}</h1>"_f(pstring.get("some_text"));
     "<h1>Request type: {}</h1>"_f(request.method());
 }

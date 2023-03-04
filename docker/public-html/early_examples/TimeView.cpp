@@ -7,17 +7,9 @@
 
 #include <sys/utsname.h>
 
-extern "C" {
-    TimeView *allocator() {
-        return new TimeView();
-    }
+INIT_VIEW(TimeView);
 
-    void deleter(TimeView *ptr) {
-        delete ptr;
-    }
-}
-
-void TimeView::generate() {
+void TimeView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     struct utsname uname;
     ::uname(&uname);
