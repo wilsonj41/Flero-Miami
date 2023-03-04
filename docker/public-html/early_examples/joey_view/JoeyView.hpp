@@ -3,11 +3,11 @@
 
 #include <fleropp/IView.hpp>
 
-class JoeyView : public IView {
+class JoeyView : public IView<JoeyView> {
   public:
     JoeyView() = default;
     ~JoeyView() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* JOEY_VIEW_HPP */

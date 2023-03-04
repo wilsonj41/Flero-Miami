@@ -60,7 +60,7 @@ namespace table_example_util {
   }
 }
 
-void TableExampleView::generate() {
+void TableExampleView::get(const fleropp::io::RequestData& request) {
     using namespace table_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;

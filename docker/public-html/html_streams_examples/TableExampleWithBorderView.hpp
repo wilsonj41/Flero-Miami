@@ -3,11 +3,11 @@
 
 #include <fleropp/IView.hpp>
 
-class TableExampleWithBorderView : public IView {
+class TableExampleWithBorderView : public IView<TableExampleWithBorderView> {
   public:
     TableExampleWithBorderView() = default;
     ~TableExampleWithBorderView() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* TABLE_EXAMPLE_WITH_BORDER_VIEW_HPP */

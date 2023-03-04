@@ -3,11 +3,11 @@
 
 #include <fleropp/IView.hpp>
 
-class TimeView : public IView {
+class TimeView : public IView<TimeView> {
   public:
     TimeView() = default;
     ~TimeView() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* TIME_VIEW_HPP */

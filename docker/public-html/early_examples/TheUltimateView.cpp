@@ -3,18 +3,9 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <cgicc/HTMLClasses.h>
 
-extern "C" {
-    TheUltimateView *allocator() {
-        return new TheUltimateView();
-    }
+INIT_VIEW(TheUltimateView);
 
-    void deleter(TheUltimateView *ptr) {
-        delete ptr;
-    }
-
-}
-
-void TheUltimateView::generate() {
+void TheUltimateView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
