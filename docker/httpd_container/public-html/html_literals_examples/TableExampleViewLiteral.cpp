@@ -9,7 +9,7 @@
 
 INIT_VIEW(TableExampleViewLiteral)
 
-void TableExampleViewLiteral::generate() {
+void TableExampleViewLiteral::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
 

@@ -9,7 +9,7 @@
 
 INIT_VIEW(IframeExampleViewLiteral)
 
-void IframeExampleViewLiteral::generate() {
+void IframeExampleViewLiteral::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
 

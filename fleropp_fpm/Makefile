@@ -7,7 +7,7 @@ INCDIR = ./include
 CXX=g++
 CXXWARN=-Wall -Wextra -Wshadow -Wpedantic -Wconversion -Werror\
  			-Wtrampolines -Wvla -Wlogical-op -Wduplicated-cond\
-  			-Wduplicated-branches -Wformat-signedness -Wswitch-default -Wswitch-enum
+  			-Wduplicated-branches -Wformat-signedness -Wswitch-default -Wswitch-enum -Wno-stringop-overflow
 CXXFLAGS=-std=c++20 $(CXXWARN) -O3 -I $(INCDIR) -fPIC -DFPM_BUILD
 LDLIBS=-lfcgi -lfcgi++ -lboost_filesystem -lboost_system -lcgicc -lspdlog -lfmt
 LDFLAGS=-rdynamic

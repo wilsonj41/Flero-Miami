@@ -6,18 +6,9 @@
 
 #include <sys/utsname.h>
 
-extern "C" {
-    JoeyView *allocator() {
-        return new JoeyView();
-    }
+INIT_VIEW(JoeyView);
 
-    void deleter(JoeyView *ptr) {
-        delete ptr;
-    }
-
-}
-
-void JoeyView::generate() {
+void JoeyView::get(const fleropp::io::RequestData& request) {
     struct utsname uname;
     ::uname(&uname);
 

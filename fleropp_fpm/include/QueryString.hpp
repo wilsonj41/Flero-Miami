@@ -27,6 +27,11 @@ namespace fleropp::io {
         static const std::regex query_re;
 
         /**
+         * Default Constructor
+        */
+        QueryString() = default;
+
+        /**
          * Constructor.
          * 
          * \param[in] contents The contents of a query string (exluding the leading '?'). 

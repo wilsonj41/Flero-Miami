@@ -28,7 +28,7 @@ namespace class_attr_example_util {
     }
 }
 
-void ClassAttributeExampleView::generate() {
+void ClassAttributeExampleView::get(const fleropp::io::RequestData& request) {
     using namespace class_attr_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<head>", "</head>"> head;

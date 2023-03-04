@@ -61,7 +61,7 @@ namespace fleropp::html_stream {
    * Free function that generates the content type for the HTML page.
    * \param[in] type the content type.
   */
-  void gen_content_type(const std::string &content_type) {
+  void gen_content_type(const std::string &content_type = "text/html") {
     fleropp::io::fppout << "Content-type: " << content_type << "\r\n\r\n";
   }
 
@@ -76,7 +76,7 @@ namespace fleropp::html_stream {
    * Free function that generates the "boiler plate" for a HTML page.
    * \param[in] type the content type for content type header.
   */
-  void gen_html_boiler_plate(const std::string &content_type) {
+  void gen_html_boiler_plate(const std::string &content_type = "text/html") {
     gen_content_type(content_type);
     gen_html_doctype();
   }

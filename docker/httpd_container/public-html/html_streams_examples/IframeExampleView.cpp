@@ -12,7 +12,7 @@ namespace htmls = fleropp::html_stream;
 // link to reference: https://www.w3schools.com/html/tryit.asp?filename=tryhtml_iframe
 INIT_VIEW(IframeExampleView)
 
-void IframeExampleView::generate() {
+void IframeExampleView::get(const fleropp::io::RequestData& request) {
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<body>", "</body>"> body;
 

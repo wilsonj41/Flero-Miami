@@ -4,11 +4,11 @@
 #include <fleropp/IView.hpp>
 #include <omp.h>
 
-class FFTView : public IView {
+class FFTView : public IView<FFTView> {
   public:
     FFTView() { omp_set_num_threads(12); };
     ~FFTView() = default;
-    void generate() override;
+    void get(const fleropp::io::RequestData& request);
 };
 
 #endif /* FFT_VIEW_HPP */

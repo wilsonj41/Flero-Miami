@@ -24,7 +24,7 @@ namespace id_attr_example_util {
     }
 }
 
-void IdAttributeExampleView::generate() {
+void IdAttributeExampleView::get(const fleropp::io::RequestData& request) {
     using namespace id_attr_example_util;
     htmls::HTMLStream<"<html>", "</html>", htmls::dump_on_end> html;
     htmls::HTMLStream<"<head>", "</head>"> head;
