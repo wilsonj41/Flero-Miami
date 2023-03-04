@@ -14,7 +14,8 @@ void JoeyView::get(const fleropp::io::RequestData& request) {
 
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-    fleropp_io::fppout << "Content-type: text/html\r\n"
+
+    fleropp::io::fppout << "Content-type: text/html\r\n"
        << "\r\n"
        << "<html>\n"
        << "  <head>\n"

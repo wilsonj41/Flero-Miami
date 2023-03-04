@@ -13,13 +13,18 @@
 #include "ISOLoader.hpp"
 #include "CompilerDefaults.hpp"
 
+#include <atomic>
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/process.hpp>
 #include <boost/process/child.hpp>
 #include <boost/process/search_path.hpp>
@@ -75,8 +80,7 @@ namespace fleropp::fpm {
                         m_handle{nullptr}, m_shared_object{shared_object},
                         m_src_path_list{src_path_list},
                         m_alloc_sym{alloc_sym}, m_del_sym{del_sym},
-                        m_compiler{compiler}, m_args{args},
-                        m_open{false} {
+                        m_compiler{compiler}, m_args{args} {
 
             if (compiler_defaults::compiler_map.find(compiler) == compiler_defaults::compiler_map.end() && args.empty()) {
                 // Warning/Error that compiler was not found to have default argument list, will revert to default parameters.
@@ -99,13 +103,25 @@ namespace fleropp::fpm {
          */
         void open_lib() final {
             // Only do something if the library is not currently open
-            if (!m_open) {
-                if (!(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
-                    spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
-                } else {
-                    m_open = true;
-                    spdlog::debug("Opened '{}'", m_shared_object);
-                }
+            static std::shared_mutex open_mtx;
+            if (!m_open.test()) {
+                {   
+                    // We attempt to acquire an exclusive lock, but don't block if we
+                    // cannot acquire it. 
+                    std::unique_lock lock(open_mtx, std::try_to_lock);
+                    if (lock && !m_open.test()) {
+                        if ((std::filesystem::file_size(m_shared_object) == 0) || 
+                            !(m_handle = ::dlopen(m_shared_object.c_str(), RTLD_LAZY | RTLD_LOCAL))) {
+                            spdlog::error("Unable to load DSO '{}': {}", m_shared_object, ::dlerror());
+                        } else {
+                            m_open.test_and_set();
+                            spdlog::debug("Opened '{}'", m_shared_object);
+                        }
+                    }
+                } 
+            }
+            {
+                std::shared_lock lock(open_mtx);
             }
         }
 
@@ -119,11 +135,17 @@ namespace fleropp::fpm {
          */
         void close_lib() final {
             // Only do something if the library is currently open.
-            if (m_open) {
-                if (::dlclose(m_handle) != 0) {
+            if (m_open.test()) {
+                // If the handle is valid (i.e., not `nullptr`) *but* we fail to close
+                // it, log an error. Otherwise, we assume the handle was never acquired
+                // in the first place (or freed at some point earlier) and clear the flag.
+                // 
+                // The first case also prevents invocation of `::dlclose(nullptr)`, a scenario
+                // that, although not well-documented, is likely to be bad news.
+                if (m_handle && (::dlclose(m_handle) != 0)) {
                     spdlog::error("Unable to unload DSO '{}': {}", m_shared_object, ::dlerror());
                 } else {
-                    m_open = false;
+                    m_open.clear();
                     spdlog::debug("Closed '{}'", m_shared_object);
                 }
             }
@@ -148,10 +170,8 @@ namespace fleropp::fpm {
             using del_fun_t = void (*)(T *);
 
             // If the library was recompiled, close it so we can reopen
-            if (recompile()) {
-                close_lib();
-            }
-            open_lib(); 
+            recompile();
+            open_lib();
 
             // dlsym returns a void pointer, so we reinterpret cast it to our
             // type aliases above
@@ -162,12 +182,14 @@ namespace fleropp::fpm {
             if (!alloc_fun || !del_fun) {
                 close_lib();
                 spdlog::error("Unable to resolve allocator and/or deleter symbol in '{}': {}", m_shared_object, ::dlerror());
-                return std::shared_ptr<T>{};
+                // Return a default-constructed std::shared_ptr whose value shall be `nullptr`
+                return {};
             }
 
             // Return a shared_ptr to T (whose raw pointer is acquired by 
             // calling alloc_fun) with a custom deleter closure that calls
             // del_fun.
+            spdlog::debug("Returning instance of '{}'", m_shared_object);
             return std::shared_ptr<T>{alloc_fun(), [del_fun] (T *p) { del_fun(p); }};
         } 
 
@@ -179,7 +201,7 @@ namespace fleropp::fpm {
         std::string m_del_sym;
         std::string m_compiler;
         std::vector<std::string> m_args;
-        bool m_open;
+        static inline std::atomic_flag m_open = ATOMIC_FLAG_INIT;
 
         // Checks if the source file was modified
         bool was_modified() const {
@@ -198,26 +220,64 @@ namespace fleropp::fpm {
         } 
 
         // Recompile if necessary
-        bool recompile() const {
+        void recompile() {
             namespace bp = boost::process;
+            static std::shared_mutex recompile_mtx;
             if (was_modified()) {
-                spdlog::info("Compiling '{}'", m_shared_object);
-                boost::asio::io_context ioc;
-                std::future<std::string> stderr;
-                bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
-                                               bp::std_out > bp::null, bp::std_err > stderr, ioc);
-                ioc.run();
-                chld.wait();
-                const auto exit_code = chld.exit_code();
-                if (exit_code) {
-                    spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
-                    return false;
-                } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
-                    spdlog::info("Sucessfully compiled '{}'", m_shared_object);
+                {
+                    // We attempt to acquire an exclusive lock, but don't block if we
+                    // cannot acquire it.
+                    std::unique_lock lock(recompile_mtx, std::try_to_lock);
+                    if (lock && was_modified()) {
+                        spdlog::info("Compiling '{}'", m_shared_object);
+
+                        // Set up and execute the compiler
+                        // We use boost::process to simplify this process
+                        //
+                        // Important note: we capture the stderr stream from the compiler
+                        // so that it can be logged in the event of a compilation failure.
+                        boost::asio::io_context ioc;
+                        std::future<std::string> stderr;
+                        bp::child chld(bp::search_path(m_compiler), m_args, bp::std_in.close(),
+                                    bp::std_out > bp::null, bp::std_err > stderr, ioc);
+                        ioc.run();
+                        chld.wait();
+                        const auto exit_code = chld.exit_code();
+
+                        // If the compilation failed, log the exit code and the errors that were
+                        // reported. If it was successful, we can simply close the library.
+                        if (exit_code) {
+                            spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, exit_code, stderr.get());
+                            
+                            // Update the modification time of the existing shared object, if it exists.
+                            // If it does not exist, we create an empty file to serve as a 
+                            // placeholder.
+                            //
+                            // This signals to `CompUnit` that a recompile has happened---and it
+                            // shouldn't happen again until another modification. A failed compile
+                            // is, in all likelihood, not going to be resolved until another
+                            // modification occurs.
+                            if (std::filesystem::exists(m_shared_object)) {
+                                // Set the mtime to now
+                                const auto new_mtime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                                boost::filesystem::last_write_time(m_shared_object, new_mtime);
+                                spdlog::debug("Updated '{}' modification time to '{}' after failed compile", m_shared_object, new_mtime);
+                            } else {
+                                // Create an empty file
+                                std::ofstream fd{m_shared_object};
+                                spdlog::debug("Created empty placeholder for '{}' after failed compile", m_shared_object);
+                            }
+                        } else { // exit_code == 0 so the page was sucessfully recompiled with no issues.
+                            spdlog::info("Sucessfully compiled '{}'", m_shared_object);
+                            close_lib();
+                        }
+                    }
                 }
-                return true;
-            }            
-            return false;
+                
+            }
+            {
+                std::shared_lock lock(recompile_mtx);   
+            }
         }
     };
 }
