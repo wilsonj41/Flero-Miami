@@ -8,10 +8,24 @@
 #include <fleropp/RequestData.hpp>
 #include <fleropp/PostFile.hpp>
 
+#include <fleropp/SQLBuilder.h>
+
 INIT_VIEW(HelloWorldView);
 
 void HelloWorldView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
+    using namespace SQLBuilder;
+
+    // Examples derived from library repo
+    // Insert
+    InsertModel i;
+    i.insert("score", 100)
+            ("name", std::string("six"))
+            ("age", (unsigned char)20)
+            ("address", "beijing")
+            ("create_time", nullptr)
+        .into("user");
+
     "Content-type: text/html\r"_h;
     "\r"_h;
     "<html>"_h;
@@ -23,9 +37,11 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "<h1>User-Agent: {}</h1>"_f(request.get_header("User-Agent"));
             "<h1>Request type: {}</h1>"_f(request.method());
             "<h1>Random number: {}</h1>"_f(rand());
+            "<h1>SQLBuilder Test</h1>"_h;
+            "<span>{}<br></span>"_f(i.str());
             "<form action='hello.elf' method='post' target='out_iframe'>"_h;
-                "<input type='text' name='some_text' value='florp'>"_h;
-                "<input type='submit'>"_h;
+            "<input type='text' name='some_text' value='florp'>"_h;
+            "<input type='submit'>"_h;
             "</form>"_h;
             "<iframe name='out_iframe'></iframe>"_h;
         "</body>"_h;

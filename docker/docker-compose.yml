@@ -16,3 +16,14 @@ services:
       - ../fleropp_fpm/so:/usr/lib/fleropp
       - ../fleropp_fpm/include:/usr/include/fleropp
       - ../:/fleropp
+  db:
+    image: mysql
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=fleropp
+      - MYSQL_DATABASE=fleropp_test
+    volumes:
+      - fleropp-db:/var/lib/mysql
+volumes:
+  fleropp-db:
