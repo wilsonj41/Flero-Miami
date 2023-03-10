@@ -7,10 +7,7 @@
 #include <Group.hpp>
 
 using group_unique_ptr = std::unique_ptr<group, std::function<void(group*)>>;
-
 Group::Group( std::string group_name ) {
-    //using group_unique_ptr = std::unique_ptr<group, std::function<void(group*)>>
-    //using group_unique_ptr = std::unique_ptr<group, void(*)(group*)>
     std::array<char, 100> buffer;
     struct group grp;
     struct group *result;
@@ -27,7 +24,6 @@ Group::Group( std::string group_name ) {
     }
     m_exit_code = exit_code;
 }
-
 std::string Group::get_group_name() {
     return m_group_name;
 }
@@ -43,7 +39,6 @@ std::vector<std::string> Group::get_grp_mem_names() {
 bool Group::is_initialized() {
     return (m_exit_code == 0);
 }
-
 int Group::get_exit_code() {
     return m_exit_code;
 }

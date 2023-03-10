@@ -24,11 +24,9 @@ User::User( std::string user_name ) {
     }
     m_exit_code = exit_code;
 }
-
 uid_t User::get_uid() {
     return m_uid;
 }
-
 gid_t User::get_gid() {
     return m_gid;
 }
@@ -47,7 +45,6 @@ std::string User::get_shell_program() {
 int User::get_exit_code() {
     return m_exit_code;
 }
-
 bool User::is_initialized() {
     return (m_exit_code == 0);
 }

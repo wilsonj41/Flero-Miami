@@ -5,16 +5,13 @@
 #include "FleroppIO.hpp"
 #include "RequestData.hpp"
 #include "ScopedRedirect.hpp"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <grp.h>
 
-#include "Group.hpp"
 #include "fcgio.h"
 #include "fcgios.h"
 
 #include <fmt/format.h>
 #include "spdlog/spdlog.h"
+#include "util.hpp"
 
 #include <string>
 
@@ -22,8 +19,7 @@ namespace fleropp::fpm {
     FCGIHandler::FCGIHandler(const std::string &unix_sock, 
                                 const unsigned int backlog) {
         // TODO: Implement permissions management for UNIX domain sockets
-        umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
-       if (!change_sock_perms()) {
+       if (!fleropp::util::permissions::change_group_name("www-data")) {
             spdlog::critical("Unable to change Unix Socket Permissions");
        }
 
@@ -66,15 +62,5 @@ namespace fleropp::fpm {
     void FCGIHandler::load_endpoints(const endpoints_map_t& endpoints_map) {
         m_endpoints = endpoints_map;
     }
-
-    bool FCGIHandler::change_sock_perms() {
-        std::string uid_str = "www-data";
-        //passwd* apache_user = getpwnam(uid_str.c_str());
-        Group apache_group(uid_str);
-
-        if (setgid(apache_group.get_group_gid()) == -1) {
-            return false;
-        }
-        return true;
-    }
+    
 }

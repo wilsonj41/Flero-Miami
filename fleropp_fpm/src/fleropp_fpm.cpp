@@ -1,6 +1,7 @@
 #include "FCGIHandler.hpp"
 #include "ConfigParser.hpp"
 
+#include <sys/stat.h>
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 #include "spdlog/fmt/fmt.h"
@@ -29,8 +30,8 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 )");
     spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
     spdlog::info("Flero++ FastCGI Process Manager (Flero++ FPM) version {}", "0.1");
-
     fleropp::fpm::ConfigParser config;
+    umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
     config.load("/etc/fleropp/demo.json");
     // Construct a handler that will listen on TCP port 50001
     fleropp::fpm::FCGIHandler handler{"/tmp/flero.sock"};
