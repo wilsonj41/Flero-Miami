@@ -2,6 +2,8 @@
 #define I_VIEW_HPP
 
 #include <ostream>
+<<<<<<< HEAD
+=======
 #include <string_view>
 
 #ifdef FPM_BUILD
@@ -18,6 +20,7 @@
 
 #include <fmt/format.h>
 
+>>>>>>> 81cc80f5a82411e4e2fbfb95ac4068c084c8162d
 #define INIT_VIEW(NAME)                       \
 extern "C" {                                  \
     NAME* allocator() {                       \
@@ -28,6 +31,29 @@ extern "C" {                                  \
     }                                         \
 }                                             \
 
+<<<<<<< HEAD
+struct IViewInterface {
+    virtual ~IViewInterface() = default;
+    virtual void get() = 0;
+    virtual void post() = 0;
+    virtual void post_impl() = 0;
+    virtual void get_impl() = 0;
+};
+
+template<class DerivedView>
+class IView : IViewInterface {
+  public:
+    virtual ~IView() = default;
+    void get() {
+        static_cast<DerivedView*>(this)->get_impl();
+    }
+    void post() {
+        static_cost<DerivedView*>(this)->post_impl();
+    }
+    virtual void generate() = 0;
+    void get_impl() {}
+    void post_imp() {}
+=======
 struct IViewWrapper {
     virtual ~IViewWrapper() = default;
     virtual void get_dispatch(const fleropp::io::RequestData& request) = 0;
@@ -97,6 +123,7 @@ class IView : public IViewWrapper {
         fleropp::io::fppout << fmt::format(constants::default_response, 
                                           fmt::join(constants::supported, ", "));
     }
+>>>>>>> 81cc80f5a82411e4e2fbfb95ac4068c084c8162d
 };
 
 #endif /* I_VIEW_HPP */
