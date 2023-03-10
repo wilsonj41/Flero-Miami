@@ -3,6 +3,7 @@
 
 #include "FleroppIO.hpp"
 #include "HTMLLiterals.hpp"
+#include "StringLiteral.hpp"
 
 #include <algorithm>
 #include <array>
@@ -14,35 +15,7 @@
 #include "cgicc/MStreamable.h"
 
 // fleropp HTML stream namespace
-namespace fleropp_html_stream {
-
-  /**
-   * \brief Class that represents a string literal that is usable as a non-type
-   * template parameter. Per the C++ Standard, a non-type template parameter
-   * must have "structural type", hence we create this class representing a
-   * string that fits those requirements:
-   *    - all base classes and non-static data members are public and 
-   *      non-mutable and  
-   *    - the types of all base classes and non-static data members
-   *      are structural types or (possibly multi-dimensional) array thereof. 
-   * \tparam N Length of the string literal.
-   */  
-  template<std::size_t N>
-  struct StringLiteral {
-    /**
-     * Constant expression c-tor.
-     * Accepts a reference to avoid decay of array to pointer.
-     * 
-     * \param[in] str Reference to a const char[N] containing the string data.
-     */
-    constexpr StringLiteral(const char (&str)[N]) {
-      // Copy to N - 1 to strip null terminator
-      // This overload of std::copy_n is constexpr in >= c++20
-      std::copy_n(std::cbegin(str), N - 1, std::begin(value));
-    }
-    std::array<char, N - 1> value;
-  };
-
+namespace fleropp::html_stream { 
   /**
    * \brief Tag type for use in tag dispatching akin to the implementation of
    * `std::setw` in the STL.
@@ -61,22 +34,22 @@ namespace fleropp_html_stream {
    * Free function that generates the content type for the HTML page.
    * \param[in] type the content type.
   */
-  void gen_content_type(const std::string &content_type) {
-    fleropp_io::fppout << "Content-type: " << content_type << "\r\n\r\n";
+  void gen_content_type(const std::string &content_type = "text/html") {
+    fleropp::io::fppout << "Content-type: " << content_type << "\r\n\r\n";
   }
 
   /**
    * Free function that generates the html DOCTYPE.
   */
   void gen_html_doctype() {
-    fleropp_io::fppout << "<!DOCTYPE html> \n";
+    fleropp::io::fppout << "<!DOCTYPE html> \n";
   }
 
   /**
    * Free function that generates the "boiler plate" for a HTML page.
    * \param[in] type the content type for content type header.
   */
-  void gen_html_boiler_plate(const std::string &content_type) {
+  void gen_html_boiler_plate(const std::string &content_type = "text/html") {
     gen_content_type(content_type);
     gen_html_doctype();
   }
@@ -98,8 +71,8 @@ namespace fleropp_html_stream {
    * of `EndTag` from `gen_end_tag` (default = void).
    */
   template <
-    StringLiteral StartT, 
-    StringLiteral EndT, 
+    fleropp::util::StringLiteral StartT, 
+    fleropp::util::StringLiteral EndT, 
     typename EndTagAction = void
   >
   class HTMLStream {  
@@ -179,7 +152,7 @@ namespace fleropp_html_stream {
         // type of an optional template parameter using the std::is_same 
         // metafunction
         if constexpr (std::is_same_v<EndTagAction, DumpOnEnd>) {
-          fleropp_io::fppout << html_stream.m_ss.rdbuf() << html_stream.m_end_tag << '\n';
+          fleropp::io::fppout << html_stream.m_ss.rdbuf() << html_stream.m_end_tag << '\n';
         } else {
           html_stream.m_ss << m_end_tag << '\n';
         }
@@ -215,10 +188,10 @@ namespace fleropp_html_stream {
    * \return A reference to `html_stream1` (of type `decltype(html_stream1)&`).
    */
   template <
-    StringLiteral StartT1,
-    StringLiteral EndT1,
-    StringLiteral StartT2, 
-    StringLiteral EndT2,
+    fleropp::util::StringLiteral StartT1,
+    fleropp::util::StringLiteral EndT1,
+    fleropp::util::StringLiteral StartT2, 
+    fleropp::util::StringLiteral EndT2,
     typename U,
     typename V
   >

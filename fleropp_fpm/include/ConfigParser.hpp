@@ -14,12 +14,12 @@
 #include <string>
 #include <unordered_map>
 
-namespace fleropp_fpm
+namespace fleropp::fpm
 {
     class ConfigParser
     {
     public:
-        std::unordered_map<std::string, std::vector<CompUnit<IViewInterface>>> endpoints;
+        std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
         ConfigParser(const std::string &lib_dir = "/var/www/html");
 
         void load(const std::string &filename);

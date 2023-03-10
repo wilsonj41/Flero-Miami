@@ -5,28 +5,29 @@
 #include <memory>
 #include <type_traits>
 
-namespace fleropp_fpm {
+namespace fleropp::io {
   /**
    * \brief A wrapper class template implementing RAII for iostream 
    * redirection.
    * \headerfile ScopedRedirect.hpp
    */
-  template<typename T1,
-           typename T2, 
-           typename = std::enable_if_t<std::is_base_of_v<std::ios_base, T1> && 
-                                       std::is_base_of_v<std::ios_base, T2>>>
+  template<typename From, typename To>
   class ScopedRedirect {
     public:
       /**
-       * Unitary explicit constructor.
+       * Constructor.
        * 
        * \param[in] from std::iostream to which `to` will be redirected.
        * \param[in,out] to std::iostream that will be redirected to `from`.
        */
-      explicit ScopedRedirect(const T1 &from, T2 &to) 
+      ScopedRedirect(From &from, To &to) 
                               : m_original_sbuf_ptr{to.rdbuf()},
                                 m_from{from}, m_to{to} {
-        m_to.rdbuf(m_from.rdbuf());
+        if constexpr (!std::is_base_of_v<std::streambuf, From>) {
+          m_to.rdbuf(m_from.rdbuf());
+        } else {
+          m_to.rdbuf(&m_from);
+        }
       }
 
       /**
@@ -46,9 +47,9 @@ namespace fleropp_fpm {
       ScopedRedirect& operator=(const ScopedRedirect&) = delete;
 
     private:
-      std::streambuf *m_original_sbuf_ptr;
-      const T1 &m_from;
-      T2 &m_to;
+      std::streambuf* m_original_sbuf_ptr;
+      From& m_from;
+      To& m_to;
   }; 
 }
 
