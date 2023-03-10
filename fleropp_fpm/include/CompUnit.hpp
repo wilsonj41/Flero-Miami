@@ -29,7 +29,7 @@
 #include <boost/process/child.hpp>
 #include <boost/process/search_path.hpp>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 #include <dlfcn.h>
 #include <unistd.h>

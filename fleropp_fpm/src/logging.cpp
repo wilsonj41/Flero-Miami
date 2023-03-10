@@ -1,6 +1,6 @@
 #include "logging.hpp"
 
-#include "spdlog/spdlog.h"
+#include <spdlog.h>
 #include "spdlog/cfg/env.h"
 #include "spdlog/fmt/fmt.h"
 #include "spdlog/sinks/rotating_file_sink.h"
