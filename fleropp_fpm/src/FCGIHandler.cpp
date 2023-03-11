@@ -18,7 +18,6 @@
 namespace fleropp::fpm {
     FCGIHandler::FCGIHandler(const std::string &unix_sock, 
                                 const unsigned int backlog) {
-        // TODO: Implement permissions management for UNIX domain sockets
        if (!fleropp::util::permissions::change_group_name("www-data")) {
             spdlog::critical("Unable to change Unix Socket Permissions");
        }

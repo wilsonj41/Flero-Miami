@@ -1,7 +1,7 @@
 #include "ConfigParser.hpp"
 #include "FCGIHandler.hpp"
 #include "logging.hpp"
-
+#include <sys/stat.h>
 #include <optional>
 #include <string>
 #include <thread>
