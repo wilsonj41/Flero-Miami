@@ -1,6 +1,8 @@
 {
     "compiler": "g++",
-    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-L/lib/fleropp", "-lfleropp", "-o"],
+    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
+             "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",
+             "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{

@@ -10,11 +10,15 @@
 
 #include <fleropp/SQLBuilder.h>
 
+#include <soci/soci.h>
+#include <soci/error.h>
+#include <soci/session.h>
+
 INIT_VIEW(HelloWorldView);
 
 void HelloWorldView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
-    using namespace SQLBuilder;
+    using namespace SQLBuilder; 
 
     // Examples derived from library repo
     // Insert
@@ -29,8 +33,17 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
     "Content-type: text/html\r"_h;
     "\r"_h;
     "<html>"_h;
-        "<head>"_h "<title>Hello!, World</title>"_h "</head>"_h;
+        "<head>"_h "<title>Hello, World!</title>"_h "</head>"_h;
         "<body>"_h;
+            try {
+                soci::session sql{"mysql", "host=db db=fleropp_test password=fleropp"};
+            } catch (const soci::soci_error& ex) {
+                "<h1>DB Status: {}</h1>"_f(ex.what());
+            } catch (const std::runtime_error& ex) {
+                "<h1>DB Status: {}</h1>"_f(ex.what());
+            } catch (...) {
+                "<h1>DB Status: {}</h1>"_f("Unknown exception");
+            }
             "<h1>Hello, World2!</h1>"_h;
             "<h1>Hello, World&mdash;{}</h1>"_f("from me, in a template");
             "<h1>Hello, {}!</h1>"_f(request.get_query_string().get("name"));
@@ -45,7 +58,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "</form>"_h;
             "<iframe name='out_iframe'></iframe>"_h;
         "</body>"_h;
-    "</html>"_h;
+    "</html>"_h; 
 }
 
 void HelloWorldView::post(const fleropp::io::RequestData& request) {
