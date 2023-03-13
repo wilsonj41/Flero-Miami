@@ -1,4 +1,12 @@
 {
+    "database": {
+        "driver": "mysql",
+        "host":"127.0.0.1",
+        "port":"3306",
+        "dbname":"fleroppDB",
+        "username":"dog",
+        "password":"123"
+    },
     "compiler": "g++",
     "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", "-L/lib/fleropp", "-lfleropp", "-o"],
     "endpoint": [{
