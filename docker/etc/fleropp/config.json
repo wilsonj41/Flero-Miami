@@ -14,7 +14,7 @@
             "dependencies": [{
                 "sharedObject": "obj/HelloWorldView.so",
                 "source": [
-                    "early_examples/HelloWorldView.cpp"
+                    "user_input_examples/HelloWorldView.cpp"
                 ]
             }]
         },
@@ -23,7 +23,7 @@
             "dependencies": [{
                 "sharedObject": "obj/MultiPartPostView.so",
                 "source": [
-                    "early_examples/MultiPartPostView.cpp"
+                    "user_input_examples/MultiPartPostView.cpp"
                 ]
             }]
         },
