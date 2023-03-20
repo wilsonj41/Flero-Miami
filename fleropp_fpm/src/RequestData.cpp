@@ -7,7 +7,6 @@
 #include <ranges>
 
 namespace fleropp::io {
-    const std::regex RequestData::header_regex{header_pattern};
     RequestData::RequestData(CGIEnvironment& request_env) 
         : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
           m_query_string{m_request_env->get("QUERY_STRING")} {

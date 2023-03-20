@@ -1,4 +1,12 @@
 {
+    "database": {
+        "driver": "mysql",
+        "host":"127.0.0.1",
+        "port":"3306",
+        "dbname":"fleroppDB",
+        "username":"dog",
+        "password":"123"
+    },
     "compiler": "g++",
     "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
              "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",
@@ -8,7 +16,7 @@
             "dependencies": [{
                 "sharedObject": "obj/HelloWorldView.so",
                 "source": [
-                    "early_examples/HelloWorldView.cpp"
+                    "user_input_examples/HelloWorldView.cpp"
                 ]
             }]
         },
@@ -17,7 +25,7 @@
             "dependencies": [{
                 "sharedObject": "obj/MultiPartPostView.so",
                 "source": [
-                    "early_examples/MultiPartPostView.cpp"
+                    "user_input_examples/MultiPartPostView.cpp"
                 ]
             }]
         },
