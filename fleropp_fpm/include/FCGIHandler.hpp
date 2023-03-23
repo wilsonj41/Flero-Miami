@@ -4,11 +4,13 @@
 #include "IView.hpp"
 #include "CompUnit.hpp"
 #include "ConstexprMap.hpp"
+#include "IDatabaseDriver.hpp"
 
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 #include "fcgiapp.h"
 
@@ -51,11 +53,17 @@ namespace fleropp::fpm {
          * \param endpoints_map The map of endpoints to compilation units.
          */
         void load_endpoints(const endpoints_map_t& endpoints_map);
-      
+
+        void connect_db(
+            const std::string &driver, const std::string &username,
+            const std::string &password, const std::string &dbname,
+            const std::string &host);
+
       private: 
         int m_fd;
         FCGX_Request m_request;
         endpoints_map_t m_endpoints;
+        std::shared_ptr<IDatabaseDriver> m_db_handle;
         std::vector<std::thread> m_workers;
     };
 }

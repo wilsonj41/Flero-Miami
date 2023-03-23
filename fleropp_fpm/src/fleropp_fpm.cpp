@@ -54,7 +54,12 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     std::unordered_map<std::string,std::string> database_info = config.database_connection_info;
 
     // TODO: establish a database connection with the provided information.
-    
+
+    const std::string driver = database_info.at("driver");
+    const std::string host = database_info.at("host");
+    const std::string username = database_info.at("username");
+    const std::string password = database_info.at("password");
+    const std::string dbname = database_info.at("dbname");
 
     // Delay construction of the handler object, calling the correct
     // c-tor based on the type of socket supplied as an argument.
@@ -69,6 +74,8 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 
     // Add the endpoint mappings from the config file
     handler->load_endpoints(config.endpoints);
+
+    handler->connect_db(driver, username, password, dbname, host);
 
     // Spawn a pool of workers to start accepting connections
     const auto n_workers = vm["workers"].as<std::size_t>();

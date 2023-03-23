@@ -2,6 +2,7 @@
 #include <iterator>
 
 #include "HelloWorldView.hpp"
+#include "FleroppDB.hpp"
 
 #include <fleropp/HTMLLiterals.hpp>
 #include <fleropp/QueryString.hpp>
@@ -52,6 +53,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "<h1>Random number: {}</h1>"_f(rand());
             "<h1>SQLBuilder Test</h1>"_h;
             "<span>{}<br></span>"_f(i.str());
+            fleropp::db::db_handle->create_entry("test");
             "<form action='hello.elf' method='post' target='out_iframe'>"_h;
             "<input type='text' name='some_text' value='florp'>"_h;
             "<input type='submit'>"_h;
