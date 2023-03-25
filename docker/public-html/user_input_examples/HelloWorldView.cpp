@@ -69,7 +69,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             SQLBuilder::SelectModel s;
            auto r = s.select("name as n", "da as d")
                 .from("hello")
-                .where(column({"id", "<", "3"}) || column({"id", "=", "5"}))
+                .where(column({"name","=","Bob"}) || column({"name","=","Raymond"}))
                 .run();
 
             "<table>"_h;

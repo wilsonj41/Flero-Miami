@@ -416,7 +416,7 @@ public:
     }
 
     SelectModel& where(const std::string& column, const std::string& op, const std::string& val) {
-        where({column, op, val});
+        where(SQLBuilder::column{column, op, val});
 
         return *this;
     }
@@ -534,14 +534,14 @@ public:
             combine_vector(_bindings, _offset_binding);
         }
 
-        std::cout << "SQL with ?: " << _sql << std::endl;
+        // std::cout << "SQL with ?: " << _sql << std::endl;
 
-        std::cout << "Bindings: " << std::endl;
+        // std::cout << "Bindings: " << std::endl;
 
-        for (size_t i = 0; i < _bindings.size(); i++)
-        {
-            std::cout << "[" << i << "] = " << _bindings.at(i) << std::endl;
-        }
+        // for (size_t i = 0; i < _bindings.size(); i++)
+        // {
+        //    std::cout << "[" << i << "] = " << _bindings.at(i) << std::endl;
+        // }
 
 
         return _sql;
@@ -568,7 +568,16 @@ public:
     }
 
     std::vector<std::unordered_map<std::string, std::string>> run() {
-        auto raw = fleropp::db::db_handle->read_entry(this->str(), _select_columns, _bindings);
+        // We intialized the query variable instead of passing 'this->str()' directly
+        // into the 'read_entry()' method, because the '_bindings' variable is initialized
+        // with the 'this->str()' call. So we have to guarantee that '_bindings' is initialized
+        // by the time it is passed to 'read_entry()'.
+        std::string query(this->str());
+
+        // std::cout << "Size of bindings in run: " << _bindings.size() << std::endl;
+
+        auto raw = fleropp::db::db_handle->read_entry(query, _select_columns, _bindings);
+        
 
         std::vector<std::unordered_map<std::string, std::string>> result;
 
