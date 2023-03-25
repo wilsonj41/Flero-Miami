@@ -18,10 +18,21 @@ class mysql: public IDatabaseDriver {
         : con("mysql", std::string("host=") + host + " user=" + username + " password=" + password + " db=" + db) {}
     
     protected:
-        bool create_entry_impl(const std::string &query) {
-            fleropp::io::fppout << "create entry called on mysql!" << std::endl;
+        size_t create_entry_impl(const std::string &query, const std::vector<std::string>& bindings) {
 
-            return true;
+            std::string query_ready_to_prepare = placeholder_to_soci_format(query, bindings);
+
+            soci::statement stat(con);
+            for (const auto &v : bindings)
+            {
+                stat.exchange(soci::use(v));
+            }
+            stat.alloc();
+            stat.prepare(query_ready_to_prepare);
+            stat.define_and_bind();
+            stat.execute(true);
+
+            return stat.get_affected_rows();
         }
 
         std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(
@@ -30,16 +41,16 @@ class mysql: public IDatabaseDriver {
 
             std::vector<std::unordered_map<std::string, std::string>> result;
 
-            auto replace_result = placeholder_to_soci_format(query);
+            // auto replace_result = placeholder_to_soci_format(query);
 
-            auto placeholder_name_counter = replace_result.second;
-            auto query_ready_to_prepare = replace_result.first;
+            // auto placeholder_name_counter = replace_result.second;
+            // std::string query_ready_to_prepare;
 
-            if (placeholder_name_counter != bindings.size()) {
-                throw std::runtime_error("Number of bindings provided for read_entry does not match the number of placeholders in the SQL statement");
-            }
+            // if (placeholder_name_counter != bindings.size()) {
+            //     throw std::runtime_error("Number of bindings provided for read_entry does not match the number of placeholders in the SQL statement");
+            // }
 
-            
+            std::string query_ready_to_prepare = placeholder_to_soci_format(query, bindings);
 
             // soci::rowset<soci::row> resultRowSet =
             //     (bindings.empty()
@@ -115,15 +126,36 @@ class mysql: public IDatabaseDriver {
             return result;
         }
 
-        bool update_entry_impl(const std::string &query) {
-            fleropp::io::fppout << "Update called on mysql" << std::endl;
+        size_t update_entry_impl(const std::string &query, const std::vector<std::string>& bindings) {
+            std::string query_ready_to_prepare = placeholder_to_soci_format(query, bindings);
 
-            return true;
+            soci::statement stat(con);
+            for (const auto &v : bindings)
+            {
+                stat.exchange(soci::use(v));
+            }
+            stat.alloc();
+            stat.prepare(query_ready_to_prepare);
+            stat.define_and_bind();
+            stat.execute(true);
+
+            return stat.get_affected_rows();
         }
 
-        bool delete_entry_impl(const std::string &query){
-            fleropp::io::fppout << "delete called on mysql" << std::endl;
-            return true;
+        size_t delete_entry_impl(const std::string &query, const std::vector<std::string>& bindings){
+            std::string query_ready_to_prepare = placeholder_to_soci_format(query, bindings);
+
+            soci::statement stat(con);
+            for (const auto &v : bindings)
+            {
+                stat.exchange(soci::use(v));
+            }
+            stat.alloc();
+            stat.prepare(query_ready_to_prepare);
+            stat.define_and_bind();
+            stat.execute(true);
+
+            return stat.get_affected_rows();
         }
 
         // void connect(const std::string &username, const std::string &password,
@@ -133,7 +165,7 @@ class mysql: public IDatabaseDriver {
     private:
         soci::session con;
 
-        std::pair<std::string, size_t> placeholder_to_soci_format(const std::string& query) {
+        std::string placeholder_to_soci_format(const std::string& query, const std::vector<std::string>& bindings) {
             // Prepare for SQL statement preparation
             size_t placeholder_find_start = 0;
             size_t placeholder_name_counter = 0;
@@ -164,7 +196,11 @@ class mysql: public IDatabaseDriver {
                 placeholder_find_start = placeholder_index + 1; // Start to find next "?"
             }
 
-            return { query_ready_to_prepare, placeholder_name_counter };
+            if (placeholder_name_counter != bindings.size()) {
+                throw std::runtime_error("Number of bindings provided for read_entry does not match the number of placeholders in the SQL statement");
+            }
+
+            return query_ready_to_prepare;
         }
 };
 

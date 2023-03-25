@@ -71,12 +71,20 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
                 .from("hello")
                 .where(column({"name","=","Bob"}) || column({"name","=","Raymond"}))
                 .run();
+        //    InsertModel ins;
+        //    ins.insert("name", "AnotherDate")("da", std::time_t(2000000)).into("hello").run();
 
-            "<table>"_h;
-            "<tr><th><td>n</td><td>d</td></th></tr>"_h;
-            "Number of rows: {}"_f(r.size());
-            for (auto re : r)
-            {
+           UpdateModel u;
+        //    std::cout << u.update("hello").set("name", "haha").where("id", "<", "3").run() << std::endl;
+
+           DeleteModel d;
+           std::cout << d.from("hello").where( column{"id", "=", "1"} || column{"id" , "=", "2"}).run() << std::endl;
+
+           "<table>"_h;
+           "<tr><th><td>n</td><td>d</td></th></tr>"_h;
+           "Number of rows: {}"_f(r.size());
+           for (auto re : r)
+           {
                 "<tr>"_h;
                 "<td>{}</td>"_f(re.at("n"));
                 "<td>{}</td>"_f(re.at("d"));

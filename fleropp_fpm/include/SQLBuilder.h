@@ -62,18 +62,17 @@ inline std::string to_value<Param>(const Param& data) {
 template <>
 inline std::string to_value<column>(const column& data);
 
-/*
+
 template <>
-static std::string sql::to_value<time_t>(const time_t& data) {
+inline std::string to_value<time_t>(const time_t& data) {
     char buff[128] = {0};
     struct tm* ttime = localtime(&data);
+    std::string str;
     strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", ttime);
-    std::string str("'");
     str.append(buff);
-    str.append("'");
     return str;
 }
-*/
+
 
 template <typename T>
 void join_vector(std::string& result, const std::vector<T>& vec, const char* sep) {
@@ -99,7 +98,7 @@ class column
 {
 public:
     column(const std::string& column) {
-        _cond.append(column);
+        _cond = column;
     }
 
     column(const std::string& column, const std::string& op, const std::string& val) {
@@ -269,7 +268,6 @@ public:
 private:
     std::string _cond;
     std::vector<std::string> _binding;
-    std::unordered_map<std::string, std::string> _alias;
 };
 
 template <>
@@ -697,8 +695,10 @@ public:
         return *this;
     }
 
-    bool run() {
-        
+    size_t run() {
+        size_t rows = fleropp::db::db_handle->create_entry(str(), _values);
+
+        return rows;
     }
 
     friend inline std::ostream& operator<< (std::ostream& out, InsertModel& mod) {
@@ -735,8 +735,8 @@ public:
     template <typename T>
     UpdateModel& set(const std::string& c, const T& data) {
         std::string str(c);
-        str.append(" = ");
-        str.append(to_value(data));
+        str.append(" = ?");
+        _set_value_binding.push_back(to_value(data));
         _set_columns.push_back(str);
         return *this;
     }
@@ -746,13 +746,22 @@ public:
         return set(c, data);
     }
 
-    UpdateModel& where(const std::string& condition) {
-        _where_condition.push_back(condition);
+    UpdateModel& where(const std::string& column, const std::string& op, const std::string& val) {
+        where(SQLBuilder::column{column, op, val});
+
         return *this;
     }
 
     UpdateModel& where(const column& condition) {
         _where_condition.push_back(condition.str());
+        combine_vector(_where_condition_binding, condition.bindings());
+
+        return *this;
+    }
+
+    UpdateModel& where(const std::string& column, const std::string& val) {
+        where(SQLBuilder::column{column, "=", val});
+
         return *this;
     }
 
@@ -762,12 +771,21 @@ public:
         _sql.append(_table_name);
         _sql.append(" set ");
         join_vector(_sql, _set_columns, ", ");
+        combine_vector(_bindings, _set_value_binding);
         size_t size = _where_condition.size();
         if(size > 0) {
             _sql.append(" where ");
             join_vector(_sql, _where_condition, " and ");
+            combine_vector(_bindings, _where_condition_binding);
         }
-        return _sql;
+
+        // std::cout << "Bindings from SET: " << std::endl;
+
+        // for (size_t i = 0; i < _bindings.size(); i++) {
+        //     std::cout << "[" << i << "] = " << _bindings.at(i) << std::endl;
+        // }
+
+            return _sql;
     }
 
     UpdateModel& reset() {
@@ -781,10 +799,19 @@ public:
         return out;
     }
 
+    size_t run() {
+        size_t rows = fleropp::db::db_handle->update_entry(this->str(), _bindings);
+
+        return rows;
+    }
+
 protected:
     std::vector<std::string> _set_columns;
     std::string _table_name;
     std::vector<std::string> _where_condition;
+    std::vector<std::string> _where_condition_binding;
+    std::vector<std::string> _set_value_binding;
+    std::vector<std::string> _bindings;
 };
 
 template <>
@@ -823,13 +850,20 @@ public:
         return *this;
     }
 
-    DeleteModel& where(const std::string& condition) {
-        _where_condition.push_back(condition);
+    DeleteModel& where(const std::string& column, const std::string& op, const std::string& val) {
+        where(SQLBuilder::column{column, op, val});
         return *this;
     }
 
     DeleteModel& where(const column& condition) {
         _where_condition.push_back(condition.str());
+        combine_vector(_where_condition_binding, condition.bindings());
+
+        return *this;
+    }
+
+    DeleteModel& where(const std::string& column, const std::string& val) {
+        where(SQLBuilder::column{column, "=", val});
         return *this;
     }
 
@@ -841,8 +875,22 @@ public:
         if(size > 0) {
             _sql.append(" where ");
             join_vector(_sql, _where_condition, " and ");
+            combine_vector(_bindings, _where_condition_binding);
         }
+
+        // std::cout << "Bindings from DELETE: " << std::endl;
+
+        // for (size_t i = 0; i < _bindings.size(); i++) {
+        //     std::cout << "[" << i << "] = " << _bindings.at(i) << std::endl;
+        // }
+
         return _sql;
+    }
+
+    size_t run() {
+        size_t rows = fleropp::db::db_handle->delete_entry(this->str(), _bindings);
+
+        return rows;
     }
 
     DeleteModel& reset() {
@@ -858,6 +906,7 @@ public:
 protected:
     std::string _table_name;
     std::vector<std::string> _where_condition;
+    std::vector<std::string> _where_condition_binding;
+    std::vector<std::string> _bindings;
 };
-
 }

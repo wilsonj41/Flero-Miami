@@ -23,12 +23,12 @@ class IDatabaseDriver {
     public:
         IDatabaseDriver(): m{} {}
 
-        virtual bool create_entry(const std::string& query) final {
-            bool result;
+        virtual size_t create_entry(const std::string& query, const std::vector<std::string>& bindings = {}) final {
+            size_t result;
 
             {
                 std::unique_lock<std::mutex> l{m};
-                result = create_entry_impl(query);
+                result = create_entry_impl(query, bindings);
             }
 
             return result;
@@ -47,32 +47,32 @@ class IDatabaseDriver {
             return result;
         }
 
-        virtual bool update_entry(const std::string& query) final {
-            bool result;
+        virtual size_t update_entry(const std::string& query, const std::vector<std::string>& bindings = {}) final {
+            size_t result;
 
             {
                 std::unique_lock<std::mutex> l{m};
-                result = update_entry_impl(query);
+                result = update_entry_impl(query, bindings);
             }
 
             return result;
         }
 
-        virtual bool delete_entry(const std::string& query) final {
-            bool result;
+        virtual size_t delete_entry(const std::string& query, const std::vector<std::string>& bindings = {}) final {
+            size_t result;
             {
                 std::unique_lock<std::mutex> l{m};
-                result = delete_entry_impl(query);
+                result = delete_entry_impl(query, bindings);
             }
 
             return result;
         }
 
         protected:
-        virtual bool create_entry_impl(const std::string& query) = 0;
+        virtual size_t create_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
         virtual std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(const std::string& model, const std::vector<std::string>& columns, const std::vector<std::string>& bindings) = 0;
-        virtual bool update_entry_impl(const std::string& query) = 0;
-        virtual bool delete_entry_impl(const std::string& query) = 0;
+        virtual size_t update_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
+        virtual size_t delete_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
         // virtual void connect(const std::string& username, const std::string& password, 
         //                      const std::string& db, const std::string& host="localhost") = 0;
     private:
