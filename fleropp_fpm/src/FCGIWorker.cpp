@@ -13,6 +13,7 @@
 
 #include <fmt/format.h>
 #include "spdlog/spdlog.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 #include <exception>
 
@@ -82,7 +83,9 @@ namespace fleropp::fpm::concurrency {
                     // by one of the pages. This will avoid SIGABRT killing the
                     // FPM. We can't handle the exception, but we can at least
                     // alert the user of its existance.
-                    spdlog::critical("Unhandled exception while responding to '{}'", script_name); 
+                    
+                    // Credit: https://stackoverflow.com/questions/315948/c-catching-all-exceptions
+                    spdlog::critical("Unhandled exception while responding to '{}':\n{}", script_name, boost::current_exception_diagnostic_information());
                     fleropp::util::status_response<"500", "Internal Server Error">(); 
                 }
             } else {

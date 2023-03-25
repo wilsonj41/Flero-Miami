@@ -23,7 +23,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
 
     // Examples derived from library repo
     // Insert
-    InsertModel i;
+    SQLBuilder::InsertModel i;
     i.insert("score", 100)
             ("name", std::string("six"))
             ("age", (unsigned char)20)
@@ -38,11 +38,22 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
         "<body>"_h;
             try {
                 soci::session sql{"mysql", "host=db db=fleropp_test password=fleropp"};
-            } catch (const soci::soci_error& ex) {
+                // std::vector<std::string> s{500}, k{500};
+                // sql << "SELECT name, da from hello", soci::into(s), soci::into(k);
+
+                // "<h1>DB DATA: {}</h1>"_f(s[0]);
+                // "<h1>DB DATA: {}</h1>"_f(k[0]);
+            }
+            catch (const soci::soci_error &ex)
+            {
                 "<h1>DB Status: {}</h1>"_f(ex.what());
-            } catch (const std::runtime_error& ex) {
+            }
+            catch (const std::runtime_error &ex)
+            {
                 "<h1>DB Status: {}</h1>"_f(ex.what());
-            } catch (...) {
+            }
+            catch (...)
+            {
                 "<h1>DB Status: {}</h1>"_f("Unknown exception");
             }
             "<h1>Hello, World2!</h1>"_h;
@@ -53,7 +64,26 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "<h1>Random number: {}</h1>"_f(rand());
             "<h1>SQLBuilder Test</h1>"_h;
             "<span>{}<br></span>"_f(i.str());
-            fleropp::db::db_handle->create_entry("test");
+            "<h2>Data in database</h2>"_h;
+
+            SQLBuilder::SelectModel s;
+           auto r = s.select("name as n", "da as d")
+                .from("hello")
+                .where(column({"id", "<", "3"}) || column({"id", "=", "5"}))
+                .run();
+
+            "<table>"_h;
+            "<tr><th><td>n</td><td>d</td></th></tr>"_h;
+            "Number of rows: {}"_f(r.size());
+            for (auto re : r)
+            {
+                "<tr>"_h;
+                "<td>{}</td>"_f(re.at("n"));
+                "<td>{}</td>"_f(re.at("d"));
+                "</tr>"_h;
+            }
+            "</table>"_h;
+
             "<form action='hello.elf' method='post' target='out_iframe'>"_h;
             "<input type='text' name='some_text' value='florp'>"_h;
             "<input type='submit'>"_h;

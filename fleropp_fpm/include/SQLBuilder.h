@@ -1,7 +1,14 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 #include <string>
+#include <unordered_map>
+#include <utility>
+#include "FleroppDB.hpp"
+#include <cstring>
+#include <boost/lexical_cast.hpp>
+#include <sstream>
 
 namespace SQLBuilder {
 
@@ -28,25 +35,22 @@ inline std::string to_value(const T& data) {
 
 template <size_t N>
 inline std::string to_value(char const(&data)[N]) {
-    std::string str("'");
+    std::string str;
     str.append(data);
-    str.append("'");
     return str;
 }
 
 template <>
 inline std::string to_value<std::string>(const std::string& data) {
-    std::string str("'");
+    std::string str;
     str.append(data);
-    str.append("'");
     return str;
 }
 
 template <>
 inline std::string to_value<const char*>(const char* const& data) {
-    std::string str("'");
+    std::string str;
     str.append(data);
-    str.append("'");
     return str;
 }
 
@@ -84,19 +88,31 @@ void join_vector(std::string& result, const std::vector<T>& vec, const char* sep
     }
 }
 
+template <typename T>
+void combine_vector(std::vector<T>& baseVec, const std::vector<T>& newVec) {
+    for (const auto& val : newVec) {
+        baseVec.push_back(val);
+    }
+}
+
 class column
 {
 public:
     column(const std::string& column) {
-        _cond = column;
+        _cond.append(column);
+    }
+
+    column(const std::string& column, const std::string& op, const std::string& val) {
+        _cond = column + " " + op + " ?";
+        _binding.push_back(to_value(val));
     }
     virtual ~column() {}
 
-    column& as(const std::string& s) {
-        _cond.append(" as ");
-        _cond.append(s);
-        return *this;
-    }
+    // column& as(const std::string& s) {
+    //     _alias[_cond] = s;
+
+    //     return *this;
+    // }
 
     column& is_null() {
         _cond.append(" is null");
@@ -112,16 +128,16 @@ public:
     column& in(const std::vector<T>& args) {
         size_t size = args.size();
         if(size == 1) {
-            _cond.append(" = ");
-            _cond.append(to_value(args[0]));
+            _cond.append(" = ?");
+            _binding.push_back(to_value(args[0]));
         } else {
             _cond.append(" in (");
             for(size_t i = 0; i < size; ++i) {
-                if(i < size - 1) {
-                    _cond.append(to_value(args[i]));
+                _cond.append("?");
+                _binding.push_back(to_value(args[i]));
+
+                if (i < size - 1) {
                     _cond.append(", ");
-                } else {
-                    _cond.append(to_value(args[i]));
                 }
             }
             _cond.append(")");
@@ -133,16 +149,16 @@ public:
     column& not_in(const std::vector<T>& args) {
         size_t size = args.size();
         if(size == 1) {
-            _cond.append(" != ");
-            _cond.append(to_value(args[0]));
+            _cond.append(" != ?");
+            _binding.push_back(to_value(args[0]));
         } else {
             _cond.append(" not in (");
             for(size_t i = 0; i < size; ++i) {
+                _cond.append("?");
+                _binding.push_back(to_value(args[i]));
+
                 if(i < size - 1) {
-                    _cond.append(to_value(args[i]));
                     _cond.append(", ");
-                } else {
-                    _cond.append(to_value(args[i]));
                 }
             }
             _cond.append(")");
@@ -150,89 +166,92 @@ public:
         return *this;
     }
 
-    column& operator &&(column& condition) {
+    column& operator &&(const column& condition) {
         std::string str("(");
         str.append(_cond);
         str.append(") and (");
         str.append(condition._cond);
+        combine_vector(_binding, condition._binding);
         str.append(")");
-        condition._cond = str;
-        return condition;
+        _cond = str;
+        return *this;
     }
 
-    column& operator ||(column& condition) {
+    column& operator ||(const column& condition) {
         std::string str("(");
         str.append(_cond);
         str.append(") or (");
         str.append(condition._cond);
+        combine_vector(_binding, condition._binding);
         str.append(")");
-        condition._cond = str;
-        return condition;
-    }
-
-    column& operator &&(const std::string& condition) {
-        _cond.append(" and ");
-        _cond.append(condition);
+        _cond = str;
+        
         return *this;
     }
 
-    column& operator ||(const std::string& condition) {
-        _cond.append(" or ");
-        _cond.append(condition);
-        return *this;
-    }
+    // column& operator &&(const std::string& condition) {
+    //     _cond.append(" and ");
+    //     _cond.append(condition);
+    //     return *this;
+    // }
 
-    column& operator &&(const char* condition) {
-        _cond.append(" and ");
-        _cond.append(condition);
-        return *this;
-    }
+    // column& operator ||(const std::string& condition) {
+    //     _cond.append(" or ");
+    //     _cond.append(condition);
+    //     return *this;
+    // }
 
-    column& operator ||(const char* condition) {
-        _cond.append(" or ");
-        _cond.append(condition);
-        return *this;
-    }
+    // column& operator &&(const char* condition) {
+    //     _cond.append(" and ");
+    //     _cond.append(condition);
+    //     return *this;
+    // }
+
+    // column& operator ||(const char* condition) {
+    //     _cond.append(" or ");
+    //     _cond.append(condition);
+    //     return *this;
+    // }
 
     template <typename T>
     column& operator ==(const T& data) {
-        _cond.append(" = ");
-        _cond.append(to_value(data));
+        _cond.append(" = ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
     template <typename T>
     column& operator !=(const T& data) {
-        _cond.append(" != ");
-        _cond.append(to_value(data));
+        _cond.append(" != ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
     template <typename T>
     column& operator >=(const T& data) {
-        _cond.append(" >= ");
-        _cond.append(to_value(data));
+        _cond.append(" >= ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
     template <typename T>
     column& operator <=(const T& data) {
-        _cond.append(" <= ");
-        _cond.append(to_value(data));
+        _cond.append(" <= ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
     template <typename T>
     column& operator >(const T& data) {
-        _cond.append(" > ");
-        _cond.append(to_value(data));
+        _cond.append(" > ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
     template <typename T>
     column& operator <(const T& data) {
-        _cond.append(" < ");
-        _cond.append(to_value(data));
+        _cond.append(" < ?");
+        _binding.push_back(to_value(data));
         return *this;
     }
 
@@ -240,11 +259,17 @@ public:
         return _cond;
     }
 
-    operator bool() {
-        return true;
+    const std::vector<std::string>& bindings() const {
+        return _binding;
     }
+
+    // operator bool() {
+    //     return true;
+    // }
 private:
     std::string _cond;
+    std::vector<std::string> _binding;
+    std::unordered_map<std::string, std::string> _alias;
 };
 
 template <>
@@ -278,8 +303,36 @@ public:
 
     template <typename... Args>
     SelectModel& select(const std::string& str, Args&&... columns) {
-        _select_columns.push_back(str);
+        std::string aliasWord = " as ";
+
+        auto aliasWordIndex = str.find(aliasWord);
+        if (aliasWordIndex == std::string::npos) {
+            _select_columns.push_back(str);
+
+            select(columns...);
+        } else {
+            // ... as ... should be processed using a pair
+            std::pair<std::string, std::string> pair {
+                str.substr(0, aliasWordIndex), 
+                str.substr(aliasWordIndex + aliasWord.length())
+            };
+
+            select(pair, columns...);
+        }
+
+        return *this;
+    }
+
+    // Take care of the "as" in select statements so that
+    // the underlying driver does not need to deal with 
+    // data column 
+    template <typename... Args>
+    SelectModel& select(const std::pair<std::string, std::string> ap, Args&&... columns) {
+        _select_column_aliases[ap.first] = ap.second;
+        _select_columns.push_back(ap.first);
+
         select(columns...);
+
         return *this;
     }
 
@@ -362,13 +415,21 @@ public:
         return *this;
     }
 
-    SelectModel& where(const std::string& condition) {
-        _where_condition.push_back(condition);
+    SelectModel& where(const std::string& column, const std::string& op, const std::string& val) {
+        where({column, op, val});
+
         return *this;
     }
 
     SelectModel& where(const column& condition) {
         _where_condition.push_back(condition.str());
+        combine_vector(_where_condition_binding, condition.bindings());
+        return *this;
+    }
+
+    SelectModel& where(const std::string& column, const std::string& val) {
+        where({column, "=", val});
+
         return *this;
     }
 
@@ -384,13 +445,16 @@ public:
         return *this;
     }
 
-    SelectModel& having(const std::string& condition) {
-        _having_condition.push_back(condition);
+    SelectModel& having(const std::string& column, const std::string& op, const std::string& val) {
+        having({column, op, val});
+
         return *this;
     }
 
     SelectModel& having(const column& condition) {
         _having_condition.push_back(condition.str());
+        combine_vector(_having_condition_binding, condition.bindings());
+
         return *this;
     }
 
@@ -400,19 +464,25 @@ public:
     }
 
     template <typename T>
-    SelectModel& limit(const T& limit) {
-        _limit = std::to_string(limit);
-        return *this;
-    }
-    template <typename T>
-    SelectModel& limit(const T& offset, const T& limit) {
-        _offset = std::to_string(offset);
-        _limit = std::to_string(limit);
-        return *this;
-    }
-    template <typename T>
     SelectModel& offset(const T& offset) {
-        _offset = std::to_string(offset);
+        _offset = "?";
+        _offset_binding.push_back(to_value(offset));
+
+        return *this;
+    }
+
+    template <typename T>
+    SelectModel& limit(const T& limit_val) {
+        _limit = "?";
+        _limit_binding.push_back(to_value(limit_val));
+
+        return *this;
+    }
+    template <typename T>
+    SelectModel& limit(const T& offset_val, const T& limit_val) {
+        limit(limit_val);
+        offset(offset_val);
+        
         return *this;
     }
 
@@ -437,6 +507,7 @@ public:
         }
         if(!_where_condition.empty()) {
             _sql.append(" where ");
+            combine_vector(_bindings, _where_condition_binding);
             join_vector(_sql, _where_condition, " and ");
         }
         if(!_groupby_columns.empty()) {
@@ -445,6 +516,7 @@ public:
         }
         if(!_having_condition.empty()) {
             _sql.append(" having ");
+            combine_vector(_bindings, _having_condition_binding);
             join_vector(_sql, _having_condition, " and ");
         }
         if(!_order_by.empty()) {
@@ -454,11 +526,24 @@ public:
         if(!_limit.empty()) {
             _sql.append(" limit ");
             _sql.append(_limit);
+            combine_vector(_bindings, _limit_binding);
         }
         if(!_offset.empty()) {
             _sql.append(" offset ");
             _sql.append(_offset);
+            combine_vector(_bindings, _offset_binding);
         }
+
+        std::cout << "SQL with ?: " << _sql << std::endl;
+
+        std::cout << "Bindings: " << std::endl;
+
+        for (size_t i = 0; i < _bindings.size(); i++)
+        {
+            std::cout << "[" << i << "] = " << _bindings.at(i) << std::endl;
+        }
+
+
         return _sql;
     }
 
@@ -482,8 +567,43 @@ public:
         return out;
     }
 
+    std::vector<std::unordered_map<std::string, std::string>> run() {
+        auto raw = fleropp::db::db_handle->read_entry(this->str(), _select_columns, _bindings);
+
+        std::vector<std::unordered_map<std::string, std::string>> result;
+
+        // Go through every column of every row and replace
+        // column name with its alias if applicable
+        if (!_select_column_aliases.empty()) {
+            for (auto &map : raw)
+            {
+                for (const auto &kv : map)
+                {
+                    auto alias = get_alias(kv.first);
+                    if (alias != kv.first)
+                    {
+                        // Credit: 
+                        // https://en.cppreference.com/w/cpp/container/unordered_map/extract
+                        auto handle = map.extract(kv.first);
+                        handle.key() = alias;
+                        map.insert(std::move(handle));
+                    }
+                }
+            }
+        }
+        
+        result = std::move(raw);
+
+        return result;
+    }
+
+    std::string get_alias(const std::string& column) {
+        return (_select_column_aliases.find(column) != _select_column_aliases.end() ? _select_column_aliases.at(column) : column);
+    }
+
 protected:
     std::vector<std::string> _select_columns;
+    std::unordered_map<std::string, std::string> _select_column_aliases;
     bool _distinct;
     std::vector<std::string> _groupby_columns;
     std::string _table_name;
@@ -491,13 +611,16 @@ protected:
     std::string _join_table;
     std::vector<std::string> _join_on_condition;
     std::vector<std::string> _where_condition;
+    std::vector<std::string> _where_condition_binding;
+    std::vector<std::string> _bindings;
     std::vector<std::string> _having_condition;
+    std::vector<std::string> _having_condition_binding;
     std::string _order_by;
     std::string _limit;
+    std::vector<std::string> _limit_binding;
     std::string _offset;
+    std::vector<std::string> _offset_binding;
 };
-
-
 
 class InsertModel : public SqlModel
 {
@@ -545,12 +668,12 @@ public:
             if(i < size - 1) {
                 _sql.append(_columns[i]);
                 _sql.append(", ");
-                v_ss.append(_values[i]);
+                v_ss.append("?");
                 v_ss.append(", ");
             } else {
                 _sql.append(_columns[i]);
                 _sql.append(")");
-                v_ss.append(_values[i]);
+                v_ss.append("?");
                 v_ss.append(")");
             }
         }
@@ -563,6 +686,10 @@ public:
         _columns.clear();
         _values.clear();
         return *this;
+    }
+
+    bool run() {
+        
     }
 
     friend inline std::ostream& operator<< (std::ostream& out, InsertModel& mod) {

@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <mutex>
+#include <vector>
 
 #define INIT_DB_DRIVER(NAME)                                      \
 extern "C" {                                                      \
@@ -33,12 +34,14 @@ class IDatabaseDriver {
             return result;
         }
 
-        virtual std::unordered_map<std::string, std::string> read_entry(const std::string& query) final {
-            std::unordered_map<std::string, std::string> result;
+        virtual std::vector<std::unordered_map<std::string, std::string>> read_entry(const std::string& query,
+                                                    const std::vector<std::string>& columns, 
+                                                    const std::vector<std::string> bindings = {}) final {
+            std::vector<std::unordered_map<std::string, std::string>> result;
 
             {
                 std::unique_lock<std::mutex> l{m};
-                result = read_entry_impl(query);
+                result = read_entry_impl(query, columns, bindings);
             }
 
             return result;
@@ -67,7 +70,7 @@ class IDatabaseDriver {
 
         protected:
         virtual bool create_entry_impl(const std::string& query) = 0;
-        virtual std::unordered_map<std::string, std::string> read_entry_impl(const std::string& query) = 0;
+        virtual std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(const std::string& model, const std::vector<std::string>& columns, const std::vector<std::string>& bindings) = 0;
         virtual bool update_entry_impl(const std::string& query) = 0;
         virtual bool delete_entry_impl(const std::string& query) = 0;
         // virtual void connect(const std::string& username, const std::string& password, 
