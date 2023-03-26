@@ -63,34 +63,36 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             "<h1>Request type: {}</h1>"_f(request.method());
             "<h1>Random number: {}</h1>"_f(rand());
             "<h1>SQLBuilder Test</h1>"_h;
-            "<span>{}<br></span>"_f(i.str());
             "<h2>Data in database</h2>"_h;
 
             SQLBuilder::SelectModel s;
-           auto r = s.select("name as n", "da as d")
+           auto r = s.select("id", "name as ne", "da as de")
                 .from("hello")
-                .where(column({"name","=","Bob"}) || column({"name","=","Raymond"}))
+                .where(column({"id",">=","8"}) && (column("id") <= 10 || column("id") == 12))
                 .run();
         //    InsertModel ins;
         //    ins.insert("name", "AnotherDate")("da", std::time_t(2000000)).into("hello").run();
 
-           UpdateModel u;
+        //    UpdateModel u;
         //    std::cout << u.update("hello").set("name", "haha").where("id", "<", "3").run() << std::endl;
 
-           DeleteModel d;
-           std::cout << d.from("hello").where( column{"id", "=", "1"} || column{"id" , "=", "2"}).run() << std::endl;
+        //    DeleteModel d;
+        //    std::cout << d.from("hello").where( column{"id", "=", "1"} || column{"id" , "=", "2"}).run() << std::endl;
 
            "<table>"_h;
-           "<tr><th><td>n</td><td>d</td></th></tr>"_h;
+           "<tr><th><td>id</td><td>n</td><td>d</td></th></tr>"_h;
            "Number of rows: {}"_f(r.size());
-           for (auto re : r)
+           for (const auto& re : r)
            {
                 "<tr>"_h;
-                "<td>{}</td>"_f(re.at("n"));
-                "<td>{}</td>"_f(re.at("d"));
+                "<td>{}"_f(re.at("id"));
+                "<td>{}</td>"_f(re.at("ne"));
+                "<td>{}</td>"_f(re.at("de"));
                 "</tr>"_h;
             }
             "</table>"_h;
+            "<br>"_h;
+            "<span>SQL for above:<br>{}</span>"_f(s.str());
 
             "<form action='hello.elf' method='post' target='out_iframe'>"_h;
             "<input type='text' name='some_text' value='florp'>"_h;

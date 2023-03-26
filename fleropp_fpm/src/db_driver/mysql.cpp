@@ -37,8 +37,7 @@ class mysql: public IDatabaseDriver {
         }
 
         std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(
-            const std::string& query, const std::vector<std::string>& columns,
-            const std::vector<std::string>& bindings) {
+            const std::string& query, const std::vector<std::string>& bindings) {
 
             std::vector<std::unordered_map<std::string, std::string>> result;
 
@@ -76,8 +75,10 @@ class mysql: public IDatabaseDriver {
             {
                 auto rowResult = std::unordered_map<std::string, std::string>();
 
-                for (const auto& colName : columns) {
-                    const auto &prop = curRow.get_properties(colName);
+                for (size_t i = 0; i < curRow.size(); i++)
+                {
+                    const auto &prop = curRow.get_properties(i);
+                    const std::string &colName = prop.get_name();
 
                     auto &curColumnResult = rowResult[colName];
 
@@ -85,20 +86,24 @@ class mysql: public IDatabaseDriver {
 
                     try {
                         // Getting result based on the data type
-                        if (type == soci::data_type::dt_string
-                        || type == soci::data_type::dt_xml) {
-                            curColumnResult = curRow.get<std::string>(colName);
+                        //
+                        // When using curRow.get(), it is
+                        // faster when positional index is
+                        // used as argument compared to
+                        // column name as argument
+                        if (type == soci::data_type::dt_string) {
+                            curColumnResult = curRow.get<std::string>(i);
                         } else if (type == soci::data_type::dt_double) {
-                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<double>(colName));
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<double>(i));
                         } else if (type == soci::data_type::dt_integer) {
-                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<int>(colName));
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<int>(i));
                         } else if (type == soci::data_type::dt_date) {
-                            std::tm d = curRow.get<std::tm>(colName);
+                            std::tm d = curRow.get<std::tm>(i);
                             curColumnResult = std::asctime(&d);
                         } else if (type == soci::data_type::dt_long_long) {
-                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<long long>(colName));
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<long long>(i));
                         } else if (type == soci::data_type::dt_unsigned_long_long) {
-                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<unsigned long long>(colName));
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<unsigned long long>(i));
                         } else if (type == soci::data_type::dt_blob) {
                             throw std::runtime_error("Support for blob not implemented!");
                             // TODO: Get the blob object and uncomment code below
@@ -122,12 +127,6 @@ class mysql: public IDatabaseDriver {
 
                 result.push_back(std::move(rowResult));
             }
-
-            // for (auto it = resultRowSet.begin(); it != resultRowSet.end(); it++) {
-            //     const soci::row &curRow = *it;
-
-                
-            // }
 
             return result;
         }

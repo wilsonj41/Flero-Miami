@@ -107,11 +107,12 @@ public:
     }
     virtual ~column() {}
 
-    // column& as(const std::string& s) {
-    //     _alias[_cond] = s;
+    column& as(const std::string& s) {
+        _cond.append(" as ");
+        _cond.append(s);
 
-    //     return *this;
-    // }
+        return *this;
+    }
 
     column& is_null() {
         _cond.append(" is null");
@@ -301,33 +302,21 @@ public:
 
     template <typename... Args>
     SelectModel& select(const std::string& str, Args&&... columns) {
-        std::string aliasWord = " as ";
+        _select_columns.push_back(str);
 
-        auto aliasWordIndex = str.find(aliasWord);
-        if (aliasWordIndex == std::string::npos) {
-            _select_columns.push_back(str);
-
-            select(columns...);
-        } else {
-            // ... as ... should be processed using a pair
-            std::pair<std::string, std::string> pair {
-                str.substr(0, aliasWordIndex), 
-                str.substr(aliasWordIndex + aliasWord.length())
-            };
-
-            select(pair, columns...);
-        }
+        select(columns...);
 
         return *this;
     }
 
-    // Take care of the "as" in select statements so that
-    // the underlying driver does not need to deal with 
-    // data column 
     template <typename... Args>
-    SelectModel& select(const std::pair<std::string, std::string> ap, Args&&... columns) {
-        _select_column_aliases[ap.first] = ap.second;
-        _select_columns.push_back(ap.first);
+    SelectModel& select(const std::unordered_map<std::string, std::string> map, Args&&... columns) {
+        for (const auto& p : map) {
+            std::string str = p.first + " as " + p.second;
+            // a as b
+
+            select(str);
+        }
 
         select(columns...);
 
@@ -574,43 +563,14 @@ public:
 
         // std::cout << "Size of bindings in run: " << _bindings.size() << std::endl;
 
-        auto raw = fleropp::db::db_handle->read_entry(query, _select_columns, _bindings);
-        
-
-        std::vector<std::unordered_map<std::string, std::string>> result;
-
-        // Go through every column of every row and replace
-        // column name with its alias if applicable
-        if (!_select_column_aliases.empty()) {
-            for (auto &map : raw)
-            {
-                for (const auto &kv : map)
-                {
-                    auto alias = get_alias(kv.first);
-                    if (alias != kv.first)
-                    {
-                        // Credit: 
-                        // https://en.cppreference.com/w/cpp/container/unordered_map/extract
-                        auto handle = map.extract(kv.first);
-                        handle.key() = alias;
-                        map.insert(std::move(handle));
-                    }
-                }
-            }
-        }
-        
-        result = std::move(raw);
+        std::vector<std::unordered_map<std::string, std::string>> result = 
+        fleropp::db::db_handle->read_entry(query, _bindings);
 
         return result;
     }
 
-    std::string get_alias(const std::string& column) {
-        return (_select_column_aliases.find(column) != _select_column_aliases.end() ? _select_column_aliases.at(column) : column);
-    }
-
 protected:
     std::vector<std::string> _select_columns;
-    std::unordered_map<std::string, std::string> _select_column_aliases;
     bool _distinct;
     std::vector<std::string> _groupby_columns;
     std::string _table_name;

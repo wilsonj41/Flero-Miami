@@ -35,13 +35,12 @@ class IDatabaseDriver {
         }
 
         virtual std::vector<std::unordered_map<std::string, std::string>> read_entry(const std::string& query,
-                                                    const std::vector<std::string>& columns, 
                                                     const std::vector<std::string> bindings = {}) final {
             std::vector<std::unordered_map<std::string, std::string>> result;
 
             {
                 std::unique_lock<std::mutex> l{m};
-                result = read_entry_impl(query, columns, bindings);
+                result = read_entry_impl(query, bindings);
             }
 
             return result;
@@ -70,7 +69,7 @@ class IDatabaseDriver {
 
         protected:
         virtual size_t create_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
-        virtual std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(const std::string& model, const std::vector<std::string>& columns, const std::vector<std::string>& bindings) = 0;
+        virtual std::vector<std::unordered_map<std::string, std::string>> read_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
         virtual size_t update_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
         virtual size_t delete_entry_impl(const std::string& query, const std::vector<std::string>& bindings) = 0;
         // virtual void connect(const std::string& username, const std::string& password, 
