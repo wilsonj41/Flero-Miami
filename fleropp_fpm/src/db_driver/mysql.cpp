@@ -3,6 +3,7 @@
 
 #include <soci/soci.h>
 #include "soci/mysql/soci-mysql.h"
+#include "spdlog/spdlog.h"
 #include <iostream>
 #include <string>
 #include <limits>
@@ -82,35 +83,40 @@ class mysql: public IDatabaseDriver {
 
                     auto type = prop.get_data_type();
 
-                    // Getting result based on the data type
-                    if (type == soci::data_type::dt_string
-                    || type == soci::data_type::dt_xml) {
-                        curColumnResult = curRow.get<std::string>(colName);
-                    } else if (type == soci::data_type::dt_double) {
-                        curColumnResult = boost::lexical_cast<std::string>(curRow.get<double>(colName));
-                    } else if (type == soci::data_type::dt_integer) {
-                        curColumnResult = boost::lexical_cast<std::string>(curRow.get<int>(colName));
-                    } else if (type == soci::data_type::dt_date) {
-                        std::tm d = curRow.get<std::tm>(colName);
-                        curColumnResult = std::asctime(&d);
-                    } else if (type == soci::data_type::dt_long_long) {
-                        curColumnResult = boost::lexical_cast<std::string>(curRow.get<long long>(colName));
-                    } else if (type == soci::data_type::dt_unsigned_long_long) {
-                        curColumnResult = boost::lexical_cast<std::string>(curRow.get<unsigned long long>(colName));
-                    } else if (type == soci::data_type::dt_blob) {
-                        throw std::runtime_error("Support for blob not implemented!");
-                        // TODO: Get the blob object and uncomment code below
+                    try {
+                        // Getting result based on the data type
+                        if (type == soci::data_type::dt_string
+                        || type == soci::data_type::dt_xml) {
+                            curColumnResult = curRow.get<std::string>(colName);
+                        } else if (type == soci::data_type::dt_double) {
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<double>(colName));
+                        } else if (type == soci::data_type::dt_integer) {
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<int>(colName));
+                        } else if (type == soci::data_type::dt_date) {
+                            std::tm d = curRow.get<std::tm>(colName);
+                            curColumnResult = std::asctime(&d);
+                        } else if (type == soci::data_type::dt_long_long) {
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<long long>(colName));
+                        } else if (type == soci::data_type::dt_unsigned_long_long) {
+                            curColumnResult = boost::lexical_cast<std::string>(curRow.get<unsigned long long>(colName));
+                        } else if (type == soci::data_type::dt_blob) {
+                            throw std::runtime_error("Support for blob not implemented!");
+                            // TODO: Get the blob object and uncomment code below
 
-                        // const std::size_t bin_len = binary.get_len();
-                        // char *buffer = new char[bin_len];
-                        // binary.read_from_start(buffer, bin_len);
-                        // curColumnResult = std::string(buffer);
-                        // delete[] buffer;
-                        // break;
-                    }
-                    else if (type == soci::data_type::dt_xml)
-                    {
-                        throw std::runtime_error("Support for xml not implemented!");
+                            // const std::size_t bin_len = binary.get_len();
+                            // char *buffer = new char[bin_len];
+                            // binary.read_from_start(buffer, bin_len);
+                            // curColumnResult = std::string(buffer);
+                            // delete[] buffer;
+                            // break;
+                        }
+                        else if (type == soci::data_type::dt_xml)
+                        {
+                            throw std::runtime_error("Support for xml not implemented!");
+                        }
+                    } catch (const soci::soci_error& e) {
+                        curColumnResult = "";
+                        spdlog::critical("Error when getting value for column \"" + colName + "\". Used empty value instead");
                     }
                 }
 

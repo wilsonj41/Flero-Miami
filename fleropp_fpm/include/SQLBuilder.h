@@ -696,7 +696,9 @@ public:
     }
 
     size_t run() {
-        size_t rows = fleropp::db::db_handle->create_entry(str(), _values);
+        std::string query(this->str());
+
+        size_t rows = fleropp::db::db_handle->create_entry(query, _values);
 
         return rows;
     }
@@ -800,7 +802,9 @@ public:
     }
 
     size_t run() {
-        size_t rows = fleropp::db::db_handle->update_entry(this->str(), _bindings);
+        std::string query = this->str();
+
+        size_t rows = fleropp::db::db_handle->update_entry(query, _bindings);
 
         return rows;
     }
@@ -888,7 +892,9 @@ public:
     }
 
     size_t run() {
-        size_t rows = fleropp::db::db_handle->delete_entry(this->str(), _bindings);
+        std::string query = this->str();
+
+        size_t rows = fleropp::db::db_handle->delete_entry(query, _bindings);
 
         return rows;
     }
