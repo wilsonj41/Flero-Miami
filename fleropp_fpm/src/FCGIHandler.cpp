@@ -57,12 +57,13 @@ namespace fleropp::fpm {
         const std::string &username,
         const std::string &password,
         const std::string &dbname,
-        const std::string &host) {
+        const std::string &host,
+        const std::string &port) {
 
         fleropp::fpm::CompUnit<IDatabaseDriver> driver_unit{driver};
 
         auto driver_instance = driver_unit.get_instance(
-            username, password, dbname, host
+            username, password, dbname, host, port
         );
         // Load the driver into memory
 

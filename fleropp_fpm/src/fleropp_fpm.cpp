@@ -57,6 +57,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 
     const std::string driver = database_info.at("driver");
     const std::string host = database_info.at("host");
+    const std::string port = database_info.at("port");
     const std::string username = database_info.at("username");
     const std::string password = database_info.at("password");
     const std::string dbname = database_info.at("dbname");
@@ -75,7 +76,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Add the endpoint mappings from the config file
     handler->load_endpoints(config.endpoints);
 
-    handler->connect_db(driver, username, password, dbname, host);
+    handler->connect_db(driver, username, password, dbname, host, port);
 
     // Spawn a pool of workers to start accepting connections
     const auto n_workers = vm["workers"].as<std::size_t>();

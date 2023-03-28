@@ -57,7 +57,7 @@ namespace fleropp::fpm {
         void connect_db(
             const std::string &driver, const std::string &username,
             const std::string &password, const std::string &dbname,
-            const std::string &host);
+            const std::string &host, const std::string &port);
 
       private: 
         int m_fd;

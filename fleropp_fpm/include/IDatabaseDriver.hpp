@@ -6,16 +6,17 @@
 #include <mutex>
 #include <vector>
 
-#define INIT_DB_DRIVER(NAME)                                      \
-extern "C" {                                                      \
-    NAME* allocator(                                              \
-        const std::string& username, const std::string& password, \
-        const std::string& db, const std::string& host) {         \
-            return new NAME(username, password, db, host);        \
-    }                                                             \
-    void deleter(NAME* ptr) {                                     \
-        delete ptr;                                               \
-    }                                                             \
+#define INIT_DB_DRIVER(NAME)                                            \
+extern "C" {                                                            \
+    NAME* allocator(                                                    \
+        const std::string& username, const std::string& password,       \
+        const std::string& db, const std::string& host,                 \
+        const std::string& port) {                                      \
+            return new NAME(username, password, db, host, port);        \
+    }                                                                   \
+    void deleter(NAME* ptr) {                                           \
+        delete ptr;                                                     \
+    }                                                                   \
 }
 
 

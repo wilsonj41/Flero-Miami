@@ -53,9 +53,19 @@ namespace fleropp::fpm {
                 }
 
                 if (database_connection_info.find("driver") == database_connection_info.end()) {
-                    const std::string error = "No driver specified for database";
+                    spdlog::critical("No driver specified for database");
+                }
 
-                    spdlog::critical(error);
+                if (database_connection_info.find("host") == database_connection_info.end()) {
+                    spdlog::warn("No host specified in database connection, using localhost");
+
+                    database_connection_info["host"] = "localhost";
+                }
+
+                if (database_connection_info.find("port") == database_connection_info.end()) {
+                    spdlog::warn("No port specified in database connection, using 3306");
+
+                    database_connection_info["port"] = "3306";
                 }
             }
             else

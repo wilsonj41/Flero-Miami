@@ -15,8 +15,8 @@
 class mysql: public IDatabaseDriver {
     public:
         mysql(const std::string& username, const std::string& password,
-        const std::string& db, const std::string& host)
-        : con("mysql", std::string("host=") + host + " user=" + username + " password=" + password + " db=" + db) {}
+        const std::string& db, const std::string& host, const std::string& port)
+        : con("mysql", std::string("host=") + host + " user=" + username + " password=" + password + " db=" + db + " port=" + port) {}
     
     protected:
         size_t create_entry_impl(const std::string &query, const std::vector<std::string>& bindings) {
