@@ -474,6 +474,7 @@ public:
     }
 
     virtual const std::string& str() override {
+        _bindings.clear();
         _sql.clear();
         _sql.append("select ");
         if(_distinct) {
@@ -543,10 +544,15 @@ public:
         _join_table.clear();
         _join_on_condition.clear();
         _where_condition.clear();
+        _where_condition_binding.clear();
         _having_condition.clear();
+        _having_condition_binding.clear();
         _order_by.clear();
         _limit.clear();
+        _limit_binding.clear();
         _offset.clear();
+        _offset_binding.clear();
+        _bindings.clear();
         return *this;
     }
     friend inline std::ostream& operator<< (std::ostream& out, SelectModel& mod) {
@@ -729,6 +735,7 @@ public:
 
     virtual const std::string& str() override {
         _sql.clear();
+        _bindings.clear();
         _sql.append("update ");
         _sql.append(_table_name);
         _sql.append(" set ");
@@ -753,7 +760,10 @@ public:
     UpdateModel& reset() {
         _table_name.clear();
         _set_columns.clear();
+        _set_value_binding.clear();
         _where_condition.clear();
+        _where_condition_binding.clear();
+        _bindings.clear();
         return *this;
     }
     friend inline std::ostream& operator<< (std::ostream& out, UpdateModel& mod) {
@@ -833,6 +843,7 @@ public:
 
     virtual const std::string& str() override {
         _sql.clear();
+        _bindings.clear();
         _sql.append("delete from ");
         _sql.append(_table_name);
         size_t size = _where_condition.size();
@@ -862,6 +873,8 @@ public:
     DeleteModel& reset() {
         _table_name.clear();
         _where_condition.clear();
+        _where_condition_binding.clear();
+        _bindings.clear();
         return *this;
     }
     friend inline std::ostream& operator<< (std::ostream& out, DeleteModel& mod) {
