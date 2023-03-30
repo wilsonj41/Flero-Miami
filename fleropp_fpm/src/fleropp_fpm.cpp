@@ -53,8 +53,6 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // by the configuration file.
     std::unordered_map<std::string,std::string> database_info = config.database_connection_info;
 
-    // TODO: establish a database connection with the provided information.
-
     const std::string driver = database_info.at("driver");
     const std::string host = database_info.at("host");
     const std::string port = database_info.at("port");
