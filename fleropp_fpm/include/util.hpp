@@ -114,7 +114,9 @@ namespace fleropp::util {
         std::array<std::string_view, M> overridden;
         std::copy_n(filtered.begin(), M, std::begin(overridden));
         return overridden;
+
     }
+    int daemonize();
     namespace permissions {
         /**
          * \brief Sets group of process to name of group
@@ -163,6 +165,7 @@ namespace fleropp::util {
          * \return Returns true if successfully set user, otherwise false
          */
         bool change_user_uid(uid_t gid);
+
     }
 }
 #endif /* UTIL_HPP */

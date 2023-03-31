@@ -10,7 +10,7 @@
 
 int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     namespace opts = boost::program_options;
-
+    fleropp::util::daemonize();
     // Create the command line options description printout
     opts::options_description desc{"Flero++ FastCGI Process Manager - Allowed options"};
     desc.add_options()
@@ -21,7 +21,6 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
         ("ipc-path,u", opts::value<std::string>(), "listen on a Unix-domain socket with this path.")
         ("workers,w", opts::value<std::size_t>()->default_value(std::thread::hardware_concurrency()), "the number of FastCGI workers to spawn.")
     ;
-    umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
     // Parse the command line options
     opts::variables_map vm;
     opts::store(opts::parse_command_line(argc, argv, desc), vm);
