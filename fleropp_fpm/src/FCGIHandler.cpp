@@ -29,7 +29,7 @@ namespace fleropp::fpm {
             return;
         }
         FCGX_Init();
-        
+        m_db_handle = nullptr;
         spdlog::info("Initialized Unix domain FastCGI handler at {}", unix_sock);
         // Possibly drop permissions or use capabilities to create files
 
@@ -40,13 +40,14 @@ namespace fleropp::fpm {
         auto sock_str = ":" + std::to_string(tcp_sock);
         m_fd = FCGX_OpenSocket(sock_str.c_str(), backlog);
         FCGX_Init();
+        m_db_handle = nullptr;
         spdlog::info("Initialized TCP FastCGI handler at {}", sock_str);
     }
 
     void FCGIHandler::spawn(std::size_t n_thr) {
         for (std::size_t i = 0; i < n_thr; ++i) {
             m_workers.emplace_back([this] () { 
-                fleropp::fpm::concurrency::FCGIWorker worker{m_fd, m_endpoints};
+                fleropp::fpm::concurrency::FCGIWorker worker{m_fd, m_endpoints, m_db_handle};
                 worker.accept();
             });
         }
@@ -61,5 +62,22 @@ namespace fleropp::fpm {
     void FCGIHandler::load_endpoints(const endpoints_map_t& endpoints_map) {
         m_endpoints = endpoints_map;
     }
-    
+
+    void FCGIHandler::connect_db(
+        const std::string &driver,
+        const std::string &username,
+        const std::string &password,
+        const std::string &dbname,
+        const std::string &host,
+        const std::string &port) {
+
+        fleropp::fpm::CompUnit<IDatabaseDriver> driver_unit{driver};
+
+        auto driver_instance = driver_unit.get_instance(
+            username, password, dbname, host, port
+        );
+        // Load the driver into memory
+
+        m_db_handle = std::move(driver_instance);
+    }
 }

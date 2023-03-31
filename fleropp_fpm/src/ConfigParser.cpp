@@ -1,6 +1,8 @@
 #include "ConfigParser.hpp"
 
 #include <filesystem>
+#include <exception>
+#include <boost/filesystem.hpp>
 
 #include "spdlog/spdlog.h"
 
@@ -8,7 +10,11 @@ namespace fleropp::fpm {
     namespace pt = boost::property_tree;
     using namespace std;
 
-    ConfigParser::ConfigParser(const string &lib_dir) : m_lib_dir(lib_dir) {}
+    ConfigParser::ConfigParser(
+        const string &lib_dir,
+        const string &db_driver_subdir,
+        const string &db_driver_prefix
+    ) : m_lib_dir(lib_dir), m_db_driver_subdir(db_driver_subdir), m_db_driver_prefix(db_driver_prefix) {}
 
     void ConfigParser::load(const string &filename) {
         try {
@@ -22,12 +28,50 @@ namespace fleropp::fpm {
             if(arg_database) {
                 for(auto& field : arg_database.get()) {
                     spdlog::info("Database information: {}:{}",field.first.data(),field.second.data());
-                    database_connection_info.emplace(field.first.data(),field.second.data());
+
+                    std::string key = field.first.data();
+                    std::string value = field.second.data();
+
+                    if (key == "driver") { // If this is the driver entry, we turn it into the full path for the driver DSO
+                        if (!value.empty()) {
+                            std::string driver_full_path = m_lib_dir + "/" + m_db_driver_subdir + "/" + m_db_driver_prefix + value + ".so";
+
+                            if (!boost::filesystem::exists(driver_full_path)) {
+                                const std::string error = "Driver file " + driver_full_path + " not found";
+
+                                spdlog::critical(error);
+                            }
+
+                            value = std::move(driver_full_path);
+                        } else {
+                            const std::string error = "driver entry cannot have an empty value.";
+                            spdlog::critical(error);
+                        }
+                    }
+
+                    database_connection_info.emplace(key, value);
                 }
-            } else {
+
+                if (database_connection_info.find("driver") == database_connection_info.end()) {
+                    spdlog::critical("No driver specified for database");
+                }
+
+                if (database_connection_info.find("host") == database_connection_info.end()) {
+                    spdlog::warn("No host specified in database connection, using localhost");
+
+                    database_connection_info["host"] = "localhost";
+                }
+
+                if (database_connection_info.find("port") == database_connection_info.end()) {
+                    spdlog::warn("No port specified in database connection, using 3306");
+
+                    database_connection_info["port"] = "3306";
+                }
+            }
+            else
+            {
                 spdlog::info("No database information was provided.");
             }
-
 
             // Get compiler configuration elements
             boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
