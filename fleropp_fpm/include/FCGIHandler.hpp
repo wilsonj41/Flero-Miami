@@ -57,6 +57,7 @@ namespace fleropp::fpm {
         FCGX_Request m_request;
         endpoints_map_t m_endpoints;
         std::vector<std::thread> m_workers;
+        bool change_sock_perms();
     };
 }
 
