@@ -65,6 +65,7 @@ namespace fleropp::fpm {
         endpoints_map_t m_endpoints;
         std::shared_ptr<IDatabaseDriver> m_db_handle;
         std::vector<std::thread> m_workers;
+        bool change_sock_perms();
     };
 }
 
