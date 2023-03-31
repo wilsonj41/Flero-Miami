@@ -49,6 +49,13 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     fleropp::fpm::ConfigParser config;
     config.load(vm["config"].as<std::string>());
 
+    // Can now read the database connection information provided
+    // by the configuration file.
+    std::unordered_map<std::string,std::string> database_info = config.database_connection_info;
+
+    // TODO: establish a database connection with the provided information.
+    
+
     // Delay construction of the handler object, calling the correct
     // c-tor based on the type of socket supplied as an argument.
     // `std::optional` does no heap allocation, despite the fact that

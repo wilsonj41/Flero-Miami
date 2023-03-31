@@ -91,8 +91,16 @@ namespace fleropp::fpm {
                 spdlog::debug("{} has no arguments, will use default parameters", m_compiler);
                 m_args = compiler_defaults::compiler_map.at(m_compiler);
             }
-            m_args.emplace_back(shared_object);
-            m_args.insert(std::end(m_args), std::begin(m_src_path_list), std::end(m_src_path_list));
+
+            // Handle the `@OBJECT` metavariable, replacing it with the shared object name
+            std::replace(std::begin(m_args), std::end(m_args), std::string{"@OBJECT"}, shared_object);
+
+            // Handle the `@SOURCES` metavariable, replacing it with the list of source files
+            auto sources_it = std::find(std::begin(m_args), std::end(m_args), "@SOURCES");
+            if (sources_it != std::end(m_args)) {
+                sources_it = m_args.erase(sources_it);
+                m_args.insert(sources_it, std::begin(m_src_path_list), std::end(m_src_path_list));
+            }
             spdlog::info("Compiler loaded: '{}'. Args loaded: '{}'", m_compiler, fmt::join(m_args, ", "));
         }
 

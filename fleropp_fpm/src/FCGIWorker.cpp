@@ -13,6 +13,8 @@
 #include <fmt/format.h>
 #include "spdlog/spdlog.h"
 
+#include <exception>
+
 namespace fleropp::fpm::concurrency {
     FCGIWorker::FCGIWorker(int sock_fd, endpoints_map_t& endpoints) : m_fd{sock_fd}, 
                                                                       m_endpoints{&endpoints} {
@@ -28,7 +30,8 @@ namespace fleropp::fpm::concurrency {
         spdlog::info("New worker accepting requests (file descriptor {})", m_fd);
         while (FCGX_Accept_r(&m_request) >= 0) {
             fleropp::io::CGIEnvironment env{m_request.envp};
-            const auto source = m_endpoints->find(env.get("SCRIPT_NAME"));
+            const auto script_name = env.get("SCRIPT_NAME");
+            const auto source = m_endpoints->find(script_name);
             
             // This information is already logged by your HTTP server; prefer
             // that log in most cases.
@@ -65,6 +68,13 @@ namespace fleropp::fpm::concurrency {
                 } catch (const std::range_error&) {
                     spdlog::info("Invalid request method received: '{}'", request_method);
                     fleropp::util::status_response<"418", "I'm a teapot">();
+                } catch (...) {
+                    // Catch all other uncaught exceptions that may be thrown
+                    // by one of the pages. This will avoid SIGABRT killing the
+                    // FPM. We can't handle the exception, but we can at least
+                    // alert the user of its existance.
+                    spdlog::critical("Unhandled exception while responding to '{}'", script_name); 
+                    fleropp::util::status_response<"500", "Internal Server Error">(); 
                 }
             } else {
                 fleropp::util::status_response<"404", "Not Found">();

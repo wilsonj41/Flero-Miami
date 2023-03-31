@@ -14,24 +14,8 @@
 // fleropp IO namespace
 namespace fleropp::io {
     typedef class QueryString PostText;
-    /**
-     * \brief The pattern for key:value pairs in a header.
-     * 
-     * This will match key:value patterns found in the header of a
-     * HTTP request.
-     */
-    static constexpr auto header_pattern = R"((\S*)\s*:\s*(.*))";
-
     class RequestData {
         public:
-            /**
-             * \brief The regular expression used to find header pairs.
-             * 
-             * Header fields will offten be in the form of:
-             *   key : value
-             */
-            static const std::regex header_regex;
-
             /**
              * Constructor.
              * 

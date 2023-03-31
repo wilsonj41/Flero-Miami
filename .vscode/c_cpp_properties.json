@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${default}",
-                "${workspaceFolder}/fleropp_fpm/include"
+                "${workspaceFolder}/fleropp_fpm/include",
+                "/usr/include/**"
             ],
             "defines": [
                 "FPM_BUILD"

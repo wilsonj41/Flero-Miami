@@ -17,6 +17,18 @@ namespace fleropp::fpm {
             // Parse the JSON into the property tree.
             pt::read_json(filename, tree);
 
+            // Get database information elements
+            auto arg_database = tree.get_child_optional("database");
+            if(arg_database) {
+                for(auto& field : arg_database.get()) {
+                    spdlog::info("Database information: {}:{}",field.first.data(),field.second.data());
+                    database_connection_info.emplace(field.first.data(),field.second.data());
+                }
+            } else {
+                spdlog::info("No database information was provided.");
+            }
+
+
             // Get compiler configuration elements
             boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
             auto arg_child = tree.get_child_optional("args");

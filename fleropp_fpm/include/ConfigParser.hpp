@@ -20,6 +20,7 @@ namespace fleropp::fpm
     {
     public:
         std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
+        std::unordered_map<std::string, std::string> database_connection_info;
         ConfigParser(const std::string &lib_dir = "/var/www/html");
 
         void load(const std::string &filename);
