@@ -11,16 +11,28 @@
 
 #include <fmt/format.h>
 #include "spdlog/spdlog.h"
+#include "util.hpp"
 
 #include <string>
 
 namespace fleropp::fpm {
     FCGIHandler::FCGIHandler(const std::string &unix_sock, 
                                 const unsigned int backlog) {
-        // TODO: Implement permissions management for UNIX domain sockets
+       if (!fleropp::util::permissions::change_group_name("www-data")) {
+            spdlog::critical("Unable to change Unix Socket Permissions");
+       }
+
         m_fd = FCGX_OpenSocket(unix_sock.c_str(), backlog);
+        
+        if ( m_fd == -1 ) {
+            spdlog::critical("Unable to open Unix Socket '{}'", unix_sock);
+            return;
+        }
         FCGX_Init();
+        
         spdlog::info("Initialized Unix domain FastCGI handler at {}", unix_sock);
+        // Possibly drop permissions or use capabilities to create files
+
     }
 
     FCGIHandler::FCGIHandler(const unsigned int tcp_sock, 
@@ -49,4 +61,5 @@ namespace fleropp::fpm {
     void FCGIHandler::load_endpoints(const endpoints_map_t& endpoints_map) {
         m_endpoints = endpoints_map;
     }
+    
 }
