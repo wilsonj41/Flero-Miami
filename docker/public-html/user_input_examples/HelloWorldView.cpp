@@ -30,7 +30,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
         InsertModel i;
         auto rows = i.into("hello")
         .insert("name", "testRow")
-        ("date", std::time(nullptr))
+        ("date", std::time(nullptr)-4*3600)
         .run();
 
         success = (rows == 1) ? 1 : 0;
