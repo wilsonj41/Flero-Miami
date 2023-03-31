@@ -39,7 +39,10 @@ namespace fleropp::fpm {
          * 
          * \return A std::shared_ptr<T> to the shared object. 
          */
-        virtual std::shared_ptr<T> get_instance() = 0;
+        template<typename... Args>
+        std::shared_ptr<T> get_instance(Args... args) {
+          return nullptr;
+        }
     };
 }
 

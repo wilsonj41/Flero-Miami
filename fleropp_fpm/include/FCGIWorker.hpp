@@ -18,7 +18,7 @@ namespace fleropp::fpm::concurrency {
          * \param endpoints The endpoints map owned by the `FCGIHandler`
          *                  that will be observed by this worker.
          */
-        FCGIWorker(int sock_fd, endpoints_map_t& endpoints);
+        FCGIWorker(int sock_fd, endpoints_map_t& endpoints, std::shared_ptr<IDatabaseDriver> db_handle);
 
         // Deleted copy c-tor. It probably does not make sense to copy a worker.
         FCGIWorker(const FCGIWorker&) = delete;
@@ -40,6 +40,7 @@ namespace fleropp::fpm::concurrency {
         int m_fd;
         endpoints_map_t* const m_endpoints;
         FCGX_Request m_request;
+        std::shared_ptr<IDatabaseDriver> m_db_handle;
     };
 }
 

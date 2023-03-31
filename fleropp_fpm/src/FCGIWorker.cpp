@@ -6,18 +6,21 @@
 #include "FleroppIO.hpp"
 #include "RequestData.hpp"
 #include "ScopedRedirect.hpp"
+#include "FleroppDB.hpp"
 
 #include "fcgio.h"
 #include "fcgios.h"
 
 #include <fmt/format.h>
 #include "spdlog/spdlog.h"
+#include <boost/exception/diagnostic_information.hpp>
 
 #include <exception>
 
 namespace fleropp::fpm::concurrency {
-    FCGIWorker::FCGIWorker(int sock_fd, endpoints_map_t& endpoints) : m_fd{sock_fd}, 
-                                                                      m_endpoints{&endpoints} {
+    FCGIWorker::FCGIWorker(int sock_fd, endpoints_map_t& endpoints, std::shared_ptr<IDatabaseDriver> db_handle) : m_fd{sock_fd}, 
+                                                                                                                  m_endpoints{&endpoints},
+                                                                                                                  m_db_handle{std::move(db_handle)}{
         FCGX_InitRequest(&m_request, m_fd, 0);                                                                    
     }
 
@@ -44,6 +47,13 @@ namespace fleropp::fpm::concurrency {
             // Redirect the streams to the global convenience variables.
             fleropp::io::ScopedRedirect redir_in{in_buf, fleropp::io::fppin};
             fleropp::io::ScopedRedirect redir_out{out_buf, fleropp::io::fppout};
+
+            // Copy the db_handle to the global convenience variable
+            // so that models can make use of it
+            // Note:
+            // Using std::move on this will result in 
+            // a random segmentation fault
+            fleropp::db::db_handle = m_db_handle;
 
             if (source != m_endpoints->end()) {  
                 // Prepare to dispatch the request by getting the request
@@ -73,7 +83,9 @@ namespace fleropp::fpm::concurrency {
                     // by one of the pages. This will avoid SIGABRT killing the
                     // FPM. We can't handle the exception, but we can at least
                     // alert the user of its existance.
-                    spdlog::critical("Unhandled exception while responding to '{}'", script_name); 
+                    
+                    // Credit: https://stackoverflow.com/questions/315948/c-catching-all-exceptions
+                    spdlog::critical("Unhandled exception while responding to '{}':\n{}", script_name, boost::current_exception_diagnostic_information());
                     fleropp::util::status_response<"500", "Internal Server Error">(); 
                 }
             } else {

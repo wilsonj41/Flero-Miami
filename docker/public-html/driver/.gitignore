@@ -1,0 +1,4 @@
+*
+!.gitignore
+
+# This is borrowed from Laravel's .gitignore file used to preserve directory structure
