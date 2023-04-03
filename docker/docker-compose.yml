@@ -25,5 +25,6 @@ services:
       - MYSQL_DATABASE=fleropp_test
     volumes:
       - fleropp-db:/var/lib/mysql
+      - ./db_mock_data:/docker-entrypoint-initdb.d
 volumes:
   fleropp-db:

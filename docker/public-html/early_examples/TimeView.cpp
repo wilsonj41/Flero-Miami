@@ -7,7 +7,7 @@
 
 #include <sys/utsname.h>
 
-INIT_VIEW(TimeView);
+INIT_VIEW(TimeView)
 
 void TimeView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;

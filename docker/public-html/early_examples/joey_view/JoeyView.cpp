@@ -6,7 +6,7 @@
 
 #include <sys/utsname.h>
 
-INIT_VIEW(JoeyView);
+INIT_VIEW(JoeyView)
 
 void JoeyView::get(const fleropp::io::RequestData& request) {
     struct utsname uname;

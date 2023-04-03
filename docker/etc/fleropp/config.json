@@ -1,12 +1,13 @@
 {
     "database": {
         "driver": "mysql",
-        "host":"db",
-        "port":"3306",
-        "dbname":"fleropp_test",
-        "username":"root",
-        "password":"fleropp"
+        "host": "db",
+        "port": "3306",
+        "dbname": "fleropp_test",
+        "username": "root",
+        "password": "fleropp"
     },
+    "webroot": "/var/www/html",
     "compiler": "g++",
     "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
              "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",

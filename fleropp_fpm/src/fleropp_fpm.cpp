@@ -47,18 +47,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
 
     // Parse our configuration file
     fleropp::fpm::ConfigParser config;
-    config.load(vm["config"].as<std::string>());
-
-    // Can now read the database connection information provided
-    // by the configuration file.
-    std::unordered_map<std::string,std::string> database_info = config.database_connection_info;
-
-    const std::string driver = database_info.at("driver");
-    const std::string host = database_info.at("host");
-    const std::string port = database_info.at("port");
-    const std::string username = database_info.at("username");
-    const std::string password = database_info.at("password");
-    const std::string dbname = database_info.at("dbname");
+    config.load(vm["config"].as<std::string>()); 
 
     // Delay construction of the handler object, calling the correct
     // c-tor based on the type of socket supplied as an argument.
@@ -74,7 +63,19 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Add the endpoint mappings from the config file
     handler->load_endpoints(config.endpoints);
 
-    handler->connect_db(driver, username, password, dbname, host, port);
+    // Can now read the database connection information provided
+    // by the configuration file.
+    std::unordered_map<std::string, std::string> database_info = config.database_connection_info;
+
+    if (!database_info.empty()) {
+        const std::string driver = database_info.at("driver");
+        const std::string host = database_info.at("host");
+        const std::string port = database_info.at("port");
+        const std::string username = database_info.at("username");
+        const std::string password = database_info.at("password");
+        const std::string dbname = database_info.at("dbname");
+        handler->connect_db(driver, username, password, dbname, host, port);
+    }
 
     // Spawn a pool of workers to start accepting connections
     const auto n_workers = vm["workers"].as<std::size_t>();

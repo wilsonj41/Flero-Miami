@@ -112,7 +112,7 @@ namespace fleropp::fpm {
          * 
          * This constructor is used when a CompUnit object is used
          * only to control the dynamic loading of a DSO without
-         * accompanying code
+         * accompanying code.
         */
        CompUnit(const std::string& shared_object,
                 const std::string& alloc_sym = "allocator",
@@ -187,12 +187,12 @@ namespace fleropp::fpm {
          * \return A `std::shared_ptr` to an instance of the contained class.
          */
         template<typename... Args>
-        std::shared_ptr<T> get_instance(Args... args) {
+        std::shared_ptr<T> get_instance(Args&& ...args) {
             // Type alias for a function pointer to a function that returns a
-            // pointer to T
-            using alloc_fun_t = T *(*)(Args...);
+            // pointer to `T`
+            using alloc_fun_t = T *(*)(Args&& ...);
             // Type alias for a function pointer to a void function that 
-            // accepts a pointer to T
+            // accepts a pointer to `T`
             using del_fun_t = void (*)(T *);
 
             // We only need to do the recompile when there is source code
@@ -221,11 +221,11 @@ namespace fleropp::fpm {
             // calling alloc_fun) with a custom deleter closure that calls
             // del_fun.
             spdlog::debug("Returning instance of '{}'", m_shared_object);
-            return std::shared_ptr<T>{alloc_fun(args...), [del_fun] (T *p) { del_fun(p); }};
+            return std::shared_ptr<T>{alloc_fun(std::forward<Args>(args)...), [del_fun] (T *p) { del_fun(p); }};
         }
 
       private:
-        void *m_handle;
+        void* m_handle;
         std::string m_shared_object;
         std::vector<std::string> m_src_path_list;
         std::string m_alloc_sym;
@@ -243,8 +243,8 @@ namespace fleropp::fpm {
                 const auto so_mtim = std::filesystem::last_write_time(m_shared_object);
                 //spdlog::debug("'{}' last modified on {}", m_shared_object, so_mtim);
                 return !m_src_path_list.empty() &&
-                std::any_of(std::begin(m_src_path_list), std::end(m_src_path_list), 
-                                    [so_mtim] (auto src) { 
+                       std::any_of(std::begin(m_src_path_list), std::end(m_src_path_list), 
+                                   [so_mtim] (auto src) { 
                                         return std::filesystem::last_write_time(src) > so_mtim; 
                                     });
             } 
