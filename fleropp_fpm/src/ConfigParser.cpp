@@ -85,6 +85,13 @@ namespace fleropp::fpm {
             // Get source file extension
             auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
 
+            const auto view_error_fun = [] (const auto& class_name, const auto& error_text, const auto& shared_object) { 
+                                                return fmt::format(fleropp::logging::error_page_source, 
+                                                                   fmt::arg("class", "_" + class_name),
+                                                                   fmt::arg("error", error_text),
+                                                                   fmt::arg("filename", shared_object));
+                                        };
+
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
@@ -116,14 +123,14 @@ namespace fleropp::fpm {
 
                     // creates a CompUnit object and stores it in the dependencies vector
                     if (compiler) {
-                        dependencies.emplace_back(shared_object, sources, compiler.get(), args);
+                        dependencies.emplace_back(shared_object, sources, view_error_fun, compiler.get(), args);
                     } else { 
-                        dependencies.emplace_back(shared_object, sources);
+                        dependencies.emplace_back(shared_object, sources, view_error_fun);
                     }
 
                     endpoints[uri] = dependencies;
                     spdlog::info("Registered endpoint: '{}'", uri);
-                    spdlog::info("Share Object name: '{}'", shared_object.string());
+                    spdlog::info("Shared object name: '{}'", shared_object.string());
                     spdlog::info("Source file(s): '{}'", fmt::join(sources, ", "));
                 }
             }
