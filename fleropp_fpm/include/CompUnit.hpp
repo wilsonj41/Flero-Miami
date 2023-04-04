@@ -68,7 +68,12 @@ namespace fleropp::fpm {
          *                          unit.
          * \param[in] error_generator A function that produces the source code
          *                            to be compiled when an error is encountered
-         *                            while compiling the actual sources. 
+         *                            while compiling the actual sources. The function
+         *                            shall accept three parameters, ideally inserting
+         *                            them into the source code it produces:
+         *                              1. The contained class name as a string.
+         *                              2. The compiler stderr stream contents as a string.
+         *                              3. The shared object file name as a string.
          * \param[in] compiler The name of the compiler executable to be used to
          *                     compile this compilation unit. Will search $PATH.
          *                     (default "g++").
@@ -115,7 +120,7 @@ namespace fleropp::fpm {
         }
 
         /**
-         * Constructor
+         * Constructor.
          * 
          * \param [in] shared_object The name of the shared object that represents
          *                          this compilation unit.
@@ -262,6 +267,8 @@ namespace fleropp::fpm {
             return true;
         }
 
+        // Compiles the shared object and provides access to the compiler's
+        // exit code and the contents of the stderr stream.
         std::pair<int, std::string> compile(const std::string& compiler, 
                                             const std::vector<std::string>& args) const {
             namespace bp = boost::process;
@@ -279,24 +286,38 @@ namespace fleropp::fpm {
             return {chld.exit_code(), stderr.get()};
         }
 
+        // 0-ary overload of `compile` for the most common use case
         std::pair<int, std::string> compile() const { return compile(m_compiler, m_args); } 
 
+        // Using source code from the error-generation function provided in the constructor, 
+        // compile a dummy shared object that will provide error information in a contextually
+        // relevant manner.
         void compile_error_object(const std::string& error_text) const {
-            auto tmp_name = boost::uuids::to_string(boost::uuids::random_generator()());
+            // Generate and stringify a UUID
+            auto tmp_name = "_" + boost::uuids::to_string(boost::uuids::random_generator()());
+
+            // Convert the UUID to a valid C++ identifier
             tmp_name.erase(std::remove(std::begin(tmp_name), std::end(tmp_name), '-'), std::end(tmp_name));
+
+            // Create a source file name from the UUID and create it within a random tmpdir
             const auto tmp_file = tmp_name + ".cpp";
             const auto tmp_dir = boost::filesystem::temp_directory_path() / boost::filesystem::unique_path();
             const auto tmp_path = tmp_dir / tmp_file;
             boost::filesystem::create_directories(tmp_dir);
             std::ofstream fd{tmp_path};
             
+            // Write the desired source code to the temporary file, ready for compilation 
             fd << m_error_generator(tmp_name, error_text, m_shared_object);
-
+            
             spdlog::info("Compiling dummy error page for '{}'", m_shared_object);
             const auto [e_exit_code, e_stderr] = compile(m_compiler, {"-std=c++20", "-shared", "-fPIC", "--no-gnu-unique",
                                                                       "-o", m_shared_object, tmp_path.string()});
+
+            // Remove the temporary directory and its contents, as it is no longer needed after compilation
             boost::filesystem::remove_all(tmp_dir);
 
+            // Last resort; if the supplied error source generation function cannot be compiled,
+            // we fall back to creating an empty dummy file or setting the mtime on the existing file. 
             if (e_exit_code) {
                 spdlog::get("compiler")->warn("Non-zero exit of {} ($? -> {}):\n{}", m_compiler, e_exit_code, e_stderr);
                 // Update the modification time of the existing shared object, if it exists.

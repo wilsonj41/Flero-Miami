@@ -87,7 +87,7 @@ namespace fleropp::fpm {
 
             const auto view_error_fun = [] (const auto& class_name, const auto& error_text, const auto& shared_object) { 
                                                 return fmt::format(fleropp::logging::error_page_source, 
-                                                                   fmt::arg("class", "_" + class_name),
+                                                                   fmt::arg("class", class_name),
                                                                    fmt::arg("error", error_text),
                                                                    fmt::arg("filename", shared_object));
                                         };
