@@ -132,6 +132,15 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                 "</div>"_h;
             "</div>"_h;
 
+            //Details on Database connectivity
+            "<div class='card' id='Input'>"_h;
+                "<h5 class='card-header'>Processing and using user-input</h5>"_h;
+                "<div class='card-body'>"_h;
+                    "<h5 class='card-title'> //TODO: Add something related to ORM. </h5>"_h;
+                    "<p class='card-text'> //TODO: Add something related to ORM.</p>"_h;
+                "</div>"_h;
+            "</div>"_h;
+
 
         "</body>"_h;
     "</html>"_h;
