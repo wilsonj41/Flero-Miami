@@ -15,7 +15,6 @@
 #include "Group.hpp"
 #include <grp.h>
 #include <pwd.h>
-
 /**
  * \namespace fleropp::util 
  */
@@ -115,6 +114,68 @@ namespace fleropp::util {
         std::array<std::string_view, M> overridden;
         std::copy_n(filtered.begin(), M, std::begin(overridden));
         return overridden;
+
+    }
+    /**
+     * \brief Sets the process as a daemon
+     * 
+     * This function will fork off twice and set a new session,
+     * then will change process permission for the grandchild process.
+     * Close all file descriptors to open up standard descriptors to /dev/null
+     * 
+     * \return An exit code if 0 then sucessful, otherwise failed
+     */
+    int daemonize(); 
+
+    namespace permissions {
+        /**
+         * \brief Sets group of process to name of group
+         * 
+         * Given a string name of the group name the function
+         * will add group to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_group The name of the group being added
+         * 
+         * \return Returns true if successfully added group, otherwise false
+         */
+        bool change_group_name(std::string new_group);
+        /**
+         * \brief Sets group of process to the gid of group
+         * 
+         * Given a gid of the group name the function
+         * will add group to the process. If successful return true
+         * otherwise returns false.
+         * \param gid Gid of the group being added
+         * 
+         * \return Returns true if successfully added group, otherwise false
+         */
+        bool change_group_gid(gid_t gid);
+        /**
+         * \brief Sets user of process with the name of the user
+         * 
+         * Given a string of the user's name the function
+         * will set the user to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_user The name of the user being set
+         * 
+         * \return Returns true if successfully set user, otherwise false
+         */
+        bool change_user_name(std::string new_user);
+        /**
+         * \brief Sets user of process with the name of the user
+         * 
+         * Given a uid of the user, the function
+         * will set the user to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_user The name of the user being set
+         * 
+         * \return Returns true if successfully set user, otherwise false
+         */
+        bool change_user_uid(uid_t gid);
+
     }
 
     /**
