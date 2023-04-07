@@ -3,7 +3,7 @@
 #include <fleropp/HTMLLiterals.hpp>
 #include <cgicc/HTMLClasses.h>
 
-INIT_VIEW(TheUltimateView);
+INIT_VIEW(TheUltimateView)
 
 void TheUltimateView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;

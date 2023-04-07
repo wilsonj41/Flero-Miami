@@ -2,49 +2,52 @@
 
 #include <filesystem>
 #include <exception>
-#include <boost/filesystem.hpp>
 
 #include "spdlog/spdlog.h"
 
 namespace fleropp::fpm {
     namespace pt = boost::property_tree;
-    using namespace std;
 
     ConfigParser::ConfigParser(
-        const string &lib_dir,
-        const string &db_driver_subdir,
-        const string &db_driver_prefix
-    ) : m_lib_dir(lib_dir), m_db_driver_subdir(db_driver_subdir), m_db_driver_prefix(db_driver_prefix) {}
+        const std::string &db_driver_subdir,
+        const std::string &db_driver_prefix
+    ) : m_db_driver_subdir{db_driver_subdir}, m_db_driver_prefix{db_driver_prefix} {}
 
-    void ConfigParser::load(const string &filename) {
+    void ConfigParser::load(const std::string &filename) {
         try {
             // Create empty property tree object
             pt::ptree tree;
             // Parse the JSON into the property tree.
             pt::read_json(filename, tree);
 
+            // Get the webroot (if supplied); this is where the shared objects are placed
+            const auto webroot = tree.get_optional<std::filesystem::path>("webroot").value_or("/var/www/html");
+            
+            // Get the error template (if supplied); this a template file representing an compilation error page
+            const auto error_template = tree.get_optional<std::filesystem::path>("errorTemplate").value_or("/etc/fleropp/error.template");
+
             // Get database information elements
             auto arg_database = tree.get_child_optional("database");
             if(arg_database) {
                 for(auto& field : arg_database.get()) {
-                    spdlog::info("Database information: {}:{}",field.first.data(),field.second.data());
+                    spdlog::info("Database information: {}:{}", field.first.data(), field.second.data());
 
                     std::string key = field.first.data();
                     std::string value = field.second.data();
 
                     if (key == "driver") { // If this is the driver entry, we turn it into the full path for the driver DSO
                         if (!value.empty()) {
-                            std::string driver_full_path = m_lib_dir + "/" + m_db_driver_subdir + "/" + m_db_driver_prefix + value + ".so";
+                            std::filesystem::path driver_full_path = (webroot / m_db_driver_subdir / m_db_driver_prefix).concat(value + ".so");
 
-                            if (!boost::filesystem::exists(driver_full_path)) {
-                                const std::string error = "Driver file " + driver_full_path + " not found";
+                            if (!std::filesystem::exists(driver_full_path)) {
+                                const std::string error = "Driver file " + driver_full_path.string() + " not found";
 
                                 spdlog::critical(error);
                             }
 
                             value = std::move(driver_full_path);
                         } else {
-                            const std::string error = "driver entry cannot have an empty value.";
+                            const std::string error = "Driver entry cannot have an empty value.";
                             spdlog::critical(error);
                         }
                     }
@@ -67,9 +70,7 @@ namespace fleropp::fpm {
 
                     database_connection_info["port"] = "3306";
                 }
-            }
-            else
-            {
+            } else {
                 spdlog::info("No database information was provided.");
             }
 
@@ -87,49 +88,61 @@ namespace fleropp::fpm {
             // Get source file extension
             auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
 
+            // Configure the error page source generator callback
+            std::ifstream fd{error_template};
+            const std::string error_page_source{std::istreambuf_iterator<char>{fd}, std::istreambuf_iterator<char>{}};
+            // Yes, we do want to capture by value here.
+            const auto view_error_fun = [error_page_source] (const auto& class_name, const auto& error_text, const auto& shared_object) { 
+                                            return fmt::format(fmt::runtime(error_page_source), 
+                                                               fmt::arg("class", class_name),
+                                                               fmt::arg("error", error_text),
+                                                               fmt::arg("filename", shared_object));
+                                        };
+
             // loop for reading through the endpoint array.
             for (auto &it1 : tree.get_child("endpoint")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
-                string uri = endpoint.get<string>("uri");
+                std::string uri = endpoint.get<std::string>("uri");
 
-                vector<CompUnit<IViewWrapper>> dependencies;
+                std::vector<CompUnit<IViewWrapper>> dependencies;
                 for (auto &it2 : endpoint.get_child("dependencies")) {
                     pt::ptree dependency = it2.second; // stores the data of the curr idx of the dependencies array
-                    string shared_object = this->m_lib_dir + "/" + dependency.get<string>("sharedObject");
+                    std::filesystem::path shared_object = webroot / dependency.get<std::string>("sharedObject");
 
-                    vector<string> sources;
+                    std::vector<std::string> sources;
 
                     for (auto &it3 : dependency.get_child("source")) {
                         // If this source unit is a directory, loop through the contained filepaths
                         // and add them to the sources vector
-                        if (filesystem::is_directory(this->m_lib_dir + "/" + it3.second.data())) {
+                        std::filesystem::path source_path = webroot / it3.second.data();
+                        if (std::filesystem::is_directory(source_path)) {
                             for (const auto& dir_entry : 
-                                    filesystem::recursive_directory_iterator(this->m_lib_dir + "/" + it3.second.data())) {
+                                    std::filesystem::recursive_directory_iterator(source_path)) {
                                 if (dir_entry.is_regular_file() && dir_entry.path().extension() == source_ext) {
                                     sources.push_back(dir_entry.path().string());
                                 }
                             }
                         } else {
                             // Else just add this filepath to the sources vector
-                            sources.push_back(this->m_lib_dir + "/" + it3.second.data());
+                            sources.push_back(source_path);
                         }
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
                     if (compiler) {
-                        dependencies.emplace_back(shared_object, sources, compiler.get(), args);
+                        dependencies.emplace_back(shared_object, sources, view_error_fun, compiler.get(), args);
                     } else { 
-                        dependencies.emplace_back(shared_object, sources);
+                        dependencies.emplace_back(shared_object, sources, view_error_fun);
                     }
 
                     endpoints[uri] = dependencies;
                     spdlog::info("Registered endpoint: '{}'", uri);
-                    spdlog::info("Share Object name: '{}'", shared_object);
+                    spdlog::info("Shared object name: '{}'", shared_object.string());
                     spdlog::info("Source file(s): '{}'", fmt::join(sources, ", "));
                 }
             }
             spdlog::info("Finished reading configuration file '{}'", filename);
-        } catch (const exception &e) {
+        } catch (const std::exception &e) {
             spdlog::critical("Unable to parse configuration file '{}': {}", filename, e.what());
         }
     }

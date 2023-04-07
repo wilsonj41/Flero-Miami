@@ -4,6 +4,7 @@
 #include "FleroppIO.hpp"
 #include "HTMLLiterals.hpp"
 #include "StringLiteral.hpp"
+#include "util.hpp"
 
 #include <algorithm>
 #include <array>
@@ -112,7 +113,7 @@ namespace fleropp::html_stream {
        * \return A reference to `html_stream`.
        */
       friend auto& operator<<(HTMLStream &html_stream, const std::string &content) {
-        html_stream.m_ss << content;
+        html_stream.m_ss << fleropp::util::html_encode(content);
         return html_stream;
       }
 

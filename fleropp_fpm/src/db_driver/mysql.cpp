@@ -209,4 +209,4 @@ class mysql: public IDatabaseDriver {
         }
 };
 
-INIT_DB_DRIVER(mysql);
+INIT_DB_DRIVER(mysql)

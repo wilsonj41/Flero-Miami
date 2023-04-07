@@ -10,6 +10,7 @@
  */
 
 #include "FleroppIO.hpp"
+#include "util.hpp"
 
 #if __cpp_lib_format >= 202110L
 #include <format>
@@ -53,7 +54,9 @@ namespace fleropp::literals {
        */
       template<typename... Args>
       void operator()(Args&& ...args) {
-        fleropp::io::fppout << fmt::format(fmt::runtime(m_data), std::forward<Args>(args)...) << '\n';
+        fleropp::io::fppout << fmt::format(fmt::runtime(m_data), 
+                                           fleropp::util::html_encode(std::forward<Args>(args))...) 
+                            << '\n';
       } 
     private:
       std::string m_data;
