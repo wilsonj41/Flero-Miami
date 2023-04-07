@@ -24,6 +24,8 @@ class IDatabaseDriver {
     public:
         IDatabaseDriver(): m{} {}
 
+        virtual ~IDatabaseDriver() = default;
+
         virtual size_t create_entry(const std::string& query, const std::vector<std::string>& bindings = {}) final {
             size_t result;
 

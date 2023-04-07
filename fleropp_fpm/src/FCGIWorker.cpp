@@ -18,9 +18,10 @@
 #include <exception>
 
 namespace fleropp::fpm::concurrency {
-    FCGIWorker::FCGIWorker(int sock_fd, endpoints_map_t& endpoints, std::shared_ptr<IDatabaseDriver> db_handle) : m_fd{sock_fd}, 
-                                                                                                                  m_endpoints{&endpoints},
-                                                                                                                  m_db_handle{std::move(db_handle)}{
+    FCGIWorker::FCGIWorker(int sock_fd, endpoints_map_t& endpoints, 
+                           std::shared_ptr<IDatabaseDriver> db_handle) : m_fd{sock_fd}, 
+                                                                         m_endpoints{&endpoints},
+                                                                         m_db_handle{std::move(db_handle)}{
         FCGX_InitRequest(&m_request, m_fd, 0);                                                                    
     }
 
@@ -73,20 +74,23 @@ namespace fleropp::fpm::concurrency {
                 // Dispatch the request, logging a warning if the request
                 // method was not understood (not in the dispatch map).
                 try {
-                    std::invoke(dispatch::request_dispatch_funs[request_method], 
-                                page, fleropp::io::RequestData{env});
+                    auto handler = dispatch::request_dispatch_funs[request_method]; 
+                    try {
+                        std::invoke(handler, page, fleropp::io::RequestData{env}); 
+                    } catch (...) {
+                        // Catch all other uncaught exceptions that may be thrown
+                        // by one of the pages. This will avoid SIGABRT killing the
+                        // FPM. We can't handle the exception, but we can at least
+                        // alert the user of its existance.
+                        
+                        // Credit: https://stackoverflow.com/questions/315948/c-catching-all-exceptions
+                        spdlog::critical("Unhandled exception while responding to '{}':\n{}", script_name, 
+                                         boost::current_exception_diagnostic_information());
+                        fleropp::util::status_response<"500", "Internal Server Error">(); 
+                    }
                 } catch (const std::range_error&) {
                     spdlog::info("Invalid request method received: '{}'", request_method);
                     fleropp::util::status_response<"418", "I'm a teapot">();
-                } catch (...) {
-                    // Catch all other uncaught exceptions that may be thrown
-                    // by one of the pages. This will avoid SIGABRT killing the
-                    // FPM. We can't handle the exception, but we can at least
-                    // alert the user of its existance.
-                    
-                    // Credit: https://stackoverflow.com/questions/315948/c-catching-all-exceptions
-                    spdlog::critical("Unhandled exception while responding to '{}':\n{}", script_name, boost::current_exception_diagnostic_information());
-                    fleropp::util::status_response<"500", "Internal Server Error">(); 
                 }
             } else {
                 fleropp::util::status_response<"404", "Not Found">();
