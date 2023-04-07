@@ -14,22 +14,18 @@
 #include <string>
 #include <unordered_map>
 
-namespace fleropp::fpm
-{
-    class ConfigParser
-    {
-    public:
+namespace fleropp::fpm {
+    class ConfigParser {
+      public:
         std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
         std::unordered_map<std::string, std::string> database_connection_info;
         ConfigParser(
-            const std::string &lib_dir = "/var/www/html", 
             const std::string &db_driver_subdir = "driver",
             const std::string &db_driver_prefix = "db_driver_");
 
         void load(const std::string &filename);
 
-    private:
-        std::string m_lib_dir;
+      private:
         std::string m_db_driver_subdir;
         std::string m_db_driver_prefix;
     };

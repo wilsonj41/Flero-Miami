@@ -16,7 +16,7 @@
 #include <soci/error.h>
 #include <soci/session.h>
 
-INIT_VIEW(HelloWorldView);
+INIT_VIEW(HelloWorldView)
 
 void HelloWorldView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
@@ -33,7 +33,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
         ("date", std::time(nullptr)-4*3600)
         .run();
 
-        success = (rows == 1) ? 1 : 0;
+        success = (rows >= 1) ? 1 : 0;
     } else if (dbop == "u") {
         UpdateModel u;
 
@@ -41,7 +41,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
                         .update("hello")
                         .where("name", "testRow")
                         .run();
-        success = (rows == 1) ? 1 : 0;
+        success = (rows >= 1) ? 1 : 0;
     } else if (dbop == "d") {
         DeleteModel d;
 
@@ -50,7 +50,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
             || SQLBuilder::column{"name", "=", "Updated!"}
         ).run();
 
-        success = (rows == 1) ? 1 : 0;
+        success = (rows >= 1) ? 1 : 0;
     }
 
     "Content-type: text/html\r"_h;

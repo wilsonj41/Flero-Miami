@@ -11,6 +11,7 @@ namespace fleropp::logging {
                                         "|  _| | |/ _ \\ '__/ _ \\_   _|_   _|\n"
                                         "| |   | |  __/ | | (_) ||_|   |_|\n"  
                                         "\\_|   |_|\\___|_|  \\___/\n";
+    
     void init_logging(const std::string& logfile);
 }
 

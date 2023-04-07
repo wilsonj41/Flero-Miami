@@ -12,6 +12,14 @@
             }
         },
         {
+            "label": "Build Fleropp (serial)...",
+            "type": "shell",
+            "command": "make clean && make all",
+            "options": {
+                "cwd": "${workspaceFolder}/fleropp_fpm"
+            }
+        },
+        {
             "label": "Run Fleropp...",
             "type": "shell",
             "command": "export SPDLOG_LEVEL=info && export LC_ALL=C && unset LANGUAGE && { { { [ -f '/opt/fleropp_fpm/fleropp_fpm' ] || { echo 'Please compile fleropp first'; exit 1; }; } && /opt/fleropp_fpm/fleropp_fpm -p 50001; }; }"
@@ -23,6 +31,15 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
+            }
+        },
+        {
+            "label": "Build (serial) and Run Fleropp...",
+            "dependsOn": ["Build Fleropp (serial)...", "Run Fleropp..."],
+            "dependsOrder": "sequence",
+            "group": {
+                "kind": "build",
+                "isDefault": false
             }
         }
     ]

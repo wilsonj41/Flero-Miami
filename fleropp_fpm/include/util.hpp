@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <array>
+#include <concepts>
 #include <ranges>
 #include <string_view>
 #include <variant>
@@ -115,6 +116,45 @@ namespace fleropp::util {
         std::copy_n(filtered.begin(), M, std::begin(overridden));
         return overridden;
     }
+
+    /**
+     * \brief Convert valid HTML characters to their entity representations. 
+     * 
+     * \param[in] data The data to be encoded.
+     * 
+     * \return The encoded version of the original data.
+     */
+    template<typename T, 
+             typename std::enable_if_t<std::is_convertible_v<T, std::string>>* = nullptr>
+    std::string html_encode(const T& data) {
+        std::string buf;
+        buf.reserve(std::size(data));
+        for (auto ch: data) {
+            switch (ch) {
+                case '&': buf += "&amp;"; break;
+                case '\"': buf += "&quot;"; break;
+                case '\'': buf += "&apos;"; break;
+                case '<': buf += "&lt;"; break;
+                case '>': buf += "&gt;"; break;
+                default: buf += ch; break;
+            }
+        }
+        return buf;
+    }
+
+    /**
+     * \brief Convert valid HTML characters to their entity representations (no-op).
+     * 
+     * This is a no-op version of `html_encode` for types not convertible to
+     * std::string.
+     * 
+     * \param[in] data The data to be encoded.
+     * 
+     * \return The original data, unchanged.
+     */
+    template<typename T>
+    T&& html_encode(T&& data) { return std::forward<T>(data); }   
+
     namespace permissions {
         /**
          * \brief Sets group of process to name of group

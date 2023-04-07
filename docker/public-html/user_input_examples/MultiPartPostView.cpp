@@ -8,7 +8,7 @@
 #include <fleropp/RequestData.hpp>
 #include <fleropp/PostFile.hpp>
 
-INIT_VIEW(MultiPartPostView);
+INIT_VIEW(MultiPartPostView)
 
 void MultiPartPostView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
