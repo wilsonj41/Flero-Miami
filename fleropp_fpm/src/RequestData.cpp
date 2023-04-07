@@ -8,8 +8,8 @@
 
 namespace fleropp::io {
     RequestData::RequestData(CGIEnvironment& request_env) 
-        : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
-          m_query_string{m_request_env->get("QUERY_STRING")} {
+         : m_request_env{&request_env}, m_request_method{m_request_env->get("REQUEST_METHOD")}, 
+           m_query_string{m_request_env->get("QUERY_STRING")}, m_post_text{}, m_post_files{} {
             // Changing the content_type to lower case
             const std::string content_type = m_request_env->get("CONTENT_TYPE");
             std::string lower_case_content_type;
@@ -30,6 +30,7 @@ namespace fleropp::io {
                 m_post_files = PostFile::loadPostData(fppin);
             }
     }
+
 
     std::string RequestData::get_header(const std::string& key) const {
         std::string cgi_format_key{"HTTP_"};

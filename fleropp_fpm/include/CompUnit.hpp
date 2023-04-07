@@ -338,6 +338,8 @@ namespace fleropp::fpm {
                     std::ofstream dummy{m_shared_object};
                     spdlog::debug("Created empty placeholder for '{}' after failed compile of dummy error page", m_shared_object);
                 }
+            } else {
+                spdlog::info("Successfully compiled dummy error page for '{}'", m_shared_object);
             }
         }
 

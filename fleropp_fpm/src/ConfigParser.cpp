@@ -22,6 +22,9 @@ namespace fleropp::fpm {
 
             // Get the webroot (if supplied); this is where the shared objects are placed
             const auto webroot = tree.get_optional<std::filesystem::path>("webroot").value_or("/var/www/html");
+            
+            // Get the error template (if supplied); this a template file representing an compilation error page
+            const auto error_template = tree.get_optional<std::filesystem::path>("errorTemplate").value_or("/etc/fleropp/error.template");
 
             // Get database information elements
             auto arg_database = tree.get_child_optional("database");
@@ -85,11 +88,15 @@ namespace fleropp::fpm {
             // Get source file extension
             auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
 
-            const auto view_error_fun = [] (const auto& class_name, const auto& error_text, const auto& shared_object) { 
-                                                return fmt::format(fleropp::logging::error_page_source, 
-                                                                   fmt::arg("class", class_name),
-                                                                   fmt::arg("error", error_text),
-                                                                   fmt::arg("filename", shared_object));
+            // Configure the error page source generator callback
+            std::ifstream fd{error_template};
+            const std::string error_page_source{std::istreambuf_iterator<char>{fd}, std::istreambuf_iterator<char>{}};
+            // Yes, we do want to capture by value here.
+            const auto view_error_fun = [error_page_source] (const auto& class_name, const auto& error_text, const auto& shared_object) { 
+                                            return fmt::format(fmt::runtime(error_page_source), 
+                                                               fmt::arg("class", class_name),
+                                                               fmt::arg("error", error_text),
+                                                               fmt::arg("filename", shared_object));
                                         };
 
             // loop for reading through the endpoint array.

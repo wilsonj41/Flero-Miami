@@ -13,19 +13,19 @@ namespace fleropp::io {
      * This will match query strings of the standard 
      */
     static constexpr auto query_pattern = R"(([\w+%]+)=([^&]*))";
+    
+    /**
+    * \brief The regular expression used to match a query string.
+    * 
+    * Query strings should be of the form:
+    *    key_1=value_1&key_2=value_2&...&key_n=value_n
+    * 
+    * See RFC-3986 for more information.
+    */
+    static inline const std::regex query_regexp{query_pattern};
 
     class QueryString {
-      public:
-        /**
-         * \brief The regular expression used to match a query string.
-         * 
-         * Query strings should be of the form:
-         *    key_1=value_1&key_2=value_2&...&key_n=value_n
-         * 
-         * See RFC-3986 for more information.
-         */
-        static const std::regex query_re;
-
+      public: 
         /**
          * Default Constructor
         */

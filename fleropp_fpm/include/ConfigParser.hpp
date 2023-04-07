@@ -14,11 +14,9 @@
 #include <string>
 #include <unordered_map>
 
-namespace fleropp::fpm
-{
-    class ConfigParser
-    {
-    public:
+namespace fleropp::fpm {
+    class ConfigParser {
+      public:
         std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
         std::unordered_map<std::string, std::string> database_connection_info;
         ConfigParser(
@@ -27,7 +25,7 @@ namespace fleropp::fpm
 
         void load(const std::string &filename);
 
-    private:
+      private:
         std::string m_db_driver_subdir;
         std::string m_db_driver_prefix;
     };
