@@ -12,6 +12,15 @@
              "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",
              "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp", "-I/usr/include/fleropp"],
     "endpoint": [{
+            "uri": "/welcome.elf",
+            "dependencies": [{
+                "sharedObject": "obj/WelcomeView.so",
+                "source": [
+                    "welcome_view/WelcomeView.cpp"
+                ]
+            }]
+        },
+        {
             "uri": "/hello.elf",
             "dependencies": [{
                 "sharedObject": "obj/HelloWorldView.so",
