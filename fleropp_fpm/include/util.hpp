@@ -14,7 +14,6 @@
 #include "Group.hpp"
 #include <grp.h>
 #include <pwd.h>
-
 /**
  * \namespace fleropp::util 
  */
@@ -116,7 +115,17 @@ namespace fleropp::util {
         return overridden;
 
     }
-    int daemonize();
+    /**
+     * \brief Sets the process as a daemon
+     * 
+     * This function will fork off twice and set a new session,
+     * then will change process permission for the grandchild process.
+     * Close all file descriptors to open up standard descriptors to /dev/null
+     * 
+     * \return An exit code if 0 then sucessful, otherwise failed
+     */
+    int daemonize(); 
+
     namespace permissions {
         /**
          * \brief Sets group of process to name of group

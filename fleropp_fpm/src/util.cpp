@@ -9,37 +9,44 @@
 
 namespace fleropp::util {
     int daemonize() {
+        // Fork off parent to child
         switch (fork()) {
             case -1: return -1;
             case 0: break;
             default: exit(0);
         }
+        // Selects if terminal sessions didn't error out
         if (setsid() == -1) {
             return -1;
         }
+        // Fork off child to grandchild
         switch (fork()) {
-            case -1: return -1;
+            case -1: return -2;
             case 0: break;
             default: exit(0);
         }
+        // Permissions for sockets to work
         umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+        // Close all file descirpotrs
+       int fd;
+       long int maxfd;
+       maxfd = sysconf(_SC_OPEN_MAX);
+       if (maxfd == -1)
+               maxfd = 100;
+       for (fd = 0; fd < maxfd; fd++)
+           close(fd);
 
-//        int maxfd = sysconf(_SC_OPEN_MAX);
-//        if ( maxfd == -1)
-//            maxfd = BD_MAX_CLOSE;
-//        for ( int fd = 0; i < maxfd; ++i) {
-//            close(fd);            
-//        }
-//
-//        close(STDIN_FILENO);
-//        fd = open("/dev/null", O_RDWR);
-//        
-//        if (fd != STDIN_FILENO) 
-//            return -1;
-//        if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
-//            return -1;
-//        if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
-//            return -1; 
+       close(STDIN_FILENO);
+
+       // Open all standard descriptors to /dev/null
+       fd = open("/dev/null", O_RDWR);
+       if (fd != STDIN_FILENO)
+           return -3;
+       if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO)
+           return -4;
+       if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO)
+           return -5;
+        return 0;
     }
 }
 namespace fleropp::util::permissions {

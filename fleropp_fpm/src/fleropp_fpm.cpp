@@ -10,7 +10,8 @@
 
 int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     namespace opts = boost::program_options;
-    fleropp::util::daemonize();
+    int daemon_exit_code = fleropp::util::daemonize();
+    
     // Create the command line options description printout
     opts::options_description desc{"Flero++ FastCGI Process Manager - Allowed options"};
     desc.add_options()
@@ -43,7 +44,9 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     
     // Set up logging
     fleropp::logging::init_logging(vm["log"].as<std::string>());
-
+    if (daemon_exit_code != 0) {
+        spdlog::warn("Fleropp was unable to daemonize");
+    }
     // Parse our configuration file
     fleropp::fpm::ConfigParser config;
     config.load(vm["config"].as<std::string>());
