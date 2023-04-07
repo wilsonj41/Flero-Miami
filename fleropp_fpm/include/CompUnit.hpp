@@ -105,6 +105,23 @@ namespace fleropp::fpm {
         }
 
         /**
+         * Constructor
+         * 
+         * \param [in] shared_object The name of the shared object that represents
+         *                          this compilation unit.
+         * 
+         * This constructor is used when a CompUnit object is used
+         * only to control the dynamic loading of a DSO without
+         * accompanying code
+        */
+       CompUnit(const std::string& shared_object,
+                const std::string& alloc_sym = "allocator",
+                const std::string& del_sym = "deleter"):
+            m_handle{nullptr}, m_shared_object{shared_object},
+            m_src_path_list{}, m_alloc_sym{alloc_sym}, m_del_sym{del_sym},
+            m_compiler{}, m_args{} {}
+
+        /**
          * Loads the shared object into memory, if it is not already open. As
          * with any call to `::dlopen`, the reference count to the shared object
          * will be incremented. 
@@ -169,16 +186,22 @@ namespace fleropp::fpm {
          * 
          * \return A `std::shared_ptr` to an instance of the contained class.
          */
-        std::shared_ptr<T> get_instance() final {
+        template<typename... Args>
+        std::shared_ptr<T> get_instance(Args... args) {
             // Type alias for a function pointer to a function that returns a
             // pointer to T
-            using alloc_fun_t = T *(*)();
+            using alloc_fun_t = T *(*)(Args...);
             // Type alias for a function pointer to a void function that 
             // accepts a pointer to T
             using del_fun_t = void (*)(T *);
 
-            // If the library was recompiled, close it so we can reopen
-            recompile();
+            // We only need to do the recompile when there is source code
+            // available
+            if (!m_src_path_list.empty()) {
+                // If the library was recompiled, close it so we can reopen
+                recompile();
+            }
+
             open_lib();
 
             // dlsym returns a void pointer, so we reinterpret cast it to our
@@ -198,8 +221,8 @@ namespace fleropp::fpm {
             // calling alloc_fun) with a custom deleter closure that calls
             // del_fun.
             spdlog::debug("Returning instance of '{}'", m_shared_object);
-            return std::shared_ptr<T>{alloc_fun(), [del_fun] (T *p) { del_fun(p); }};
-        } 
+            return std::shared_ptr<T>{alloc_fun(args...), [del_fun] (T *p) { del_fun(p); }};
+        }
 
       private:
         void *m_handle;
@@ -219,7 +242,8 @@ namespace fleropp::fpm {
             if (std::filesystem::exists(m_shared_object)) {
                 const auto so_mtim = std::filesystem::last_write_time(m_shared_object);
                 //spdlog::debug("'{}' last modified on {}", m_shared_object, so_mtim);
-                return std::any_of(std::begin(m_src_path_list), std::end(m_src_path_list), 
+                return !m_src_path_list.empty() &&
+                std::any_of(std::begin(m_src_path_list), std::end(m_src_path_list), 
                                     [so_mtim] (auto src) { 
                                         return std::filesystem::last_write_time(src) > so_mtim; 
                                     });

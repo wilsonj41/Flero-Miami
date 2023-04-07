@@ -78,5 +78,4 @@ namespace fleropp::util::permissions {
         }
         return true;
     }
-
 }

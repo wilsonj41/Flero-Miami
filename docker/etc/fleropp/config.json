@@ -1,16 +1,16 @@
 {
     "database": {
         "driver": "mysql",
-        "host":"127.0.0.1",
+        "host":"db",
         "port":"3306",
-        "dbname":"fleroppDB",
-        "username":"dog",
-        "password":"123"
+        "dbname":"fleropp_test",
+        "username":"root",
+        "password":"fleropp"
     },
     "compiler": "g++",
     "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
              "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",
-             "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp"],
+             "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp", "-I/usr/include/fleropp"],
     "endpoint": [{
             "uri": "/hello.elf",
             "dependencies": [{

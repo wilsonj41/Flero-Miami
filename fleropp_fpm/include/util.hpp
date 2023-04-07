@@ -176,5 +176,54 @@ namespace fleropp::util {
         bool change_user_uid(uid_t gid);
 
     }
+    namespace permissions {
+        /**
+         * \brief Sets group of process to name of group
+         * 
+         * Given a string name of the group name the function
+         * will add group to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_group The name of the group being added
+         * 
+         * \return Returns true if successfully added group, otherwise false
+         */
+        bool change_group_name(std::string new_group);
+        /**
+         * \brief Sets group of process to the gid of group
+         * 
+         * Given a gid of the group name the function
+         * will add group to the process. If successful return true
+         * otherwise returns false.
+         * \param gid Gid of the group being added
+         * 
+         * \return Returns true if successfully added group, otherwise false
+         */
+        bool change_group_gid(gid_t gid);
+        /**
+         * \brief Sets user of process with the name of the user
+         * 
+         * Given a string of the user's name the function
+         * will set the user to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_user The name of the user being set
+         * 
+         * \return Returns true if successfully set user, otherwise false
+         */
+        bool change_user_name(std::string new_user);
+        /**
+         * \brief Sets user of process with the name of the user
+         * 
+         * Given a uid of the user, the function
+         * will set the user to the process. If successful return true
+         * otherwise returns false.
+         * 
+         * \param new_user The name of the user being set
+         * 
+         * \return Returns true if successfully set user, otherwise false
+         */
+        bool change_user_uid(uid_t gid);
+    }
 }
 #endif /* UTIL_HPP */
