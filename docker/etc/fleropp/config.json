@@ -10,7 +10,7 @@
     "webroot": "/var/www/html",
     "compiler": "g++",
     "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
-             "-o", "@OBJECT", "@SOURCES", "-lsoci_core", "-lsoci_mysql", "-ldl",
+             "-o", "@OBJECT", "@SOURCES", "-lcgicc", "-lsoci_core", "-lsoci_mysql", "-ldl",
              "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp", "-I/usr/include/fleropp"],
     "endpoint": [{
             "uri": "/welcome.elf",

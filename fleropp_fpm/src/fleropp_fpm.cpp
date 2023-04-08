@@ -10,13 +10,15 @@
 
 int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     namespace opts = boost::program_options;
-    int daemon_exit_code = fleropp::util::daemonize();
+
+    bool should_daemonize = false;
     
     // Create the command line options description printout
     opts::options_description desc{"Flero++ FastCGI Process Manager - Allowed options"};
     desc.add_options()
         ("help,h", "print this help message and exit.")
         ("config,c", opts::value<std::string>()->default_value("/etc/fleropp/config.json"), "configuration file location.")
+        ("daemonize,d", opts::bool_switch(&should_daemonize), "daemonize the process.")
         ("log,l", opts::value<std::string>()->default_value("/var/log/fleropp.log"), "log file location.")
         ("port,p", opts::value<unsigned int>(), "listen on a TCP socket with this port.")
         ("ipc-path,u", opts::value<std::string>(), "listen on a Unix-domain socket with this path.")
@@ -41,12 +43,15 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
         std::cerr << "Must specify either 'port' or 'ipc-path'.\n";
         return EXIT_FAILURE;
     }
-    
+
+    if (should_daemonize && fleropp::util::daemonize()) {
+        std::cerr << "Flero++ was unable to daemonize.\n";
+        return EXIT_FAILURE;
+    }
+
     // Set up logging
     fleropp::logging::init_logging(vm["log"].as<std::string>());
-    if (daemon_exit_code != 0) {
-        spdlog::warn("Fleropp was unable to daemonize");
-    }
+    
     // Parse our configuration file
     fleropp::fpm::ConfigParser config;
     config.load(vm["config"].as<std::string>()); 
