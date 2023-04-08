@@ -11,6 +11,9 @@
 int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     namespace opts = boost::program_options;
 
+    // Permissions for sockets to work
+    umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+
     bool should_daemonize = false;
     
     // Create the command line options description printout
@@ -27,7 +30,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Parse the command line options
     opts::variables_map vm;
     opts::store(opts::parse_command_line(argc, argv, desc), vm);
-    opts::notify(vm);
+    opts::notify(vm); 
 
     // Print the help description.
     if (vm.count("help")) {
@@ -42,11 +45,14 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     } else if (!(vm.count("port") || vm.count("ipc-path"))) {
         std::cerr << "Must specify either 'port' or 'ipc-path'.\n";
         return EXIT_FAILURE;
-    }
+    }  
 
-    if (should_daemonize && fleropp::util::daemonize()) {
-        std::cerr << "Flero++ was unable to daemonize.\n";
-        return EXIT_FAILURE;
+    if (should_daemonize) {
+        const auto daemon_exit_code = fleropp::util::daemonize();
+        if (daemon_exit_code != 0) {
+            std::cerr << "Flero++ was unable to daemonize.\n";
+            return EXIT_FAILURE;
+        }
     }
 
     // Set up logging
@@ -87,7 +93,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Spawn a pool of workers to start accepting connections
     const auto n_workers = vm["workers"].as<std::size_t>();
     spdlog::info("Spawning a pool of {} workers.", n_workers);
-    handler->spawn(n_workers);
+    handler->spawn(n_workers); 
 
     // Wait on those workers to join
     handler->wait();
