@@ -20,7 +20,10 @@ namespace welcome_page_setup_util {
     void navigation_bar_setup() {
         // Mostly just HTML and Bootstrap to set up pretty-looking Navigation bar.
         "<nav class='navbar navbar-expand-lg navbar-dark bg-dark'>"_h;
-            "<a class='navbar-brand' href='#'>Flero++</a>"_h;
+            "<a class='navbar-brand px-3' href='#'>Flero++</a>"_h;
+            "<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">"_h;
+                "<span class=\"navbar-toggler-icon\"></span>"_h;
+            "</button>"_h
             "<div id='navbarNav'>"_h;
                 "<ul class='navbar-nav'>"_h;
                     "<li class='nav-item active'>"_h;
@@ -71,6 +74,7 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
             "<head>"_h;
                 "<title>Welcome to Flero++!</title>"_h;
                 "<link href=\"https:\/\/cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp\" crossorigin=\"anonymous\">"_h;
+                "<link rel=\"icon\" type=\"image/png\" href='./welcome_view/img/fleropp.png' />"_h
             "</head>"_h;
         
         "<body>"_h;  
@@ -122,9 +126,14 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                     "<p class='card-text'> Here is an example of form text using an Iframe and a post method: </p>"_h;
 
                         //This is the example form.
-                        "<form action='welcome.elf' method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
-                            "Name: <input type='text' name='person'>"_h;
-                            "<input type='submit'>"_h;
+                        "<form class='row align-items-center' action='welcome.elf'  method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
+                            "<label for='person' class='fw-bold col-sm-1 col-form-label-lg'>Name</label>"_h
+                            "<div class='col-sm-2'>"_h
+                                "<input type='text' class='form-control' id='person' name='person'>"_h;
+                           "</div>"_h
+                            "<div class='col-sm-1'>"_h
+                                "<input class='btn btn-primary 'type='submit'>"_h;
+                           "</div>"_h
                         "</form>"_h;
 
                         //Iframe that shows the results of the form.
