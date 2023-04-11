@@ -126,13 +126,18 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                     "<p class='card-text'> Here is an example of form text using an Iframe and a post method: </p>"_h;
 
                         //This is the example form.
-                        "<form class='row align-items-center form-group' action='welcome.elf'  method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
-                            "<label for='person' class='fw-bold col-auto col-form-label-lg '>Name</label>"_h
-                            "<div class='col-1'>"_h
+                        "<form class='row form-group' action='welcome.elf'  method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
+
+                        "<div class='col-2'>"_h
+                            "<div class='input-group mb-3'>"_h;
+                                "<div class='input-group-prepend'>"_h;
+                                    "<span for='person' class='input-group-text fw-bold'>Name</span>"_h
+                                "</div>"_h
                                 "<input type='text' class='form-control' id='person' name='person'>"_h;
-                           "</div>"_h
+                            "</div>"_h
+                        "</div>"_h
                             "<div class='col-auto'>"_h
-                                "<input class='btn btn-secondary 'type='submit'>"_h;
+                                "<input class='btn btn-secondary'type='submit'>"_h;
                            "</div>"_h
                         "</form>"_h;
 
