@@ -19,8 +19,8 @@ namespace welcome_page_setup_util {
     using namespace fleropp::literals;
     void navigation_bar_setup() {
         // Mostly just HTML and Bootstrap to set up pretty-looking Navigation bar.
-        "<nav class='navbar navbar-expand-lg navbar-dark bg-dark'>"_h;
-            "<a class='navbar-brand px-3' href='#'>Flero++</a>"_h;
+        "<nav class='navbar navbar-expand-lg navbar-dark sticky-top bg-fleropp'>"_h;
+            "<a class='navbar-brand px-3 fleropp_font' href='#'>Flero++</a>"_h;
             "<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarSupportedContent\" aria-controls=\"navbarSupportedContent\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">"_h;
                 "<span class=\"navbar-toggler-icon\"></span>"_h;
             "</button>"_h
@@ -49,7 +49,7 @@ namespace welcome_page_setup_util {
     void welcome_card() {
         // An introduction to Flero++
         "<div class='card'>"_h;
-            "<h5 class='card-header'>Introduction</h5>"_h;
+            // "<h5 class='card-header fleropp_card'>Introduction</h5>"_h;
             "<div class='card-body'>"_h;
                 "<h5 class='card-title'> Welcome to Flero++! </h5>"_h;
                 "<p class='card-text'> Welcome to Flero++! We are thrilled to have you as a new user on our web framework. Flero++ is a powerful and flexible tool designed to help developers create dynamic web applications with ease. Whether you are a seasoned C++ developer or just starting out, Flero++ has everything you need to build robust and scalable applications. </p>"_h;
@@ -72,18 +72,23 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
     "\r"_h;
     "<html>"_h;
             "<head>"_h;
-                "<title>Welcome to Flero++!</title>"_h;
-                "<link href=\"https:\/\/cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp\" crossorigin=\"anonymous\">"_h;
+                "<title>Welcome to Flero++</title>"_h;
+                "<link href=\"https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css\" rel=\"stylesheet\" integrity=\"sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp\" crossorigin=\"anonymous\">"_h;
                 "<link rel=\"icon\" type=\"image/png\" href='./welcome_view/img/fleropp.png' />"_h
+                "<link href='./welcome_view/css/welcome.css' rel=\"stylesheet\">"_h;
+                "<link rel='preconnect' href='https://fonts.googleapis.com'>"_h
+                "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>"_h
+                "<link href='https://fonts.googleapis.com/css2?family=Roboto+Mono:ital@1&family=Roboto:ital,wght@1,300&display=swap' rel='stylesheet'>"_h
             "</head>"_h;
         
+
         "<body>"_h;  
         navigation_bar_setup();
         welcome_card();
 
             // Details on Auto-Compilation
             "<div class='card' id='Recompilation'>"_h;
-                "<h5 class='card-header'>Automatic Recompilation</h5>"_h;
+                "<h5 class='card-header fleropp_card'>Automatic Recompilation</h5>"_h;
                 "<div class='card-body'>"_h;
                     "<p class='card-text'> One of the most important features of Flero++ is the automatic recompilation built-in, which makes it easy for users to see the results of their changes in real-time. By simply editing the source code and refreshing the web browser, users can immediately see the updated version of the web page. This feature eliminates the need for manual compilation, making web development faster and more efficient.  </p>"_h;
                     "<h5 class='card-title'> Give it a try! </h5>"_h;
@@ -94,7 +99,7 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
 
             // Details on the HTML Templating Libraries
             "<div class='card' id='HTML'>"_h;
-                "<h5 class='card-header'>HTML Templating Libraries</h5>"_h;
+                "<h5 class='card-header fleropp_card' >HTML Templating Libraries</h5>"_h;
                 "<div class='card-body'>"_h;
                     "<h5 class='card-title'> What are the HTML Templating Libraries? </h5>"_h;
                     "<p class='card-text'> HTML literals and streams are C++ libraries included in Flero++ web framework that aim to simplify the process of writing HTML code in C++. These libraries eliminate the need for all the boilerplate code that is typically required in vanilla C++ to generate a line of HTML. By using HTML literals and streams, developers can focus on creating great web applications without worrying about the details of C++. </p>"_h;
@@ -118,16 +123,15 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
 
             // Details on User Input
             "<div class='card' id='Input'>"_h;
-                "<h5 class='card-header'>Processing and using user-input</h5>"_h;
+                "<h5 class='card-header fleropp_card'>Processing and using user-input</h5>"_h;
                 "<div class='card-body'>"_h;
                     "<h5 class='card-title'> What is the Request Data class? </h5>"_h;
                     "<p class='card-text'> The Flero++ web framework also has the ability to handle user input into web pages with ease, thanks to the Request Data class. This class contains many ways to handle user input, such as query strings, form text, and file uploads. The Request Data class automatically parses this information, making it ready to use without the need for developers to understand the inner workings of HTTP method messages. </p>"_h;
                     "<p class='card-text'> By using the Request Data class, developers can create web applications that are more interactive. This class allows developers to easily collect and process user input, enabling them to create web applications that are tailored to the needs of their users. </p>"_h;
                     "<p class='card-text'> Here is an example of form text using an Iframe and a post method: </p>"_h;
-
+            
                         //This is the example form.
-                        "<form class='row form-group' action='welcome.elf'  method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
-
+                        "<form class='row form-group' action='welcome.elf' method='post' enctype='application/x-www-form-urlencoded' target='out_iframe'>"_h;
                         "<div class='col-2'>"_h
                             "<div class='input-group mb-3'>"_h;
                                 "<div class='input-group-prepend'>"_h;
@@ -137,7 +141,7 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                             "</div>"_h
                         "</div>"_h
                             "<div class='col-auto'>"_h
-                                "<input class='btn btn-secondary'type='submit'>"_h;
+                                "<input class='btn btn-primary fleropp_card' type='submit' value=Post>"_h;
                            "</div>"_h
                         "</form>"_h;
 
@@ -146,20 +150,36 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                 "</div>"_h;
             "</div>"_h;
 
-            //Details on Database connectivity
-            "<div class='card' id='Input'>"_h;
-                "<h5 class='card-header'>Processing and using user-input</h5>"_h;
-                "<div class='card-body'>"_h;
-                    "<h5 class='card-title'> //TODO: Add something related to ORM. </h5>"_h;
-                    "<p class='card-text'> //TODO: Add something related to ORM.</p>"_h;
+            "<div class='card' id='ORM'>"_h;
+            "<h5 class='card-header fleropp_card'>Details on Database connectivity</h5>"_h;
+                "<div class='card-body'>"_h
+                    "<h5 class='card-title'> How do you connect to a Database?</h5>"_h
+                        "<form class='form-group row'action='welcome.elf'>"_h;
+                                "<div class='col-2'>"_h;
+                                    "<div class='input-group mb-3'>"_h
+                                        "<div class='input-group-prepend'>"_h
+                                            "<span for='dbopselect' class='input-group-text fw-bold'>Select DB operation:</span>"_h;
+                                        "</div>"_h
+                                        "<select name='dbOp' class='form-control' id='dbopselect'>"_h;
+                                            "<option value='i'>Insert</option>"_h;
+                                            "<option value='u'>Update</option>"_h;
+                                            "<option value='d'>Delete</option>"_h;
+                                        "</select>"_h;
+                                    "</div>"_h
+                                "</div>"_h;
+                                "<div class='col-3'>"_h;
+                                    "<input type='submit' class='btn btn-primary fleropp_card' value='Execute'>"_h;
+                                "</div>"_h;
+                        "</form> "_h;
                 "</div>"_h;
-            "</div>"_h;
-
-
+            "</div>"_h
+            //Details on Database connectivity
+          //      "<div class='card-body'>"_h;
+           //         "<h5 class='card-title'> //TODO: Add something related to ORM. </h5>"_h;
+            //        "<p class='card-text'> //TODO: Add something related to ORM.</p>"_h;
+             //   "</div>"_h;
         "</body>"_h;
     "</html>"_h;
-
-
 }
 
 
@@ -170,5 +190,10 @@ void WelcomeView::post(const fleropp::io::RequestData& request) {
     "Content-type: text/html\r"_h;
     "\r"_h;
     QueryString res = request.get_post_text();
-    "<h2> This is the results of the form: {} </h2>"_f(res.get("person"));
+    if (!(res.get("person").empty())) {
+        "<h2> This is the results of the form: {} </h2>"_f(res.get("person"));
+    }
+    else if (!(res.get("sumbit_type").empty())) {
+
+    }
 }

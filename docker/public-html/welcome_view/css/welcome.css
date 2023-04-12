@@ -1,0 +1,17 @@
+.fleropp_card{
+    /* background-color: #8DBDFF; */
+    background-color: #010C80;
+    color:white;
+}
+.bg-fleropp {
+    background-color: #010C80;
+}
+.fleropp-navbar {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1030;
+}
+.fleropp_font {
+    font-family: 'Roboto Mono', monospace;
+}
