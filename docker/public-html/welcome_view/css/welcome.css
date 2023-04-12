@@ -2,6 +2,7 @@
     /* background-color: #8DBDFF; */
     background-color: #010C80;
     color:white;
+    font-family: 'Prompt', 'sans-serif';
 }
 .bg-fleropp {
     background-color: #010C80;
@@ -14,4 +15,10 @@
 }
 .fleropp_font {
     font-family: 'Roboto Mono', monospace;
+}
+.fleropp_prompt {
+    font-family: 'Prompt', 'sans-serif';
+}
+.bg-fleropp-secondary {
+    background-color: #8DBDFF;
 }
