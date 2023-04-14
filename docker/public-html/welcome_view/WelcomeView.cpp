@@ -164,22 +164,23 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
             SQLBuilder::SelectModel sm;
             auto result = sm.select("id, username, password").from("users").run();
 
+            /*
+            The following SQL statement needs to be executed to create the table
+            used by the following demo:
+                CREATE TABLE `users` (
+                    `id` BIGINT NOT NULL AUTO_INCREMENT,
+                    `username` VARCHAR(100) NOT NULL,
+                    `password` VARCHAR(200) NOT NULL,
+                    PRIMARY KEY (`id`)
+                );
+            */
+
             "<div class='card' id='ORM'>"_h;
             "<h5 class='card-header fleropp_card'>Database Operations</h5>"_h;
             "<div class='card-body fleropp_prompt'>"_h;
             "<h5 class='card-title fw-bold'>Connecting to a Database</h5>"_h;
             "<p class='card-text'>Flero++ provides a handy way to connect to a database and operate on data within it.</p>"_h;
             "<p class='card-text'>All you have to do as a developer is to tell Flero++ your database connection info in the config file and the connection will be established automatically when the FPM is executed."_h;
-            // "<pre>"_h
-            // "\"database\": {<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"driver\": \"&lt;DB Driver&gt;\",<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"host\":\"&lt;DB Hostname&gt;\",<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"port\":\"&lt;DB Port&gt;\",<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"dbname\":\"&lt;DB Name&gt;\",<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"username\":\"&lt;DB Username&gt;\",<br>"_h
-            // "&nbsp;&nbsp;&nbsp;&nbsp;\"password\":\"&lt;DB Password&gt;\"<br>"_h
-            // "}"_h
-            // "</pre>"_h
             "</p>"_h;
             "<h5 class='card-title fw-bold'>CRUD Operations on Database</h5>"_h;
             "<p class='card-text'>SQL is the foundation of all data operations, but it is not always easy to write. Therefore, Flero++ incorporates a SQL Builder library where you can construct a SQL statement declaratively and run the statement whenever you want with just one function call.</p>"_h; 
