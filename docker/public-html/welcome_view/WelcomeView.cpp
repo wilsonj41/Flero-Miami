@@ -11,11 +11,14 @@
 #include <fleropp/RequestData.hpp>
 #include <fleropp/PostFile.hpp>
 
+// Database Operations
+#include <fleropp/SQLBuilder.h>
+
 // Generate the C boiler plate for the web-page.
 INIT_VIEW(WelcomeView);
 
 
-namespace welcome_page_setup_util {
+namespace welcome_page_util {
     using namespace fleropp::literals;
     void navigation_bar_setup() {
         // Mostly just HTML and Bootstrap to set up pretty-looking Navigation bar.
@@ -39,7 +42,7 @@ namespace welcome_page_setup_util {
                         "<a class='nav-link' href='#Input'>User Input</a>"_h;
                         "</li>"_h;
                     "<li class='nav-item'>"_h;
-                        "<a class='nav-link' href='#ORM'>Object Relational Model</a>"_h;
+                        "<a class='nav-link' href='#ORM'>Database Operations</a>"_h;
                         "</li>"_h;
                 "</ul>"_h;
                 "</div>"_h;
@@ -59,6 +62,12 @@ namespace welcome_page_setup_util {
             "</div>"_h;
         "</div>"_h;
     }
+
+    void redirect_welcome() {
+        "Status: 303 See Other\r"_h;
+        "Location: /welcome.elf#ORM\r"_h; // What if this website is not at /
+        "\r"_h;
+    }
 }
 
 
@@ -66,7 +75,7 @@ namespace welcome_page_setup_util {
 void WelcomeView::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals; // Declaring that we are using the literals library.
     using namespace fleropp::html_stream;
-    using namespace welcome_page_setup_util;
+    using namespace welcome_page_util;
 
     "Content-type: text/html\r"_h;
     "\r"_h;
@@ -152,49 +161,238 @@ void WelcomeView::get(const fleropp::io::RequestData& request) {
                 "</div>"_h;
             "</div>"_h;
 
+            SQLBuilder::SelectModel sm;
+            auto result = sm.select("id, username, password").from("users").run();
 
             "<div class='card' id='ORM'>"_h;
-            "<h5 class='card-header fleropp_card'>Details on Database connectivity</h5>"_h;
-                "<div class='card-body fleropp_prompt'>"_h
-                    "<h5 class='card-title fw-bold'> Connecting to a Database</h5>"_h
-                    "<p class='card-text'> </p>"_h
-                    "<p class='card-text'> </p>"_h
-                    "<p class='card-text'> </p>"_h
-                        "<form class='form-group row'action='welcome.elf'>"_h;
-                                "<div class='col-3'>"_h;
-                                    "<div class='input-group mb-3'>"_h
-                                        "<div class='input-group-prepend'>"_h
-                                            "<span for='dbopselect' class='input-group-text '>Select DB operation:</span>"_h;
-                                        "</div>"_h
-                                        "<select name='dbOp' class='form-control' id='dbopselect'>"_h;
-                                            "<option value='i'>Insert</option>"_h;
-                                            "<option value='u'>Update</option>"_h;
-                                            "<option value='d'>Delete</option>"_h;
-                                        "</select>"_h;
-                                    "</div>"_h
-                                "</div>"_h;
-                                "<div class='col-3'>"_h;
-                                    "<input type='submit' class='btn btn-primary fleropp_card' value='Execute'>"_h;
-                                "</div>"_h;
-                        "</form> "_h;
-                "</div>"_h;
+            "<h5 class='card-header fleropp_card'>Database Operations</h5>"_h;
+            "<div class='card-body fleropp_prompt'>"_h;
+            "<h5 class='card-title fw-bold'>Connecting to a Database</h5>"_h;
+            "<p class='card-text'>Flero++ provides a handy way to connect to a database and operate on data within it.</p>"_h;
+            "<p class='card-text'>All you have to do as a developer is to tell Flero++ your database connection info in the config file and the connection will be established automatically when the FPM is executed."_h;
+            // "<pre>"_h
+            // "\"database\": {<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"driver\": \"&lt;DB Driver&gt;\",<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"host\":\"&lt;DB Hostname&gt;\",<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"port\":\"&lt;DB Port&gt;\",<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"dbname\":\"&lt;DB Name&gt;\",<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"username\":\"&lt;DB Username&gt;\",<br>"_h
+            // "&nbsp;&nbsp;&nbsp;&nbsp;\"password\":\"&lt;DB Password&gt;\"<br>"_h
+            // "}"_h
+            // "</pre>"_h
+            "</p>"_h;
+            "<h5 class='card-title fw-bold'>CRUD Operations on Database</h5>"_h;
+            "<p class='card-text'>SQL is the foundation of all data operations, but it is not always easy to write. Therefore, Flero++ incorporates a SQL Builder library where you can construct a SQL statement declaratively and run the statement whenever you want with just one function call.</p>"_h; 
+            "<p class='card-text'>Here is an example of doing CRUD operations within Flero++ (use the drop-down menu to select operations you want to carry out): </p>"_h;
+            "<form method='post' class='form-group row' action='welcome.elf' enctype='application/x-www-form-urlencoded'>"_h;
+            "<div class='col-3'>"_h
+
+            // Id
+            "<div class='input-group mb-3'>"_h
+            "<div class='input-group-prepand'>"_h
+            "<span for='idField' class='input-group-text'>Id:</span>"_h
             "</div>"_h
-        "</body>"_h;
-    "</html>"_h;
+            "<input type='text' id='idField' name='dataId' class='form-control'>"_h
+            "</div>"_h
+
+            // Username
+            "<div class='input-group mb-3'>"_h
+            "<div class='input-group-prepand'>"_h
+            "<span for='username' class='input-group-text'>Username:</span>"_h
+            "</div>"_h
+            "<input type='text' id='username' name='username' class='form-control'>"_h
+            "</div>"_h
+
+            // Password
+            "<div class='input-group mb-3'>"_h
+            "<div class='input-group-prepand'>"_h
+            "<span for='pass' class='input-group-text'>Password:</span>"_h
+            "</div>"_h
+            "<input type='password' id='pass' name='password' class='form-control'>"_h
+            "</div>"_h
+
+            // Operation
+            "<div class='input-group mb-3'>"_h
+            "<div class='input-group-prepend'>"_h
+            "<span for='dbopselect' class='input-group-text'>Select DB operation:</span>"_h
+            "</div>"_h
+            "<select name='dbOp' class='form-control' id='dbopselect'>"_h
+            "<option value='i'>Insert</option>"_h
+            "<option value='u'>Update</option>"_h
+            "<option value='d'>Delete</option>"_h
+            "</select>"_h
+            "</div>"_h
+
+            // Submit button
+            "<div class='col-3'>"_h;
+            "<input type='submit' class='btn btn-primary fleropp_card' value='Execute'>"_h
+            "</div>"_h;
+            "</form> "_h;
+
+            "<div class='row'>"_h
+            "<div class='col'>"_h
+            "<table class='table my-3'>"_h
+            "<tr>"_h
+            "<th scope='col'>ID</th>"_h
+            "<th scope='col'>Username</th>"_h
+            "<th scope='col'>Password</th>"_h
+            "</tr>"_h;
+
+            for(const auto& row : result) {
+                "<tr>"_h;
+                "<td>{}</td>"_f(row.at("id"));
+                "<td>{}</td>"_f(row.at("username"));
+                "<td>{}</td>"_f(row.at("password"));
+                "</tr>"_h;
+            }
+
+            "</table>"_h
+            "</div>"_h
+            "</div>"_h
+            "</div>"_h
+            "</div>"_h;
+            "</div>"_h
+            "</body>"_h;
+            "</html>"_h;
 }
 
 
 void WelcomeView::post(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     using namespace fleropp::io;
+    using namespace welcome_page_util;
+    using namespace SQLBuilder;
+
+    QueryString res = request.get_post_text();
+
+    if (!(res.get("dbOp").empty())) {
+        std::string dbOp = res.get("dbOp");
+        std::string id = res.get("dataId");
+        std::string username = res.get("username");
+        std::string password = res.get("password");
+
+        if (dbOp == "i") {
+            if (username.empty() || password.empty()) {
+                "Content-type: text/plain\r"_h;
+                "\r"_h;
+
+                "Error: No username or password!"_h;
+                return;
+            }
+
+            InsertModel i;
+
+            auto result = 
+            i.into("users")
+            .insert("username", username)
+                   ("password", password)
+            .run();
+
+            if (result <= 0) {
+                "Content-type: text/plain\r"_h;
+                "\r"_h;
+
+                "Error: Insert operation error"_h;
+                return;
+            }
+            else
+            {
+                // Finish operation. Direct back
+                redirect_welcome();
+                return;
+            }
+        } else if (dbOp == "d" || dbOp == "u") {
+            // Check id existance
+            if (id.empty()) {
+               "Content-type: text/plain\r"_h;
+                "\r"_h;
+
+                "Error: No id"_h;
+                return;
+            }
+            else
+            {
+                if (dbOp == "u" && username.empty() && password.empty()) {
+                    "Content-type: text/plain\r"_h;
+                    "\r"_h;
+
+                    "Error: No username nor password. Do not know what to update"_h;
+                    return;
+                }
+
+                SelectModel s;
+                auto count = 
+                s.select("id").from("users").where("id", id).run().size();
+
+                if (count <= 0) {
+                    "Content-type: text/plain\r"_h;
+                    "\r"_h;
+
+                    "Error: No data with specified id"_h;
+                    return;
+                }
+
+                if (dbOp == "u") {
+                    UpdateModel u;
+                    u.update("users").where("id", id);
+                    if (!(username.empty()))
+                    {
+                        u.set("username", username);
+                    }
+
+                    if (!(password.empty())) 
+                    {
+                        u.set("password", password);
+                    }
+
+                    auto result = u.run();
+
+                    if (result <= 0) {
+                        "Content-type: text/plain\r"_h;
+                        "\r"_h;
+
+                        "Error: Update operation error"_h;
+                        return;
+                    }
+                    else
+                    {
+                        // Finish operation. Direct back
+                        redirect_welcome();
+                        return;
+                    }
+                } else if (dbOp == "d") {
+                    DeleteModel d;
+                    auto result = d.from("users").where("id", id).run();
+                    if (result <= 0) {
+                        "Content-type: text/plain\r"_h;
+                        "\r"_h;
+
+                        "Error: Update operation error"_h;
+                        return;
+                    }
+                    else
+                    {
+                        // Finish operation. Direct back
+                        redirect_welcome();
+                        return;
+                    }
+                }
+            }
+        } else {
+            "Content-type: text/plain\r"_h;
+            "\r"_h;
+
+            "Error: Invalid database operation"_h;
+            return;
+        }
+        return;
+    }
 
     "Content-type: text/html\r"_h;
     "\r"_h;
-    QueryString res = request.get_post_text();
     if (!(res.get("person").empty())) {
         "<h2 class='fleropp_font'> This is the results of the form: {} </h2>"_f(res.get("person"));
     }
     else if (!(res.get("sumbit_type").empty())) {
-
     }
 }
