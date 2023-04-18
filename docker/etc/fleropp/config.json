@@ -9,15 +9,25 @@
     },
     "webroot": "/var/www/html",
     "compiler": "g++",
-    "args": ["-std=c++20", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
+    "args": ["-std=c++20", "-O3", "-fopenmp", "-shared", "-fPIC", "--no-gnu-unique", 
              "-o", "@OBJECT", "@SOURCES", "-lcgicc", "-lsoci_core", "-lsoci_mysql", "-ldl",
              "-lmysqlclient", "-L/lib/fleropp", "-lfleropp", "-Wl,-rpath=/lib/fleropp", "-I/usr/include/fleropp"],
-    "endpoint": [{
+    "endpoint": [
+        {
             "uri": "/welcome.elf",
             "dependencies": [{
                 "sharedObject": "obj/WelcomeView.so",
                 "source": [
                     "welcome_view/WelcomeView.cpp"
+                ]
+            }]
+        },
+        {
+            "uri": "/nprimes.elf",
+            "dependencies": [{
+                "sharedObject": "obj/NPrimesView.so",
+                "source": [
+                    "benchmarks/NPrimesView.cpp"
                 ]
             }]
         },
