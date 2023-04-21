@@ -75,15 +75,21 @@ namespace fleropp::fpm {
             }
 
             // Get compiler configuration elements
-            boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
-            auto arg_child = tree.get_child_optional("args");
+            //boost::optional<std::string> compiler = tree.get_optional<std::string>("compiler");
+            //auto arg_child = tree.get_child_optional("args");
 
+            auto arg_compiler = tree.get_child_optional("compiler");
+            auto arg_compiler_name = boost::make_optional<std::string>("");
             std::vector<std::string> args;
-            if (arg_child) {
-                for (auto& params : arg_child.get()) {
-                    args.emplace_back(params.second.data());
+            if (arg_compiler) {
+                arg_compiler_name = arg_compiler->get_optional<std::string>("name");
+                auto arg_compiler_args = arg_compiler->get_child_optional("args");
+                if (arg_compiler_args) {
+                    for (auto& params : arg_compiler_args.get()) {
+                        args.emplace_back(params.second.data());
+                    }
                 }
-            } 
+            }
 
             // Get source file extension
             auto source_ext = tree.get_optional<std::string>("sourceExtension").value_or(".cpp");
@@ -100,18 +106,18 @@ namespace fleropp::fpm {
                                         };
 
             // loop for reading through the endpoint array.
-            for (auto &it1 : tree.get_child("endpoint")) {
+            for (auto &it1 : tree.get_child("endpoints")) {
                 pt::ptree endpoint = it1.second; // stores the data of the cur idx of the endpoint array
-                std::string uri = endpoint.get<std::string>("uri");
+                std::string uri = endpoint.get<std::string>("path"); 
 
                 std::vector<CompUnit<IViewWrapper>> dependencies;
                 for (auto &it2 : endpoint.get_child("dependencies")) {
                     pt::ptree dependency = it2.second; // stores the data of the curr idx of the dependencies array
-                    std::filesystem::path shared_object = webroot / dependency.get<std::string>("sharedObject");
+                    std::filesystem::path shared_object = webroot / dependency.get<std::string>("object");
 
                     std::vector<std::string> sources;
 
-                    for (auto &it3 : dependency.get_child("source")) {
+                    for (auto &it3 : dependency.get_child("sources")) {
                         // If this source unit is a directory, loop through the contained filepaths
                         // and add them to the sources vector
                         std::filesystem::path source_path = webroot / it3.second.data();
@@ -129,8 +135,19 @@ namespace fleropp::fpm {
                     }
 
                     // creates a CompUnit object and stores it in the dependencies vector
-                    if (compiler) {
-                        dependencies.emplace_back(shared_object, sources, view_error_fun, compiler.get(), args);
+                    auto arg_spec_compiler = endpoint.get_child_optional("compiler"); 
+                    if (arg_spec_compiler) {
+                        std::vector<std::string> spec_args;
+                        auto arg_spec_compiler_name = arg_spec_compiler->get_optional<std::string>("name");
+                        auto arg_spec_compiler_args = arg_spec_compiler->get_child_optional("args");
+                        if (arg_spec_compiler_args) {
+                            for (auto& params : arg_spec_compiler_args.get()) {
+                                spec_args.emplace_back(params.second.data());
+                            }
+                        }
+                        dependencies.emplace_back(shared_object, sources, view_error_fun, arg_spec_compiler_name.get(), spec_args);
+                    } else if (arg_compiler) {
+                        dependencies.emplace_back(shared_object, sources, view_error_fun, arg_compiler_name.get(), args);
                     } else { 
                         dependencies.emplace_back(shared_object, sources, view_error_fun);
                     }
