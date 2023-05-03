@@ -16,6 +16,15 @@
     },
     "endpoints": [
         {
+            "path": "/demo.elf",
+            "dependencies": [{
+                "object": "obj/DemoView.so",
+                "sources": [
+                    "demo/DemoView.cpp"
+                ]
+            }]
+        },
+        {
             "path": "/welcome.elf",
             "dependencies": [{
                 "object": "obj/WelcomeView.so",

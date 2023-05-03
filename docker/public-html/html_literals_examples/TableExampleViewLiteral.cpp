@@ -13,7 +13,7 @@ void TableExampleViewLiteral::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
 
-    htmls::gen_html_boiler_plate("text/html");
+    htmls::gen_html_boilerplate("text/html");
     "<html>"_h;
         "<body>"_h;
             "<h2>HTML Tables</h2>"_h;

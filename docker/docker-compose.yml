@@ -18,6 +18,9 @@ services:
       - ../:/fleropp
   db:
     image: mysql
+    command: [
+      '--wait-timeout=31536000',
+    ]
     expose:
       - 3306
     environment:
