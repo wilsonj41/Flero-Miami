@@ -5,6 +5,7 @@ SODIR = ./so
 INCDIR = ./include
 DBDIR = ../docker/public-html/driver
 DB_INCDIR = /usr/include/mysql
+TEMPLATEDIR = ../docker/etc/fleropp
 
 CXX=g++
 CXXWARN=-Wall -Wextra -Wshadow -Wpedantic -Wconversion -Werror\
@@ -73,9 +74,12 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/lib/fleropp/drivers
 	install -d $(DESTDIR)$(PREFIX)/include/fleropp
 	install -d $(DESTDIR)$(PREFIX)/bin
+	install -d $(DESTDIR)/etc/fleropp
 	install -m 755 $(SODIR)/$(SO) $(DESTDIR)$(PREFIX)/lib/fleropp
 	install -m 755 $(DBDIR)/$(MYSQL_DB_SO) $(DESTDIR)$(PREFIX)/lib/fleropp/drivers
 	cp -r $(INCDIR)/* $(DESTDIR)$(PREFIX)/include/fleropp
 	chmod -R 644 $(DESTDIR)$(PREFIX)/include/fleropp/*
 	install -m 755 $(BINDIR)/$(BIN) $(DESTDIR)$(PREFIX)/bin
+	cp $(TEMPLATEDIR)/*.template $(DESTDIR)/etc/fleropp 
+	chmod 644 $(DESTDIR)/etc/fleropp/*.template
 

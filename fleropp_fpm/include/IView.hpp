@@ -28,6 +28,12 @@ extern "C" {                                  \
     }                                         \
 }                                             \
 
+/**
+ * \brief Wrapper for storing a heterogeneous collection of \code IView \endcode.
+ * 
+ * This abstract wrapper class serves as a base class for IView, allowing them to
+ * be stored easily in a container. 
+ */
 struct IViewWrapper {
     virtual ~IViewWrapper() = default;
     virtual void get_dispatch(const fleropp::io::RequestData& request) = 0;
