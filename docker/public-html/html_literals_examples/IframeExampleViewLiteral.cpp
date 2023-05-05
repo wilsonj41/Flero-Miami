@@ -13,7 +13,7 @@ void IframeExampleViewLiteral::get(const fleropp::io::RequestData& request) {
     using namespace fleropp::literals;
     namespace htmls = fleropp::html_stream;
 
-    htmls::gen_html_boiler_plate("text/html");
+    htmls::gen_html_boilerplate("text/html");
     "<html>"_h;
         "<body>"_h;
             "<iframe src='https://projects.baxterhuntington.xyz/modulon' width=600 height=600/>"_h;

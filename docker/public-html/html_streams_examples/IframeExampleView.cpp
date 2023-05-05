@@ -17,7 +17,7 @@ void IframeExampleView::get(const fleropp::io::RequestData& request) {
     htmls::HTMLStream<"<body>", "</body>"> body;
 
     std::string content_type("text/html");
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boilerplate(content_type);
 
     body << h2("HTML Iframes")
         << p("An iframe is used to display a web page within a web page:")

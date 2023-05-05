@@ -57,7 +57,7 @@ void TableExampleWithBorderView::get(const fleropp::io::RequestData& request) {
     buildTable(table, list);
 
     std::string content_type("text/html");
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boilerplate(content_type);
 
     /* --------------------- NOTE: Building the <body> tag of the webpage ---------------------  */
     // the style tag is added to the head tag.

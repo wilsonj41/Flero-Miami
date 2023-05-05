@@ -6,6 +6,7 @@
 #include "FleroppDB.hpp"
 
 #include <fleropp/HTMLLiterals.hpp>
+#include <fleropp/HTMLStream.hpp>
 #include <fleropp/QueryString.hpp>
 #include <fleropp/RequestData.hpp>
 #include <fleropp/PostFile.hpp>
@@ -53,8 +54,7 @@ void HelloWorldView::get(const fleropp::io::RequestData& request) {
         success = (rows >= 1) ? 1 : 0;
     }
 
-    "Content-type: text/html\r"_h;
-    "\r"_h;
+    fleropp::html_stream::gen_html_boilerplate();
     "<html>"_h;
     "<head>"_h;
         "<title>Hello, World!</title>"_h;

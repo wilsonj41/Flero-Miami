@@ -25,8 +25,6 @@ namespace fleropp::util {
             case 0: break;
             default: exit(0);
         }
-        // Permissions for sockets to work
-        umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
         // Close all file descirpotrs
        int fd;
        long int maxfd;
