@@ -6,9 +6,21 @@
 #include <grp.h>
 #include <memory>
 
+/**
+ * \class User
+ * \brief A class that represents a user
+*/
 class User {
     public:
+        /**
+         * \brief Constructor that makes a User object from a given user name
+         * \param[in] user_name The name of the user to be created
+        */
         User( std::string user_name );
+
+        /**
+         * \brief Destructor that deletes a User object
+        */
         ~User(){};
 
         /**

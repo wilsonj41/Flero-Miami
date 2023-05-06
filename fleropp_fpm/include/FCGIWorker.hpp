@@ -5,35 +5,45 @@
 
 namespace fleropp::fpm::concurrency {
     /**
-     * \class Represents an entity responsible for individual untis of work
-     * (requests). 
+     * \class FCGIWorker
+     * \brief Represents an entity responsible for individual units of work
      */
     class FCGIWorker {
       public:
         /**
-         * Constructor.
+         * \brief FCGIWorker constructor
          * 
-         * \param sock_fd The file descriptor associated with the socket
-         *                opened by `FCGIHandler`.
-         * \param endpoints The endpoints map owned by the `FCGIHandler`
-         *                  that will be observed by this worker.
+         * \param[in] sock_fd The file descriptor associated with the socket
+         *                opened by `FCGIHandler`
+         * \param[in,out] endpoints The endpoints map owned by the `FCGIHandler`
+         *                  that will be observed by this worker
+         * \param[out] db_handle A shared pointer referencing the database
          */
         FCGIWorker(int sock_fd, endpoints_map_t& endpoints, std::shared_ptr<IDatabaseDriver> db_handle);
 
-        // Deleted copy c-tor. It probably does not make sense to copy a worker.
+        /**
+         * \brief Deleted copy constructor
+         * 
+         * It would not make sense to copy a worker.
+         * 
+         * \param[in] FCGIWorker The existing FCGIWorker to be deleted
+         */
         FCGIWorker(const FCGIWorker&) = delete;
 
-        // Deleted copy assignment operator. It probably does not make sense to
-        // copy a worker.
+        /**
+         * \brief Deleted FCGIWorker copy assignment operator
+         * 
+         * It would not make sense to copy a worker.
+        */
         FCGIWorker& operator=(const FCGIWorker&) = delete;
 
         /**
-         * Destructor. 
+         * \brief FCGIWorker destructor
          */
         ~FCGIWorker();
 
         /**
-         * Start accepting requests. 
+         * \brief Function used to start accepting requests
          */
         void accept();
       private:

@@ -45,7 +45,8 @@
 namespace fleropp::fpm {
     using error_fun_t = std::function<std::string(std::string, std::string, std::string)>;
     /**
-     * \brief Class template representinig a dynamically-loaded shared object.
+     * \class CompUnit
+     * \brief Class template that represents a dynamically-loaded shared object
      * 
      * A compilation unit is responsible for:
      * - Tracking the state of its shared object in memory.
@@ -59,21 +60,21 @@ namespace fleropp::fpm {
     class CompUnit : public ISOLoader<T> { 
       public:
         /**
-         * Constructor.
+         * \brief CompUnit constructor
          * 
          * \param[in] shared_object The name of the shared object that represents
-         *                          this compilation unit.
+         *                          this compilation unit
          * \param[in] src_path_list A vector containing a list of paths to all of
          *                          the source files belonging to this compilation
-         *                          unit.
+         *                          unit
          * \param[in] error_generator A function that produces the source code
          *                            to be compiled when an error is encountered
          *                            while compiling the actual sources. The function
          *                            shall accept three parameters, ideally inserting
          *                            them into the source code it produces:
-         *                              1. The contained class name as a string.
-         *                              2. The compiler stderr stream contents as a string.
-         *                              3. The shared object file name as a string.
+         *                              1. The contained class name as a string
+         *                              2. The compiler stderr stream contents as a string
+         *                              3. The shared object file name as a string
          * \param[in] compiler The name of the compiler executable to be used to
          *                     compile this compilation unit. Will search $PATH.
          *                     (default "g++").
@@ -120,14 +121,17 @@ namespace fleropp::fpm {
         }
 
         /**
-         * Constructor.
-         * 
-         * \param [in] shared_object The name of the shared object that represents
-         *                          this compilation unit.
+         * \brief CompUnit constructor
          * 
          * This constructor is used when a CompUnit object is used
          * only to control the dynamic loading of a DSO without
          * accompanying code.
+         * 
+         * \param [in] shared_object The name of the shared object that represents
+         *                          this compilation unit
+         * \param [in] alloc_sym The allocator symbol
+         * \param [in] del_sym The deleter symbol
+         * 
         */
        CompUnit(const std::string& shared_object,
                 const std::string& alloc_sym = "allocator",
@@ -137,6 +141,8 @@ namespace fleropp::fpm {
             m_del_sym{del_sym}, m_compiler{}, m_args{} {}
 
         /**
+         * \brief Function that loads shared objects into memory
+         * 
          * Loads the shared object into memory, if it is not already open. As
          * with any call to `::dlopen`, the reference count to the shared object
          * will be incremented. 
@@ -166,6 +172,8 @@ namespace fleropp::fpm {
         }
 
         /**
+         * \brief Function that unloads shared objects from memory
+         * 
          * Unloads the shared object from memory, if: it is already open AND
          * decrementing the reference count would lead to a reference count
          * of zero AND no other translation units depend on its exported
@@ -192,6 +200,8 @@ namespace fleropp::fpm {
         }
 
         /**
+         * \brief Function that recompiles (if necessary) and returns a pointer to the relevant class
+         * 
          * Provides a smart pointer to an instance of the class contained
          * within this compilation unit. The compilation unit will be
          * compiled prior to returning an instance if the shared object

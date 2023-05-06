@@ -16,6 +16,9 @@
 #include "cgicc/MStreamable.h"
 
 // fleropp HTML stream namespace
+/**
+ * \namespace fleropp::html_stream
+*/
 namespace fleropp::html_stream { 
   /**
    * \brief Tag type for use in tag dispatching akin to the implementation of
@@ -24,31 +27,31 @@ namespace fleropp::html_stream {
   static struct EndTag{} end_tag;
   
   /**
-   * Free function that returns an `EndTag` tag type, leading to the correct
+   * \brief Function that returns the appropriate `EndTag` tag type
+   * 
+   * This is a free function that returns an `EndTag` tag type, leading to the correct
    * overload of `operator<<` being resolved.
    */
   EndTag gen_end_tag() { return {}; }
 
-  // TODO(linr5): Make `Content-type:` free function
-
   /**
-   * Free function that generates the content type for the HTML page.
-   * \param[in] type the content type.
+   * \brief Free function that generates the content type for the HTML page
+   * \param[in] type the content type
   */
   void gen_content_type(const std::string &content_type = "text/html") {
     fleropp::io::fppout << "Content-type: " << content_type << "\r\n\r\n";
   }
 
   /**
-   * Free function that generates the html DOCTYPE.
+   * \brief Free function that generates the html DOCTYPE
   */
   void gen_html_doctype() {
     fleropp::io::fppout << "<!DOCTYPE html> \n";
   }
 
   /**
-   * Free function that generates the "boiler plate" for a HTML page.
-   * \param[in] type the content type for content type header.
+   * \brief Free function that generates the "boiler plate" for a HTML page
+   * \param[in] type the content type for content type header
   */
   void gen_html_boiler_plate(const std::string &content_type = "text/html") {
     gen_content_type(content_type);
@@ -56,15 +59,17 @@ namespace fleropp::html_stream {
   }
   
   /**
-   * \brief Tag type for use in template tag dispatching. Results in 
-   * `HTMLStream` dumping output to global ostream upon receipt of
+   * \brief Tag type for use in template tag dispatching. 
+   * 
+   * Results in `HTMLStream` dump output to global ostream upon receipt of
    * `EndTag`.
    */
   typedef struct DumpOnEnd dump_on_end;
   
   /**
+   * \class HTMLStream
    * \brief Class template that represents an output stream designed with HTML
-   * `div`s in mind. 
+   * `div`s in mind
    * 
    * \tparam StartT String representation of the start tag (e.g., "<html>").
    * \tparam EndT String representation of the end tag (e.g., "</html>").
@@ -79,38 +84,38 @@ namespace fleropp::html_stream {
   class HTMLStream {  
     public:
       /**
-       * Default c-tor.
+       * \brief Default constructor
        */
       HTMLStream() { m_ss << m_start_tag << '\n'; }
       
       /**
-       * Accessor for a pointer to the interal `streambuf`.
+       * \brief Accessor for a pointer to the interal `streambuf`
        * 
        * \return Pointer to the internal `streambuf`
        */
       auto* rdbuf() const { return m_ss.rdbuf(); }
 
       /**
-       * Accessor to the internal `stringstream` string. 
+       * \brief Accessor to the internal `stringstream` string
        * 
-       * \return String build from the `stringstream`.
+       * \return String build from the `stringstream`
        */
       auto str() const { return m_ss.str(); }
 
       /**
-       * Accessor to the internal stringstream object. 
+       * \brief Accessor to the internal stringstream object
        * 
-       * \return Reference to the internal `stringstream`.
+       * \return Reference to the internal `stringstream`
        */
       auto& ss() { return m_ss; }
       
       /**
-       * Friend stream insertion operator for use with strings.
+       * \brief Friend stream insertion operator for use with strings
        * 
-       * \param[in, out] html_stream Stream to be written to.
-       * \param[in] content String to be written to the `HTMLStream`.
+       * \param[in,out] html_stream Stream to be written to
+       * \param[in] content String to be written to the `HTMLStream`
        * 
-       * \return A reference to `html_stream`.
+       * \return A reference to `html_stream`
        */
       friend auto& operator<<(HTMLStream &html_stream, const std::string &content) {
         html_stream.m_ss << fleropp::util::html_encode(content);
@@ -118,13 +123,13 @@ namespace fleropp::html_stream {
       }
 
       /**
-       * Friend stream inseration operator for use with any class
-       * in the cgicc library that implements MStreamable.
+       * \brief Friend stream inseration operator for use with any class
+       * in the cgicc library that implements MStreamable
        * 
-       * \param[in, out] html_stream Stream to be written to.
-       * \param[in] content String to be writen to the `HTMLStream`.
+       * \param[in, out] html_stream Stream to be written to
+       * \param[in] content String to be writen to the `HTMLStream`
        * 
-       * \return A reference to `html_stream`.
+       * \return A reference to `html_stream`
       */
       friend auto& operator<<(HTMLStream &html_stream, const cgicc::MStreamable &content_html) {
         html_stream.m_ss << content_html;
@@ -137,16 +142,18 @@ namespace fleropp::html_stream {
       } */
       
       /**
+       * \brief Friend stream insertion operator that recieves end tag and conditionally writes to output stream
+       * 
        * Friend stream insertion operator that recieves end tag. The behavior of this
        * function depends on `std::is_same<EndTagAction, X>::value`, for some tag type
        * `X`. For example, `std::is_same_v<EndTagAction, DumpOnEnd>`, the stream will
        * be written to the global output stream upon receipt of the end tag. By default,
        * nothing is done upon receipt of the end tag. 
        * 
-       * \param[in, out] html_stream Stream to be written to.
-       * \param[in] end_tag An EndTag object generated by `gen_end_tag`.
+       * \param[in, out] html_stream Stream to be written to
+       * \param[in] end_tag An EndTag object generated by `gen_end_tag`
        * 
-       * \return A reference to `html_stream`.
+       * \return A reference to `html_stream`
        */
       friend auto& operator<<(HTMLStream &html_stream, const EndTag &end_tag) { 
         // Alternative to explicit specialization, we modify behavior based on the

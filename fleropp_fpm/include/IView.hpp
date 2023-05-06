@@ -28,6 +28,10 @@ extern "C" {                                  \
     }                                         \
 }                                             \
 
+/**
+ * \class IViewWrapper
+ * \brief An interface for the view wrapper
+*/
 struct IViewWrapper {
     virtual ~IViewWrapper() = default;
     virtual void get_dispatch(const fleropp::io::RequestData& request) = 0;
@@ -40,33 +44,72 @@ struct IViewWrapper {
     virtual void del(const fleropp::io::RequestData& request) = 0;
 };
 
+/**
+ * \class IView
+ * \brief Derived class from IViewWrapper
+*/
 template <class DerivedView>
 class IView : public IViewWrapper {    
   public:
+    /**
+     * \brief Default IView destructor
+    */
     virtual ~IView() = default;
     
+    /**
+     * \brief Function that handles GET requests
+     * \param[in] request RequestData object containing GET request information
+    */
     void get_dispatch(const fleropp::io::RequestData& request) final {
         static_cast<DerivedView*>(this)->get(request);
     }
 
+    /**
+     * \brief Function that handles POST requests
+     * \param[in] request RequestData object containing POST request information
+    */
     void post_dispatch(const fleropp::io::RequestData& request) final {
         static_cast<DerivedView*>(this)->post(request);
     }
 
+    /**
+     * \brief Function that handles PUT requests
+     * \param[in] request RequestData object containing PUT request information
+    */
     void put_dispatch(const fleropp::io::RequestData& request) final {
         static_cast<DerivedView*>(this)->put(request);
     }
 
+    /**
+     * \brief Function that handles DELETE requests
+     * \param[in] request RequestData object containing DELETE request information
+    */
     void del_dispatch(const fleropp::io::RequestData& request) final {
         static_cast<DerivedView*>(this)->del(request);
     }
 
+    /**
+     * \brief Default implementation of method for handling GET requests
+     * \param[in] request RequestData object containing GET request information
+    */
     void get(const fleropp::io::RequestData& request) { print_default_response(); }
 
+    /**
+     * \brief Default implementation of method that handles POST requests
+     * \param[in] request RequestData object containing POST request information
+    */
     void post(const fleropp::io::RequestData& request) { print_default_response(); }
 
+    /**
+     * \brief Default implementation of method that handles PUT requests
+     * \param[in] request RequestData object containing PUT request information
+    */
     void put(const fleropp::io::RequestData& request) { print_default_response(); }
 
+    /**
+     * \brief Default implementation of method that handles DELETE requests
+     * \param[in] request RequestData object containing DELETE request information
+    */
     void del(const fleropp::io::RequestData& request) { print_default_response(); }
   private:
     struct constants {

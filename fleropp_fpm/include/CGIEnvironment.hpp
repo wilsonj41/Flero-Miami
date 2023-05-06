@@ -4,20 +4,27 @@
 #include <string>
 #include <unordered_map>
 
+/**
+ * \namespace fleropp::io
+*/
 namespace fleropp::io {
+  /**
+   * \class CGIEnvironment
+   * \brief Represents the CGI environment used to communicate with a web server
+  */
     class CGIEnvironment {
       public:
         /**
-         * Constructor.
+         * \brief CGIEnvironment constructor
          * 
-         * \param envp The CGI environment array
+         * \param[in] envp The CGI environment array
          */
         explicit CGIEnvironment(char** envp);
 
         /**
-         * Gets the value of a given CGI environment variable.
+         * \brief Gets the value of a given CGI environment variable
          * 
-         * \param key the CGI environment variable identifier 
+         * \param[in] key the CGI environment variable identifier 
          */
         std::string get(const std::string& key) const;
       private:
