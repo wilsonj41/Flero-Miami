@@ -99,7 +99,7 @@ void FFTView::get(const fleropp::io::RequestData& request) {
         "<td>{} + {}<i>i</i></td>"_f(z.real(), z.imag());
     };
 
-    htmls::gen_html_boiler_plate("text/html");
+    htmls::gen_html_boilerplate("text/html");
     "<html>"_h;
         "<head>"_h;
             R"(<style>

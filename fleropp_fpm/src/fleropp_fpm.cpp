@@ -10,13 +10,18 @@
 
 int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     namespace opts = boost::program_options;
-    int daemon_exit_code = fleropp::util::daemonize();
+
+    // Permissions for sockets to work
+    umask(~(S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP));
+
+    bool should_daemonize = false;
     
     // Create the command line options description printout
     opts::options_description desc{"Flero++ FastCGI Process Manager - Allowed options"};
     desc.add_options()
         ("help,h", "print this help message and exit.")
         ("config,c", opts::value<std::string>()->default_value("/etc/fleropp/config.json"), "configuration file location.")
+        ("daemonize,d", opts::bool_switch(&should_daemonize), "daemonize the process.")
         ("log,l", opts::value<std::string>()->default_value("/var/log/fleropp.log"), "log file location.")
         ("port,p", opts::value<unsigned int>(), "listen on a TCP socket with this port.")
         ("ipc-path,u", opts::value<std::string>(), "listen on a Unix-domain socket with this path.")
@@ -25,7 +30,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Parse the command line options
     opts::variables_map vm;
     opts::store(opts::parse_command_line(argc, argv, desc), vm);
-    opts::notify(vm);
+    opts::notify(vm); 
 
     // Print the help description.
     if (vm.count("help")) {
@@ -40,13 +45,19 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     } else if (!(vm.count("port") || vm.count("ipc-path"))) {
         std::cerr << "Must specify either 'port' or 'ipc-path'.\n";
         return EXIT_FAILURE;
+    }  
+
+    if (should_daemonize) {
+        const auto daemon_exit_code = fleropp::util::daemonize();
+        if (daemon_exit_code != 0) {
+            std::cerr << "Flero++ was unable to daemonize.\n";
+            return EXIT_FAILURE;
+        }
     }
-    
+
     // Set up logging
     fleropp::logging::init_logging(vm["log"].as<std::string>());
-    if (daemon_exit_code != 0) {
-        spdlog::warn("Fleropp was unable to daemonize");
-    }
+    
     // Parse our configuration file
     fleropp::fpm::ConfigParser config;
     config.load(vm["config"].as<std::string>()); 
@@ -82,7 +93,7 @@ int main ([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
     // Spawn a pool of workers to start accepting connections
     const auto n_workers = vm["workers"].as<std::size_t>();
     spdlog::info("Spawning a pool of {} workers.", n_workers);
-    handler->spawn(n_workers);
+    handler->spawn(n_workers); 
 
     // Wait on those workers to join
     handler->wait();

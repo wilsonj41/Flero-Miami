@@ -18,7 +18,7 @@ void TheUltimateView::get(const fleropp::io::RequestData& request) {
     // "\r"_h;
     // "<!DOCTYPE html>"_h;
     std::string content_type("text/html");
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boilerplate(content_type);
 
     h2 << "From inside <em>the ultimate</em> view generated using <code>HTMLStream</code>" << htmls::gen_end_tag();
     sneaky << "Click for free money!" << htmls::gen_end_tag();

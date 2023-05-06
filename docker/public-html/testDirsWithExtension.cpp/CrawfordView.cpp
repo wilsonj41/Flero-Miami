@@ -23,7 +23,7 @@ void CrawfordView::get(const fleropp::io::RequestData& request) {
     htmls::HTMLStream<"<h2>", "</h2>"> h2;
 
     std::string content_type("text/html");
-    htmls::gen_html_boiler_plate(content_type);
+    htmls::gen_html_boilerplate(content_type);
 
     h2 << "<em>Welcome to the Craw Zone</em>" << htmls::gen_end_tag();
     body << h2;

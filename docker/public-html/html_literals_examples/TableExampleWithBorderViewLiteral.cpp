@@ -17,7 +17,7 @@ void TableExampleWithBorderViewLiteral::get(const fleropp::io::RequestData& requ
     namespace htmls = fleropp::html_stream;
     using entry = std::tuple<std::string_view, std::string_view, unsigned int>;
 
-    htmls::gen_html_boiler_plate("text/html");
+    htmls::gen_html_boilerplate("text/html");
     "<html>"_h;
         "<head>"_h;
             // Raw string literals are fully supported

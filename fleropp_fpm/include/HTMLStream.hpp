@@ -53,7 +53,7 @@ namespace fleropp::html_stream {
    * \brief Free function that generates the "boiler plate" for a HTML page
    * \param[in] type the content type for content type header
   */
-  void gen_html_boiler_plate(const std::string &content_type = "text/html") {
+  void gen_html_boilerplate(const std::string &content_type = "text/html") {
     gen_content_type(content_type);
     gen_html_doctype();
   }
