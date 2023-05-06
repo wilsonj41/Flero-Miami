@@ -7,50 +7,65 @@
 
 namespace fleropp::io {
   /**
-   * \brief A wrapper class template implementing RAII for iostream 
-   * redirection.
+   * \brief A wrapper class template that implements RAII for iostream
+   * redirection
    * \headerfile ScopedRedirect.hpp
    */
-  template<typename From, typename To>
+  template <typename From, typename To>
   class ScopedRedirect {
-    public:
-      /**
-       * Constructor.
-       * 
-       * \param[in] from std::iostream to which `to` will be redirected.
-       * \param[in,out] to std::iostream that will be redirected to `from`.
-       */
-      ScopedRedirect(From &from, To &to) 
-                              : m_original_sbuf_ptr{to.rdbuf()},
-                                m_from{from}, m_to{to} {
-        if constexpr (!std::is_base_of_v<std::streambuf, From>) {
-          m_to.rdbuf(m_from.rdbuf());
-        } else {
-          m_to.rdbuf(&m_from);
-        }
+  public:
+    /**
+     * \brief ScopedRedirect constructor
+     *
+     * \param[in] from std::iostream to which `to` will be redirected
+     * \param[in,out] to std::iostream that will be redirected to `from`
+     */
+    ScopedRedirect(From &from, To &to)
+        : m_original_sbuf_ptr{to.rdbuf()},
+          m_from{from}, m_to{to} {
+      if constexpr (!std::is_base_of_v<std::streambuf, From>)
+      {
+        m_to.rdbuf(m_from.rdbuf());
       }
-
-      /**
-       * Explicitly-defined destructor. Accomplishes RAII by returning `to`
-       * to its original state.
-       */
-      ~ScopedRedirect() {
-        m_to.rdbuf(m_original_sbuf_ptr);
+      else
+      {
+        m_to.rdbuf(&m_from);
       }
+    }
 
-      // Delete the default c-tor
-      ScopedRedirect() = delete;
+    /**
+     * \brief ScopedRedirect destructor
+     *
+     * Explicitly-defined destructor. Accomplishes RAII by returning `to`
+     * to its original state.
+     */
+    ~ScopedRedirect() {
+      m_to.rdbuf(m_original_sbuf_ptr);
+    }
 
-      // Delete the implicit copy c-tor and copy assignment operator
-      // Thus the class is neither copyable nor moveable
-      ScopedRedirect(const ScopedRedirect&) = delete;
-      ScopedRedirect& operator=(const ScopedRedirect&) = delete;
+    /**
+     * \brief Delete the default c-tor
+     */
+    ScopedRedirect() = delete;
 
-    private:
-      std::streambuf* m_original_sbuf_ptr;
-      From& m_from;
-      To& m_to;
-  }; 
+    /**
+     * \brief ScopedRedirect copy constructor
+     * \param[in] other ScopredRedirect object to copy from
+     */
+    ScopedRedirect(const ScopedRedirect &) = delete;
+
+    /**
+     * \brief ScopedRedirect copy assignment operator
+     * \param[in] & ScopedRedirect object to assign from
+     * \return Reference to this ScopedRedirect object
+     */
+    ScopedRedirect &operator=(const ScopedRedirect &) = delete;
+
+  private:
+    std::streambuf *m_original_sbuf_ptr;
+    From &m_from;
+    To &m_to;
+  };
 }
 
 #endif /* SCOPED_REDIRECT_HPP */

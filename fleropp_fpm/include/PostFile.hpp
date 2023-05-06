@@ -75,6 +75,11 @@ typedef unsigned char byte;
     -----------------------------198994908615659096011560184689--^M
     </pre>
 */
+
+/**
+ * \class PostFile
+ * \brief Class for dealing with POST requests containing files
+*/
 class PostFile {
 public:
     /** The top-level convenience method to load data for this post

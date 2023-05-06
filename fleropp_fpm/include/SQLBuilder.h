@@ -10,29 +10,71 @@
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 
+/**
+ * \namespace SQLBuilder
+ * 
+*/
 namespace SQLBuilder {
 
+/**
+ * \class column
+ * \brief column class for use in SQLBuilder
+*/
 class column;
 
-class Param
-{
+/**
+ * \class Param
+ * \brief A class that represents a parameter
+*/
+class Param {
 public:
+/**
+ * \brief Param constructor with parameter
+ * \param[in] param The string representation of the parameter
+*/
     Param (const std::string &param) : _param(param) {}
+    /**
+     * \brief Param constructor with char array parameter
+     * \param[in] param The char array representation of the parameter
+    */
     Param (const char *param) : _param(param) {}
 
 public:
+    /**
+     * \brief Function that returns the parameter
+     * \return The parameter as a string
+    */
     std::string operator()() const { return param(); }
+    /**
+     * \brief Returns the parameter
+     * \return The parameter as a string
+    */
     inline std::string param() const { return _param; }
 
 private:
     const std::string _param;
 };
 
+
+/**
+ * \brief Converts data of type T to a string
+ * 
+ * \tparam T Type of data to be converted
+ * \param[in] data The data to be converted
+ * \return A string representation of the data
+*/
 template <typename T>
 inline std::string to_value(const T& data) {
     return std::to_string(data);
 }
 
+/**
+ * \brief Converts a character array to a string
+ * 
+ * \tparam N Size of the character array
+ * \param[in] data The character array to be converted
+ * \return A string representation of the character array
+*/
 template <size_t N>
 inline std::string to_value(char const(&data)[N]) {
     std::string str;
@@ -40,6 +82,12 @@ inline std::string to_value(char const(&data)[N]) {
     return str;
 }
 
+/**
+ * \brief Copies a string from a string
+ * 
+ * \param[in] data The string to be copied
+ * \return A string representation of the string copy
+*/
 template <>
 inline std::string to_value<std::string>(const std::string& data) {
     std::string str;
@@ -47,6 +95,12 @@ inline std::string to_value<std::string>(const std::string& data) {
     return str;
 }
 
+/**
+ * \brief Converts a C-style string to a normal string
+ * 
+ * \param[in] data The C-style string to be converted
+ * \return A string representation of the original C-style string
+*/
 template <>
 inline std::string to_value<const char*>(const char* const& data) {
     std::string str;
@@ -54,15 +108,32 @@ inline std::string to_value<const char*>(const char* const& data) {
     return str;
 }
 
+/**
+ * \brief Converts a Param object to a string
+ * 
+ * \param[in] data The Param object to be converted to a string
+ * \return A string representation of the Param object
+*/
 template <>
 inline std::string to_value<Param>(const Param& data) {
     return data();
 }
 
+/**
+ * \brief Converts a column object to a string
+ * 
+ * \param[in] data The column object to be converted
+ * \return A string representation of the column object
+*/
 template <>
 inline std::string to_value<column>(const column& data);
 
-
+/**
+ * \brief Converts a time_t object to a string with the format "YYYY-MM-DD HH:MM:SS"
+ * 
+ * \param data[in] The time_t object to be converted
+ * \return A string representation of the time_t object
+*/
 template <>
 inline std::string to_value<time_t>(const time_t& data) {
     char buff[128] = {0};
@@ -73,7 +144,14 @@ inline std::string to_value<time_t>(const time_t& data) {
     return str;
 }
 
-
+/**
+ * \brief Concatenates the elements of a vector into a string, separated by chosen delimiter
+ * 
+ * \tparam T The type of the vector elements
+ * \param[out] result The output string to store the concatenated elements
+ * \param[in] vec The input vector containing the elements to be concatenated
+ * \param[in] sep The delimiter to be used to separate the elements
+*/
 template <typename T>
 void join_vector(std::string& result, const std::vector<T>& vec, const char* sep) {
     size_t size = vec.size();
@@ -87,6 +165,13 @@ void join_vector(std::string& result, const std::vector<T>& vec, const char* sep
     }
 }
 
+/**
+ * \brief Function that combines two vectors into a single vector
+ * 
+ * \tparam T Type of vector elements
+ * \param[out] baseVec The output vector in which the combined elements are stored
+ * \param[in] newVec The input vector containing the elements to be added to baseVec
+*/
 template <typename T>
 void combine_vector(std::vector<T>& baseVec, const std::vector<T>& newVec) {
     for (const auto& val : newVec) {
@@ -94,13 +179,29 @@ void combine_vector(std::vector<T>& baseVec, const std::vector<T>& newVec) {
     }
 }
 
+/**
+ * \class column
+ * \brief Represents a SQL column in a query
+*/
 class column
 {
 public:
+    /**
+     * \brief Constructs a column object with a given SQL column name
+     * 
+     * \param[in] column The name of the SQL column
+    */
     column(const std::string& column) {
         _cond = column;
     }
 
+    /**
+     * \brief Constructs a column object after comparing the column's value to the given value
+     * 
+     * \param[in] column The name of the SQL column
+     * \param[in] op The comparison operator to be used
+     * \param[in] val The value to which the column value will be compared
+    */
     column(const std::string& column, const std::string& op, const std::string& val) {
         _cond = column + " " + op + " ?";
         _binding.push_back(to_value(val));

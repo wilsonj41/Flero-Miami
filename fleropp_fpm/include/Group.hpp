@@ -3,9 +3,21 @@
 #include <string>
 #include <vector>
 #include <grp.h>
+
+/**
+ * \class Group
+ * \brief A class for working with Unix groups
+*/
 class Group {
     public:
+        /**
+         * \brief Function that constructs a Group object with the given group name
+         * \param group_name The name of the Group for which to retrieve information
+        */
         Group( std::string group_name );
+        /**
+         * \brief Function that destroys the Group object
+        */
         ~Group(){};
         /**
          * \brief Returns name of group

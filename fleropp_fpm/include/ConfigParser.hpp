@@ -14,21 +14,44 @@
 #include <string>
 #include <unordered_map>
 
-namespace fleropp::fpm {
-    class ConfigParser {
-      public:
-        std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
-        std::unordered_map<std::string, std::string> database_connection_info;
-        ConfigParser(
-            const std::string &db_driver_subdir = "driver",
-            const std::string &db_driver_prefix = "db_driver_");
+namespace fleropp::fpm
+{
+  /**
+   * \class ConfigParser
+   * \brief Class that parses the config file for information about source files and endpoints
+   */
+  class ConfigParser
+  {
+  public:
+    /**
+     * \brief A list of endpoints
+     */
+    std::unordered_map<std::string, std::vector<CompUnit<IViewWrapper>>> endpoints;
+    /**
+     * \brief A map containing database connection info
+     */
+    std::unordered_map<std::string, std::string> database_connection_info;
+    /**
+     * \brief ConfigParser constructor
+     *
+     * \param[in] db_driver_subdir The name of the subdirectory containing the driver
+     * \param[in] db_driver_prefix The prefix to be prepended to the driver name
+     */
+    ConfigParser(
+        const std::string &db_driver_subdir = "driver",
+        const std::string &db_driver_prefix = "db_driver_");
 
-        void load(const std::string &filename);
+    /**
+     * \brief Function for loading a shared object by the desired file name
+     *
+     * \param[in] filename The name under which the shared object will be organized
+     */
+    void load(const std::string &filename);
 
-      private:
-        std::string m_db_driver_subdir;
-        std::string m_db_driver_prefix;
-    };
+  private:
+    std::string m_db_driver_subdir;
+    std::string m_db_driver_prefix;
+  };
 }
 
 #endif /* CONFIG_PARSER_HPP */
