@@ -1,8 +1,0 @@
-.libs/
-obj/
-bin/
-so/
-*.la
-*.lo
-*.o
-*.slo
